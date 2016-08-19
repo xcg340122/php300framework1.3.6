@@ -210,6 +210,19 @@ class mysql_class extends system_class{
 	}
 	
 	/**
+	* 添加数据
+	* @param 数据 $data
+	* @param 表名 $table
+	* @param 是否插入ID $return_insert_id
+	* @param 替换 $replace
+	* 
+	* @return bool
+	*/
+	public function add($data, $table, $return_insert_id = false, $replace = false){
+		$this->insert($data,$table,$return_insert_id,$replace);
+	}
+	
+	/**
 	 * 获取最后一次添加记录的主键号
 	 * @return int 
 	 */
@@ -272,6 +285,18 @@ class mysql_class extends system_class{
 	}
 	
 	/**
+	* 更新数据
+	* @param 字段 $data
+	* @param 表名 $table
+	* @param 条件 $where
+	* 
+	* @return bool
+	*/
+	public function save($data, $table, $where = ''){
+		$this->update($data,$table,$where);
+	}
+	
+	/**
 	 * 执行删除记录操作
 	 * @param $table 		数据表
 	 * @param $where 		删除数据条件,不充许为空。
@@ -285,6 +310,17 @@ class mysql_class extends system_class{
 		$where = ' WHERE '.$where;
 		$sql = 'DELETE FROM `'.$this->config['database'].'`.`'.$table.'`'.$where;
 		return $this->execute($sql);
+	}
+	
+	/**
+	* 删除数据
+	* @param 表名 $table
+	* @param 条件 $where
+	* 
+	* @return bool
+	*/
+	public function  del($table, $where){
+		$this->delete($table, $where);
 	}
 	
 	/**

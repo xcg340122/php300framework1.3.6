@@ -27,7 +27,11 @@ $CON['LOGS'] = true;	//开启日志记录
 
 $CON['TMP_CACHE'] = true;	//开启模板缓存
 
-$CON['TMP_CACHE_TIME'] = 1200;	//模板缓存周期
+$CON['TMP_CACHE_TIME'] = 0;	//模板缓存周期(模板页面内容若经常更新请保持为0)
+
+$CON['UPLOAD'] = './Uploads/';	//上传文件路径
+
+$CON['SYSTEMLIST'] = array('cookies','http','mysql','mysqli','system','image','file');	//系统类列表
 
 $GLOBALS['PHP300_CON'] = $CON;	//赋值全局配置
 ?>

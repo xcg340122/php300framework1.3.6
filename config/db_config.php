@@ -2,7 +2,7 @@
 /*
 PHP300数据库配置文件
 */
-$DB['hostname'] = 'localhost';	//数据库主机地址
+$DB['hostname'] = '127.0.0.1';	//数据库主机地址
 
 $DB['username'] = 'root';	//数据库用户名
 
@@ -21,5 +21,7 @@ $DB['autoconnect'] = false;	//自动连接,设置好数据库参数即可设置�
 $DB['pconnect'] = false;	//开启长连接
 
 $DB['sqldebug'] = false;	//开启后将自动打印SQL语句
+
+$DB['mysqli'] = true;	//是否使用mysqli连接
 
 $GLOBALS['DB'] = $DB;
