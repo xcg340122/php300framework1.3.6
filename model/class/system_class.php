@@ -21,6 +21,10 @@ class system_class extends php300_class{
 		$GLOBALS['TMP']->display($names.$GLOBALS['TEMP']['TMP_TAIL']);
 	}
 	
+	public function show($names='index'){	//模板渲染 （别名）
+		$this->display($names);
+	}
+	
 	public function get_vars($vername=''){	//获取指定模板全部变量
 		return $GLOBALS['TMP']->get_template_vars($vername);
 	}

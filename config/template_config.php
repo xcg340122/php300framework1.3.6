@@ -1,1 +1,1 @@
-<?php/*PHP300模板引擎配置文件*/$TEMP['TMP_TAIL'] = '.html';		//模板文件后缀$TEMP['TMP_CACHE'] = true;	//开启模板缓存$TEMP['TMP_CACHE_TIME'] = 0;	//模板缓存周期(模板页面内容若经常更新请保持为0)$TEMP['TMP_LEFT'] = '{';		//模板标记左$TEMP['TMP_RIGHT'] = '}';		//模板标记左$GLOBALS['TEMP'] = $TEMP;
+<?php/** PHP300模板引擎配置文件*/$TEMP['TMP_TAIL'] = '.html';		//模板文件后缀$TEMP['TMP_CACHE'] = true;	//开启模板缓存$TEMP['TMP_CACHE_TIME'] = 0;	//模板缓存周期(模板页面内容若经常更新请保持为0)$TEMP['TMP_LEFT'] = '{';		//模板标记左$TEMP['TMP_RIGHT'] = '}';		//模板标记左$GLOBALS['TEMP'] = $TEMP;
