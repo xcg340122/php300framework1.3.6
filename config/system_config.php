@@ -19,17 +19,9 @@ $CON['DEBUG'] = true; 	//是否开启调试信息
 
 $CON['CONFUSION'] = true;	//开启代码压缩(推荐为true,如开启后出错请设置为false)
 
-$CON['TMP_TAIL'] = '.html';		//模板文件后缀
-
-$CON['HOST'] = '127.0.0.1';		//主机地址
-
 $CON['LOGS'] = true;	//开启日志记录
 
-$CON['TMP_CACHE'] = true;	//开启模板缓存
-
-$CON['TMP_CACHE_TIME'] = 0;	//模板缓存周期(模板页面内容若经常更新请保持为0)
-
-$CON['UPLOAD'] = './Uploads/';	//上传文件路径
+$CON['UPLOAD'] = 'Uploads/';	//上传文件路径(请自行修改)
 
 $CON['SYSTEMLIST'] = array('cookies','http','mysql','mysqli','system','image','file');	//系统类列表
 

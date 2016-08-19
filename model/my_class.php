@@ -19,8 +19,10 @@ class my_class extends system_class{
 	
 	public function db_use(){	//可在数据库配置文件设置[autoconnect]为true自动连接数据库
 		if(DB()->link!=NULL){
-			$res = DB() -> select('*','qs_ad','id=1');	//查询sql
-			print_r($res[0]);
+			$res = DB() -> get_one('*','test_tab','id=1');	//查询sql (查询单条)
+			$res = DB() -> select('*','test_tab',"username<>''");	//查询sql (查询多条)
+			print_r($res);
+			print_r($res);
 		}else{
 			echo '数据库未连接！';
 		}
@@ -64,7 +66,7 @@ class my_class extends system_class{
 	
 	/**
 	* image_use()
-	* 图片操作演示
+	* 图片操作演示 (本操作需要提前开启GD库)
 	* url：index.php?c=my&f=image_use
 	*/
 	
@@ -111,8 +113,8 @@ class my_class extends system_class{
 	
 	public function file_use(){
 		//创建多层文件夹
-		M('file')->createDir(C('UPLOAD').'test1/'.time().'/');
-		echo '创建文件夹完成：'.C('UPLOAD').'test1/'.time().'/';
+		M('file')->createDir(C('UPLOAD').'test1/'.date('Y-m-d').'/');
+		echo '创建文件夹完成：'.C('UPLOAD').'test1/'.date('Y-m-d').'/';
 		//写出文本
 		M('file')->writetxt(C('UPLOAD').'test.txt','您好，这是php300测试写出文本文件');
 		echo '<br />写出文本完成：'.C('UPLOAD').'test.txt';

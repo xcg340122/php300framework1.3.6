@@ -14,11 +14,11 @@ class system_class extends php300_class{
 	}
 	
 	public function display($names='index'){	//模板渲染
-		$tmp_names = $names.$GLOBALS['PHP300_CON']['TMP_TAIL'];
+		$tmp_names = $names.$GLOBALS['TEMP']['TMP_TAIL'];
 		if(!$GLOBALS['TMP']->templateExists($tmp_names)){
 			$this->get_error_page('找不到'.$tmp_names.'模板页');
 		}
-		$GLOBALS['TMP']->display($names.$GLOBALS['PHP300_CON']['TMP_TAIL']);
+		$GLOBALS['TMP']->display($names.$GLOBALS['TEMP']['TMP_TAIL']);
 	}
 	
 	public function get_vars($vername=''){	//获取指定模板全部变量
@@ -31,6 +31,8 @@ class system_class extends php300_class{
 		}
 		$this->del_tmp();
 		$this->set_var('error_txt',$error_txt);
+		$GLOBALS['TMP']->left_delimiter = '<{';
+		$GLOBALS['TMP']->right_delimiter = '}>';
 		$this->display($tmp_names);
 		exit();
 	}
@@ -50,7 +52,7 @@ class system_class extends php300_class{
 	public function del_tmp($tmpname=''){	//清除缓存文件,参数为空的话则清除全部缓存文件
 		if($tmpname!=''){
 			//$this->del_cache($tmpname);
-			$tmpname = $tmpname.$GLOBALS['PHP300_CON']['TMP_TAIL'];
+			$tmpname = $tmpname.$GLOBALS['TEMP']['TMP_TAIL'];
 		}else{
 			unset($tmpname);
 		}
@@ -59,22 +61,22 @@ class system_class extends php300_class{
 	
 	public function del_cache($tmpname=''){	//清空缓存,非缓存文件
 		if($tmpname!=''){
-			$GLOBALS['TMP']->cache->clear($tmpname.$GLOBALS['PHP300_CON']['TMP_TAIL']);
+			$GLOBALS['TMP']->cache->clear($tmpname.$GLOBALS['TEMP']['TMP_TAIL']);
 		}else{
 			$GLOBALS['TMP']->cache->clearAll();
 		}
 	}
 	
 	public function com_tmp($force = true){	//编译全部模板文件,参数为true的话则只编译修改过的文件,为false的话则强制编译全部文件
-		$GLOBALS['TMP']->compileAllTemplates($GLOBALS['PHP300_CON']['TMP_TAIL'],$force);
+		$GLOBALS['TMP']->compileAllTemplates($GLOBALS['TEMP']['TMP_TAIL'],$force);
 	}
 	
 	public function	fetch($names='index'){
-		$tmp_names = $names.$GLOBALS['PHP300_CON']['TMP_TAIL'];
+		$tmp_names = $names.$GLOBALS['TEMP']['TMP_TAIL'];
 		if(!$GLOBALS['TMP']->templateExists($tmp_names)){
 			$this->get_error_page('找不到'.$tmp_names.'模板页');
 		}
-		return $GLOBALS['TMP']->fetch($names.$GLOBALS['PHP300_CON']['TMP_TAIL']);
+		return $GLOBALS['TMP']->fetch($names.$GLOBALS['TEMP']['TMP_TAIL']);
 	}
 	
 	public function __call($method, $args) {

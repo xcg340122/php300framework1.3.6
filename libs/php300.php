@@ -1,19 +1,15 @@
 <?php
 /**
 * PHP300V1.8云类库版
-*PHP300Frameworkv1.7
-*官方网站：http://php300.cn
+*PHP300Frameworkv1.1.8
+*官方网站：http://framework.php300.cn
 *在线论坛：http://bbs.php300.cn
 *登录地址：http://yun.php300.cn 在线提交您的函数
 *交流QQ群：231201376
 */
-define('FRAMEWROK_VER','1.1.7');	//框架版本
+define('FRAMEWROK_VER','1.1.8');	//PHP300框架版本
 
-define('FUNCTION_VERSION','1.8');	//PHP300云类库版本
-
-define('FUNCTION_UPDATATIME','2016/07/25');	//最后更新时间
-
-define('FUNCTION_NAMES','php300云类库');
+define('FUNCTION_UPDATATIME','2016/08/20');	//最后更新时间
 
 define('FUNCTION_NAME','_class.php');
 
@@ -80,9 +76,13 @@ include_once(PLUG.'Smarty/Smarty.class.php');	//模板系统
 
 $TMP = new Smarty;
 
-$TMP->caching = $CON['TMP_CACHE'];
+$TMP->caching = $TEMP['TMP_CACHE'];
 
-$TMP->cache_lifetime = $CON['TMP_CACHE_TIME'];
+$TMP->cache_lifetime = $TEMP['TMP_CACHE_TIME'];
+
+$TMP->left_delimiter = $TEMP['TMP_LEFT'];
+
+$TMP->right_delimiter = $TEMP['TMP_RIGHT'];
 
 $GLOBALS['TMP'] = $TMP;
 
@@ -126,6 +126,8 @@ if($CON['PHP300_AUTO']){
 }
 
 set_error_handler(array($G['system'],"php300_error_handler"));	//处理错误
+
+system_define_info();	//预设基本常量
 
 if($U['URL_WAY'] == '1'){
 	url_routing($_SERVER['QUERY_STRING'],$U);	//URL路由
@@ -253,6 +255,8 @@ function use_controller($option=array()){
 		}
 		if(method_exists($GLOBALS[$option['c']],$option['f'])){
 			$function = $option['f'];
+			$vals = array('C_NAME'=>$option['c'],'F_NAME'=>$function);
+			set_define($vals);
 			$GLOBALS[$option['c']] -> $function();
 			exit();
 		}else{
@@ -275,6 +279,7 @@ function url_routing($info,$U){
 	}
 	$count = count($url_arr);
 	if($count > 1){
+		$url_arr[2] = $url_arr[2] ? $url_arr[2] : 'index';
 		$urls .= 'c='.$url_arr[1].'&f='.$url_arr[2];
 		$n = 0;
 		for($i=3;$i<=$count;$i++){
@@ -363,3 +368,78 @@ function update_class($CON){
 		echo ($CON['DEBUG'])?($results['msg']):('');
 		}
 	}
+
+/**
+* 系统基本常量
+* system_define_info();
+*/
+
+function system_define_info(){
+	$vals = array(
+		'__APP__'=>dirname($_SERVER['PHP_SELF']).'/',
+		'__HOST__'=>$_SERVER['HTTP_HOST'],
+		'__PORT__'=>$_SERVER["SERVER_PORT"],
+		'__TMP__'=>dirname($_SERVER['PHP_SELF']).'/template/',
+		'__REFERER__'=>$_SERVER['HTTP_REFERER'],
+	);
+	set_define($vals);
+}
+
+/**
+* 常量预设
+* set_define(关联数组)
+*/
+
+function set_define($vals){
+	foreach($vals as $key=>$val){
+		define($key,$val);
+		$GLOBALS['system']->set_var($key,$val);
+	}
+}
+
+/**
+* 错误页
+*/
+
+function error($error='未知错误',$url='',$seconds=3){
+	$info = array(
+		'message'=>$error,
+		'url'=>$url,
+		'seconds'=>$seconds,
+		'state'=>'0',
+	);
+	show_state_information($info);
+}
+
+/**
+* 成功页
+*/
+
+function success($success='操作成功',$url='',$seconds=3){
+	$info = array(
+		'message'=>$success,
+		'url'=>$url,
+		'seconds'=>$seconds,
+		'state'=>'1',
+	);
+	show_state_information($info);
+}
+
+/**
+* 展示状态页
+* show_state_information(关联数组);
+*/
+function show_state_information($info){
+	if(is_array($info)){
+		M('system')->set_var('message',$info['message']);
+		$info['url'] = $info['url']!='' ? $info['url'] : __REFERER__;
+		$info['url'] = $info['url']!='' ? $info['url'] : '#';
+		M('system')->set_var('url',$info['url']);
+		M('system')->set_var('seconds',$info['seconds']*1000);
+		$state = $info['state']=='1' ? 'S u c c e s s' : 'E r r o r';
+		M('system')->set_var('state',$state);
+		$GLOBALS['TMP']->left_delimiter = '<{';
+		$GLOBALS['TMP']->right_delimiter = '}>';
+		M('system')->display('php300_tmp/state');
+	}
+}

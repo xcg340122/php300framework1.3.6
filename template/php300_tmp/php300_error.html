@@ -1,16 +1,16 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<!-- saved from url=(0061)http://www.17sucai.com/preview/51168/2013-11-10/404/demo.html -->
-<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style type="text/css">
-{literal}
 body {
   background-color: #ECECEC;
   font-family: 'Open Sans', sans-serif;
   font-size: 14px;
   color: #3c3c3c;
 }
-.demo{width:100%;margin:0 auto;}
-.demo p:first-child {
+.php300_error{width:100%;margin:0 auto;}
+.php300_error p:first-child {
   text-align: center;
   font-size: 50px;
   font-weight: bold;
@@ -19,7 +19,7 @@ body {
   color: #fff;
 }
 
-.demo p:first-child span {
+.php300_error p:first-child span {
   cursor: pointer;
   text-shadow: 0px 0px 2px #686868,
     0px 1px 1px #ddd,
@@ -39,7 +39,7 @@ body {
   transition: all .1s linear;
 }
 
-.demo p:first-child span:hover {
+.php300_error p:first-child span:hover {
   text-shadow: 0px 0px 2px #686868,
     0px 1px 1px #fff,
     0px 2px 1px #fff,
@@ -58,7 +58,7 @@ body {
   transition: all .1s linear;
 }
 
-.demo p:not(:first-child) {
+.php300_error p:not(:first-child) {
   text-align: center;
   color: #666;
   font-family: cursive;
@@ -68,15 +68,14 @@ body {
   line-height: 2em;
   margin-top: 10px;
 }
-{/literal}
 </style>
 <title>PHP300_程序异常</title>
 </head>
 <body>
-<div class="demo">
+<div class="php300_error">
 	<p>php300程序异常</p>
-	<p>{$error_txt}</p>
-	<p>{date('20y-m-d h:i',time())}</p>
+	<p><{$error_txt}></p>
+	<p><{date('20y-m-d h:i',time())}></p>
 </div>
 </body>
 </html>

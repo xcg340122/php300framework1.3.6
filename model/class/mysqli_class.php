@@ -28,6 +28,8 @@ class mysqli_class extends system_class{
 	 */
 	public $querycount = 0;
 	
+	public $sql = '';
+	
 	public function __construct() {
 
 	}
@@ -69,6 +71,8 @@ class mysqli_class extends system_class{
 		if(C('sqldebug')){
 			echo $sql;
 		}
+		
+		$this->sql = $sql;
 		
 		$this->lastqueryid = mysqli_query($this->link,$sql) or $this->halt(mysqli_connect_error(), $sql);
 
@@ -462,6 +466,14 @@ class mysqli_class extends system_class{
 		}
 		$value = $q.$value.$q;
 		return $value;
+	}
+	
+	/**
+	* 返回最后一次操作的SQL语句
+	* @return sql string
+	*/
+	public function get_sql(){
+		return $this->sql;
 	}
 }
 ?>
