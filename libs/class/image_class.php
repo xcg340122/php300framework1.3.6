@@ -103,8 +103,9 @@ class image_class extends system_class{
 	* @return Height
 	*/
     public function Height() {
-
-        $Height = getimagesize($this->image)[1];
+    	
+    	 $size = getimagesize($this->image);
+        $Height = $size[1];
 
         return $Height;
     }
@@ -114,7 +115,10 @@ class image_class extends system_class{
 	* @return Width
 	*/
     public function Width() {
-        $Width = getimagesize($this->image)[0];
+    	
+    	  $size = getimagesize($this->image);
+    	  
+        $Width = $size[0];
 
         return $Width;
     }
@@ -124,6 +128,7 @@ class image_class extends system_class{
 	* @return Imagesize
 	*/
     public function Imagesize() {
+    	
         $dimension = getimagesize($this->image);
 
         $dimension = $dimension[0] . ' x ' . $dimension[1];
@@ -147,7 +152,9 @@ class image_class extends system_class{
 	* @return mime
 	*/
     public function mime() {
-        $mime = getimagesize($this->image)['mime'];
+    	
+    	 $size = getimagesize($this->image);
+        $mime = $size['mime'];
 
         return $mime;
     }

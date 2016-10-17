@@ -12,8 +12,6 @@ $CON['UPDATE_WAY'] = '0'; //同步方式
 $CON['SN'] = ''; //用户SN(如需使用云函数请登录yun.php300.cn查看账号SN)
 
 $CON['TIME'] = time(); //调用返回时间戳
-
-$CON['PHP300_AUTO'] = true; //是否自动实例化类
 	
 $CON['DEBUG'] = true; 	//是否开启调试信息
 
@@ -21,9 +19,11 @@ $CON['CONFUSION'] = true;	//开启代码压缩(推荐为true,如开启后出错�
 
 $CON['LOGS'] = true;	//开启日志记录
 
-$CON['UPLOAD'] = 'Uploads/';	//上传文件路径(请自行修改)
+$CON['UPLOAD'] = 'uploads/';	//上传文件路径(请自行修改)
 
-$CON['SYSTEMLIST'] = array('cookies','http','mysql','mysqli','system','image','file');	//系统类列表
+$CON['CLASSLIST'] = array('cookies','http','mysqli','system','image','file','cache','session');	//系统类列表
+
+$CON['FUNCTIONLIST'] = array('system','extension');	//系统方法列表
 
 $GLOBALS['PHP300_CON'] = $CON;	//赋值全局配置
 ?>

@@ -2,8 +2,8 @@
 /*
 PHP300 - FrameWorks
 http://framework.php300.cn
-2016年8月20日
-version 1.1.8
+2016年10月16日
+version 1.2.0
 */
 
 include_once('./libs/php300.php');
