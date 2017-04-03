@@ -7,4 +7,6 @@ php300框架
 
 手册：http://api.php300.cn
 
+云函数调用提交：http://yun.php300.cn
+
 Run PHP Version >= 5.5
