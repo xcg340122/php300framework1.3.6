@@ -6,3 +6,5 @@ php300框架
 论坛：http://bbs.php300.cn
 
 手册：http://api.php300.cn
+
+Run PHP Version >= 5.5
