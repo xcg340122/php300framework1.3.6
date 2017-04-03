@@ -6,10 +6,10 @@
  * @license				http://framework.php300.cn
  * @lastmodify			2016-07-01
  */
-class http_class extends system_class{
+class Http_class extends System_class{
     public $useragent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; en)';
     /**
-     * 当为true,HttpClient为饼干创建临时文件。
+     * 当为true,HttpClient创建临时文件。
      * @var boolean
      */
     public $useRandomCookieFile = false;

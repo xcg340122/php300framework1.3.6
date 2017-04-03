@@ -6,7 +6,7 @@
  * @license				http://framework.php300.cn
  * @lastmodify			2016-07-02
  */
-class file_class extends system_class{
+class File_class extends System_class{
 
     /**
      * 建立文件夹

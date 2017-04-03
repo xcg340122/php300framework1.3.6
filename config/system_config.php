@@ -7,23 +7,104 @@ UPDATE_WAY => 同步方式;
 2 = 每次运行都会同步;
 2016年4月28日
 */
-$CON['UPDATE_WAY'] = '0'; //同步方式
 
-$CON['SN'] = ''; //用户SN(如需使用云函数请登录yun.php300.cn查看账号SN)
+/**
+* 
+* 同步方式
+* 
+*/
+$CON['UPDATE_WAY'] = '0';
 
-$CON['TIME'] = time(); //调用返回时间戳
-	
-$CON['DEBUG'] = true; 	//是否开启调试信息
+/**
+* 
+* 用户SN(如需使用云函数请登录yun.php300.cn查看账号SN)
+* 
+*/
+$CON['SN'] = '';
 
-$CON['CONFUSION'] = true;	//开启代码压缩(推荐为true,如开启后出错请设置为false)
+/**
+* 
+* 调用返回时间戳
+* 
+*/
+$CON['TIME'] = time();
 
-$CON['LOGS'] = true;	//开启日志记录
+/**
+* 
+* 默认时区
+* 
+*/
+$COM['TIME_ZONE'] = 'Asia/Shanghai';
 
-$CON['UPLOAD'] = 'uploads/';	//上传文件路径(请自行修改)
+/**
+* 
+* 是否开启调试信息
+* 
+*/
+$CON['DEBUG'] = true;
 
-$CON['CLASSLIST'] = array('cookies','http','mysqli','system','image','file','cache','session');	//系统类列表
+/**
+* 
+* 开启代码压缩(推荐为true,如开启后出错请设置为false)
+* 
+*/
+$CON['CONFUSION'] = true;
 
-$CON['FUNCTIONLIST'] = array('system','extension');	//系统方法列表
+/**
+* 
+* 开启日志记录
+* 
+*/
+$CON['LOGS'] = true;
 
-$GLOBALS['PHP300_CON'] = $CON;	//赋值全局配置
+/**
+* 
+* 上传文件路径(请自行修改)
+* 
+*/
+$CON['UPLOAD'] = 'Uploads/';
+
+/**
+* 
+* 是否开启中文控制器编译
+* 
+*/
+$CON['CHINESE_COMPILE'] = false;
+
+/**
+* 
+* 默认控制器参数名称
+* 
+*/
+$CON['CLASS_NAME'] = 'c';
+
+/**
+* 
+* 默认方法参数名称
+* 
+*/
+$CON['FUNCTION_NAME'] = 'f';
+
+/**
+* 
+* 系统类列表
+* 
+*/
+$CON['CLASSLIST'] = array('Cookies','Http','Mysqli','System','Image','File','Cache','Session','Socket');
+
+/**
+* 
+* 系统方法列表
+* 
+*/
+$CON['FUNCTIONLIST'] = array('System','Extension');
+
+/**
+* 
+* 是否默认开启session(如程序不需要操作session可设置为false)
+* 
+*/
+$CON['SESSION_START'] = true;
+
+$GLOBALS['PHP300_CON'] = $CON;
 ?>

@@ -6,7 +6,7 @@
  * @license				http://framework.php300.cn
  * @lastmodify			2016-07-02
  */
-class image_class extends system_class{
+class Image_class extends System_class{
 
     public $image;
     private $CreateImage;

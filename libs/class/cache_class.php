@@ -6,9 +6,9 @@
  * @license				http://framework.php300.cn
  * @lastmodify			2016-10-11
  */
-class cache_class extends system_class {
+class Cache_class extends System_class {
 
-  private $_cachepath = 'cache/';
+  private $_cachepath = 'Cache/';
 
   private $_cachename = 'default';
 
@@ -34,7 +34,9 @@ class cache_class extends system_class {
       $dataArray = array($key => $storeData);
     }
     $cacheData = json_encode($dataArray);
-    file_put_contents($this->getCacheDir(), $cacheData);
+	$handle = fopen($this->getCacheDir(),'a+');
+	fwrite($handle,$cacheData);
+	fclose($handle);
     return $this;
   }
 

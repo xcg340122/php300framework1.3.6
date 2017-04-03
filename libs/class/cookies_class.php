@@ -6,7 +6,7 @@
  * @license				http://framework.php300.cn
  * @lastmodify			2016-10-09
  */
-class cookies_class extends system_class{
+class Cookies_class extends System_class{
   
   private $_prefix = '';
   private $_securekey = 'ekOt4_Ut0f3XE-fJcpBvRFrg506jpcuJeixezgPNyALm';
@@ -29,7 +29,6 @@ class cookies_class extends system_class{
   } 
   
   public function set($name, $value, $expire=0){ 
-  
     $cookie_name = $this->getName($name); 
     $cookie_expire = time() + ($expire? $expire : $this->_expire); 
     $cookie_value = $this->pack($value, $cookie_expire); 
@@ -38,7 +37,6 @@ class cookies_class extends system_class{
     if($cookie_name && $cookie_value && $cookie_expire){ 
       setcookie($cookie_name, $cookie_value, $cookie_expire); 
     } 
-  
   } 
   
   public function get($name){ 
@@ -189,4 +187,4 @@ class cookies_class extends system_class{
     } 
   } 
 }
-?> 
+?>
