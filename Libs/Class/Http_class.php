@@ -1,18 +1,26 @@
 <?php
+
 /**
- *  http_class.php http操作类
- *
- * @copyright			(C) 2015-2016 PHP300
- * @license				http://framework.php300.cn
- * @lastmodify			2016-07-01
- */
-class Http_class extends System_class{
-    public $useragent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; en)';
-    /**
-     * 当为true,HttpClient创建临时文件。
-     * @var boolean
-     */
+* @copyright: PHP300Framework
+* @author: Chungui
+* 
+*/
+
+namespace Libs\Deal;
+
+class Http {
+	
+	/**
+	* 请求标识
+	*/
+	public $useragent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; en)';
+	/**
+	* 是否创建临时文件
+	*/
     public $useRandomCookieFile = false;
+    /**
+	* 临时文件后缀
+	*/
     public $randomCookieFilePrefix = 'phphc';
     
     protected $_cookieFile = null;
@@ -39,6 +47,10 @@ class Http_class extends System_class{
     
     protected $ch;
     
+    /**
+	* 初始化
+	* 
+	*/
     function init()
     {
         if ( $this->useRandomCookieFile )
@@ -312,18 +324,18 @@ class Http_class extends System_class{
      */
     public function getCookies()
     {
-		if (!$this->getCookieFile())
+		if (!$this->getCookieFile()){
 			return array();
-        
+		}
         unset($this->ch);
-		
         $text = file_get_contents($this->getCookieFile());
         
         $cookies = array();
         foreach (explode("\n", $text) as $line) {
             $parts = explode("\t", $line);
-            if (count($parts) === 7)
-                $cookies[$parts[5]] = $parts[6];
+            if (count($parts) === 7){
+				$cookies[$parts[5]] = $parts[6];
+			}   
         }
         return $cookies;
     }
@@ -339,8 +351,9 @@ class Http_class extends System_class{
     {
         $this->_cookieFile = $fname;
         
-        if ( $clear )
-            $this->clearCookieFile();
+        if ( $clear ){
+			$this->clearCookieFile();
+		} 
     }
     
      /**
@@ -360,8 +373,9 @@ class Http_class extends System_class{
     public function clearCookieFile()
     {
 		$cookieFile = $this->getCookieFile();
-        if ($cookieFile !== null)
-            file_put_contents($cookieFile, '');
+        if ($cookieFile !== null){
+			file_put_contents($cookieFile, '');
+		}
     }
 
 	public function __destruct()
@@ -369,7 +383,8 @@ class Http_class extends System_class{
 		unset($this->ch);
 		
 		$cookieFile = $this->getCookieFile();
-        if ($cookieFile !== null)
+        if ($cookieFile !== null){
 			unlink($cookieFile);
+		}
 	}
 }

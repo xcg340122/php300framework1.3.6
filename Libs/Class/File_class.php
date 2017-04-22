@@ -1,14 +1,16 @@
-<?php 
-/**
- *  file_class.php 文件操作类
- *
- * @copyright			(C) 2015-2016 PHP300
- * @license				http://framework.php300.cn
- * @lastmodify			2016-07-02
- */
-class File_class extends System_class{
+<?php
 
-    /**
+/**
+* @copyright: PHP300Framework
+* @author: Chungui
+* 
+*/
+
+namespace Libs\Deal;
+
+class File {
+	
+	/**
      * 建立文件夹
      *
      * @param string $aimUrl
@@ -160,12 +162,12 @@ class File_class extends System_class{
      */
      
     public function writetxt($filename,$txt='',$type='w'){
-  	$fileHandle = fopen($filename,$type);
-  	fwrite($fileHandle,$txt);
-  	fclose($fileHandle);
-  	if(!file_exists($filename)){
-		file_put_contents($filename,$txt);	
-	}
+	  	$fileHandle = fopen($filename,$type);
+	  	fwrite($fileHandle,$txt);
+	  	fclose($fileHandle);
+	  	if(!file_exists($filename)){
+			file_put_contents($filename,$txt);	
+		}
    }
 
     /**
@@ -223,6 +225,5 @@ class File_class extends System_class{
         copy($fileUrl, $aimUrl);
         return true;
     }
-
 }
 ?>

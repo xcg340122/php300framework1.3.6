@@ -1,413 +1,444 @@
 <?php
 
-/* PHP300: 框架中央处理文件: */
-// +----------------------------------------------------------------------+
-// | PHP version > 5.4                                                    |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 2016-2017 Group by PHP300                              |
-// +----------------------------------------------------------------------+
-// | 本处理文件需要至少5.5版本运行,文件开源,但是请尊重权限,切勿伪造传播.  |
-// | PHP300V1.9云类库支持 												  |
-// | PHP300Framework v1.3.0											      |
-// | 官方网站：http://framework.php300.cn                                 |
-// | 在线论坛：http://bbs.php300.cn										  |
-// | PHP300极推送：http://push.php300.cn								  |
-// | 登录地址：http://yun.php300.cn 在线提交您的函数			          |
-// | 文档地址：http://api.php300.cn						                  |
-// | 交流QQ群：231201376						                 		  |
-// +----------------------------------------------------------------------+
-
 /**
-* 
-* PHP300框架版本
-* 
+* PHP300Framework驱动控制器
+* @author:Chungui
+* @copyright:PHP300
 */
-define('FRAMEWROK_VER', '1.3.0');
+namespace Libs\PHP300;
 
-/**
-* 
-* 最后更新时间
-* 
-*/
-define('SYSTEM_UPDATATIME', '2017/04/01');
-
-/**
-* 
-* 类文件后缀
-* 
-*/
-define('CLASS_NAME', '_class.php');
-
-/**
-* 
-* 库文件根路径
-* 
-*/
-define('FILE_PATH', str_replace(DIRECTORY_SEPARATOR . 'Libs', '', __DIR__.DIRECTORY_SEPARATOR));
-
-/**
-* 
-* 方法目录
-* 
-*/
-define('FUNCTION_PATH', FILE_PATH . 'Libs/Function/');
-
-/**
-* 
-* 用户类目录
-* 
-*/
-define('CLASS_PATH', FILE_PATH . "Model/");
-
-/**
-* 
-* 插件目录
-* 
-*/
-define('PLUG', FILE_PATH . 'Libs/Plug/');
-
-/**
-* 
-* 获取目录列表
-* 
-*/
-$ModelList = scandir(CLASS_PATH);
-
-$ClassList = scandir(FILE_PATH . 'Libs/Class/');
-
-$ConList = scandir(FILE_PATH . 'Config');
-
-$FunctionList = scandir(FUNCTION_PATH);
-
-/**
-* 
-* 屏蔽NOTICE级别错误
-* 
-*/
-error_reporting(E_ALL ^ E_NOTICE);
-
-/**
-* 
-* 加载配置文件
-* 
-*/
-foreach ($ConList as $val) {
+class Php300Deal {
 	
-    if ($val != "." and $val != "..") {
-    	
-        if (explode('.', $val)[1] == 'php') {
-        	
-            include_once (FILE_PATH . 'Config/' . $val);
-        }
-    }
-}
-
-/**
-* 
-* 判断php.ini是否具有默认时区配置
-* 
-*/
-if(ini_get('date.timezone')==''){
-	ini_set('date.timezone','PRC');
-}
-
-/**
-* 
-* 设置默认时区
-* 
-*/
-date_default_timezone_set($CON['TIME_ZONE']);
-
-/**
-* 
-* 加载方法文件
-* 
-*/
-foreach ($FunctionList as $val) {
-    if ($val != "." and $val != "..") {
-    	
-        $trim = explode('.', $val);
-        
-        if ($trim[1] == 'php') {
-        	
-            include_once (FUNCTION_PATH . $val);
-        }
-    }
-}
-
-/**
-* 
-* cli模式禁用项
-* 
-*/
-if (PHP_SAPI == 'cli') {
-    $CliUnset = array(
-        'cookies'
-    );
-    foreach ($ClassList as $key => $val) {
-    	
-        if (in_array(str_replace(CLASS_NAME, '', $val), $CliUnset)) {
-        	
-            unset($ClassList[$key]);
-            
-        }
-    }
-    G('status', $argv[1], 'PHP300_CON');
-}
-
-/**
-* 
-* 预处理URL
-* 
-*/
-if ($U['URL_WAY'] == '1') {
+	/**
+	* 框架版本
+	* @var String
+	*/
+	public $Version;
 	
-    url_routing($_SERVER['QUERY_STRING'], $U);
-    
-}
-
-/**
-* 
-* 预设基本常量
-* 
-*/
-SystemDefineInfo();
-
-/**
-* 
-* 预注册类
-* 
-*/
-spl_autoload_register("firstload");
-
-/**
-* 
-* 屏蔽错误
-* 
-*/
-if (!$CON['DEBUG']) {
+	/**
+	* 框架路径
+	* @var String
+	*/
+	public $CorePath;
 	
-    error_reporting(0);
-    
-    ini_set("display_errors", "Off");
-}
-
-/**
-* 
-* 同步更新云函数
-* 
-*/
-switch ($CON['UPDATE_WAY']) {
-    case '1':
-        if (!file_exists(FILE_PATH . 'LOCK')) {
-            update_class($CON);
-            $file_link = fopen(FILE_PATH . 'LOCK', 'w');
-            fwrite($file_link, time());
-            fclose($file_link);
-        }
-        break;
-
-    case '2':
-        update_class($CON);
-        break;
-}
-
-/**
-* 
-* 引入云函数缓存 
-* 
-*/
-if (file_exists(FILE_PATH . 'Cache/cache_class.php')) {
+	/**
+	* 框架更新时间
+	* @var String
+	*/
+	public $UpDateTime;
 	
-    include_once (FILE_PATH . 'Cache/cache_class.php');
-}
-if (class_exists('php300_class')) {
+	public $ActionName = '';
 	
-    $php300 = new php300_class();
-    
-    G('php300', $php300);
-} else {
-
-    class php300_class {
-        
-    }
-
-    $php300 = new php300_class();
-    
-    G('php300', $php300);
-}
-
-/**
-* 
-* 模板系统
-* 
-*/
-include_once (PLUG . 'Smarty/Smarty.class.php');
-
-$TMP = new Smarty;
-
-$TMP->caching = $TEMP['TMP_CACHE'];
-
-$TMP->cache_lifetime = $TEMP['TMP_CACHE_TIME'];
-
-$TMP->left_delimiter = $TEMP['TMP_LEFT'];
-
-$TMP->right_delimiter = $TEMP['TMP_RIGHT'];
-
-$function_list = C('TMP_FUNCTION');
-
-/**
-* 
-* 注册函数
-* 
-*/
-if (is_array($function_list)) {
+	public $ClassName = '';
 	
-    foreach ($function_list as $val) {
-    	
-        if (file_exists($val)) {
-        	
-            $TMP->registerPlugin('function', $val, $val);
-            
-        }
-    }
-}
-
-/**
-* 
-* 缓存变量
-* 
-*/
-
-G('TMP', $TMP);
-
-G('autoloads', array());
-
-$modelnum = count($ModelList);
-
-/**
-* 
-* 装载系统内置类库
-* 
-*/
-foreach ($ClassList as $classname) {
+	public $FunctionName = '';
 	
-    if ($classname != "." and $classname != "..") {
-    	
-		if (explode('.', $classname)[1] != 'php') { continue; }
-		
-        $classname = FILE_PATH . 'Libs/Class/' . $classname;
-        
-        if (is_file($classname)) {
-        	
-            $replace_arr = array(
-                FILE_PATH . 'Libs/Class/',
-                CLASS_NAME,
-                'Class/'
-            );
-            
-            $class = str_replace($replace_arr, '', $classname);
-            
-            array_push($GLOBALS['autoloads'], $class);
-            
-        }
-    }
-}
-
-/**
-* 
-* 用户控制器
-* 
-*/
-if ($modelnum > 0) {
-    foreach ($ModelList as $modelname) {
-        if ($modelname != "." and $modelname != "..") {
-			if (explode('.', $modelname)[1] != 'php') { continue; }
-            $modelnames = $modelname = CLASS_PATH . $modelname;
-            $modelval = @file_get_contents($modelname);
-            if (is_file($modelname)) {
-                $replace_arr = array(CLASS_PATH,CLASS_NAME);
-                $model = str_replace($replace_arr, '', $modelname);
-                if ($CON['CHINESE_COMPILE']) {
-					$modelname = FILE_PATH . 'Cache/' . md5($model) . '.php';
-					if(file_exists($modelname)){
-						$cachetime = middle_string(file_get_contents($modelname),'//TIME_START_','_TIME_END//');	//获取上次修改时间
-						if($cachetime!=''){
-							$filemtime = filemtime($modelnames) - $cachetime;	//检测是否更新
-							if($filemtime == 0){
-								array_push(C('autoloads'), $model);
-								continue;
-							}
-						}
-					}
-                    $keys = @return_key();
-                    if (is_array($keys)) {
-                        $fileType = @mb_detect_encoding($modelval, array('UTF-8','GBK','LATIN1','BIG5'
-                        ));
-                        $modelval = ($fileType != 'UTF-8') ? (@mb_convert_encoding($modelval, 'UTF-8', $fileType)) : ($modelval);	//进行中文编码兼容
-                        foreach ($keys as $key => $val) {
-                            $modelval = @preg_replace('/' . $key . '/', $val, $modelval);
-                        }
-                        if ($modelval != '') {
-                            @file_put_contents($modelname, $modelval);
-                            if (C('PHP300_CON') ['CONFUSION']) {
-                                $modelval = @php_strip_whitespace($modelname);
-                                @file_put_contents($modelname,'<?php //TIME_START_'.filemtime($modelnames).'_TIME_END// ?>'.$modelval);
-                            }
-                        }
-                    }
-                }
-                array_push($GLOBALS['autoloads'], $model);
-            }
-        }
-    }
-    ReleaseUseless();
-}
-
-/**
-* 
-* 自动实例化
-* 
-*/
-foreach (C('autoloads') as $val) {
-    if ($val != '') {
-    	
-        $classname = $val . '_class';
-        
-        $GLOBALS[$val] = new $classname();
-        
-        $G[$val] = $GLOBALS[$val];
-    }
-}
-
-/**
-* 
-* 处理错误
-* 
-*/
-set_error_handler(array(
-    M('System'),
-    'php300_error_handler'
-));
-
-if ($U['URL_WAY'] == '1') {
+	private $ClassTail = '_class';
 	
-    $U = C('C_AND_F');
-    
-    if (is_array($U)) {
-    	
-    	/**
-		* 
-		* URL路由
-		* 
-		*/
-        ExecUrl($U['c'], $U['f']);
+	private $ActionCount = 0;
+	
+	private $ClassList = array();
+	
+	private $FunctionList = array();
+	
+	private $ConfigList = array();
+	
+	function __construct()
+	{
+		if(PHP_SAPI=='cli'){
+			ini_set('include_path',dirname(__FILE__));
+		}
+		$this->Version = '1.3.1';
+		$this->UpDateTime = '2017/04/22';		
+		$this->init();
+	}
+	
+	/**
+	* 初始化框架
+	* 
+	*/
+	function init()
+	{
+		$this->setCorePath();
+		$this->ConfigList = $this->getDir($this->CorePath.'Config');
+		$this->ActionList = $this->getDir($this->CorePath.'Action');
+		$this->FunctionList = $this->getDir($this->getFunctionPath());
+		$this->ClassList = $this->getDir($this->getClassPath());
+		$this->loadConfig();
+		$this->loadFunction();
+		$this->loadView();
+		$this->loadClass();
+		$this->Actioncount();
+		spl_autoload_register(array(&$this,'Autoload'));
+	}
+	
+	/**
+	* 自动加载
+	* @param 类名 $Class
+	* 
+	*/
+	public function Autoload($Class)
+	{
+		$Path = (strpos($Class,'Action'))?($this->CorePath . 'Action/' . str_replace('\Action','',$Class)):($this->CorePath . 'Libs/Class/' . $Class);
+		$Path = $Path  . '.php';
+		if(is_file($Path)){
+			include_once($Path);
+		}else{
+			ShowText('PHP300::找不到类 -> '.$Class,true);
+		}
+	}
+	
+	/**
+	* 加载公共方法文件
+	* 
+	*/
+	function loadFunction()
+	{
+		if(count($this->FunctionList) > 0){
+			$FunctionPath = $this->getFunctionPath().DIRECTORY_SEPARATOR;
+			foreach($this->FunctionList as $key=>$val){ if($this->getExtension($val) === 'php'){ $this->Readload($FunctionPath.$val); } }
+		}
+	}
+	
+	/**
+	* 加载公共配置文件
+	* 
+	*/
+	function loadConfig()
+	{
+		if(count($this->ConfigList) > 0){
+			$ConfigPath = $this->CorePath . 'Config' . DIRECTORY_SEPARATOR;
+			foreach($this->ConfigList as $key=>$val){ if($this->getExtension($val) === 'php'){ $this->Readload($ConfigPath.$val,substr($val,0,-4),'Config'); } } }
+	}
+	
+	/**
+	* 加载视图引擎
+	* 
+	*/
+	function loadView()
+	{
+		$this->loadPlug('Smarty/Smarty.class.php');
+		$View = new \Smarty;
+		$this->setView($View);
+	}
+	
+	/**
+	* 加载系统扩展类
+	* 
+	*/
+	public function loadClass()
+	{
+		if(count($this->ClassList) > 0){
+			$ClassPath = $this->getClassPath() . DIRECTORY_SEPARATOR;
+			foreach($this->ClassList as $key=>$val){ if($this->getExtension($val) === 'php'){ $this->Readload($ClassPath.$val,substr($val,0,-4)); } }			}
+	}
+	
+	/**
+	* 加载插件
+	* @param 插件路径 $File
+	* 
+	*/
+	public function loadPlug($File)
+	{
+		$PlugPath = $this->getPlugPath().DIRECTORY_SEPARATOR.$File;
+		if(is_file($PlugPath)){
+			include_once($PlugPath);
+		}
+	}
+	
+	/**
+	* 路由操作
+	* 
+	*/
+	public function RunRoute()
+	{
+		$UrlConfig = $this->ReadConfig('Url','Url');
+		$this->Directly($UrlConfig);
+		if($UrlConfig['Switch']){
+			$QueryArr = $this->Arrgd(Receive('server.QUERY_STRING'),$UrlConfig);
+		}
+	}
+	
+	/**
+	* 分拣数据
+	* @param 访问数组 $Arr
+	* @param 配置文件 $Config
+	* 
+	*/
+	function setAccess($Arr,$Config)
+	{
+		$this->ActionName = $Arr['Action'];
+		$this->ClassName = $Arr['Class'];
+		$this->FunctionName = $Arr['Function'];
+	}
+	
+	/**
+	* 普通get执行
+	* 
+	*/
+	function Directly($UrlConfig)
+	{
+		$Action = Receive($UrlConfig['Action'],$this->ActionName);
+		$Class = Receive($UrlConfig['Class'],$this->ClassName);
+		$Function = Receive($UrlConfig['Function'],$this->FunctionName);
+		$this->ActionName = $Action;
+		$this->ClassName = $Class;
+		$this->FunctionName = $Function;
+	}
+	
+	/**
+	* 设置框架根目录
+	* 
+	*/
+	function setCorePath()
+	{
+		$Path = str_replace(DIRECTORY_SEPARATOR.'Libs','',dirname(__FILE__)).DIRECTORY_SEPARATOR;
+		$this->CorePath = $Path;
+	}
+	
+	/**
+	* 返回公用方法目录
+	* 
+	* @return String
+	*/
+	function getFunctionPath()
+	{
+		$Path = $this->CorePath.'Libs'.DIRECTORY_SEPARATOR.'Function';
+		return $Path;
+	}
+	
+	/** 
+	* 返回系统类目录
+	* 
+	* @return String
+	*/
+	function getClassPath()
+	{
+		$Path = $this->CorePath.'Libs'.DIRECTORY_SEPARATOR.'Class';
+		return $Path;
+	}
+	
+	/**
+	* 返回插件目录
+	* 
+	* @return String
+	*/
+	function getPlugPath()
+	{
+		$Path = $this->CorePath.'Libs'.DIRECTORY_SEPARATOR.'Plug';
+		return $Path;
+	}
+	
+	/**
+	* 截取文件后缀
+	* @param 文件名 $file
+	* 
+	* @return String
+	*/
+	function getExtension($File)
+	{
+		$Arr = explode('.', $File);
+		return end($Arr);
+	}
+	
+	/**
+	* 获取目录文件列表
+	* @param 目录路径 $Path
+	* 
+	* @return Array
+	*/
+	function getDir($Path)
+	{
+		if(is_dir($Path)){
+			$List = scandir($Path);
+			foreach($List as $key=>$val){if ($val == "." or $val == "..") {	unset($List[$key]); } }
+			return $List;
+		}
+		return array();
+	}
+	
+	/**
+	* 引入文件
+	* 
+	*/
+	public function Readload($Path,$name='',$Type='Class')
+	{	
+		if(is_file($Path)){
+			if($Type==='Config'){
+				global $PHP300Res;
+				$PHP300Res[$name] = include_once($Path);
+			}else{
+				include_once($Path);	
+			}
+		}
+	}
+	
+	/**
+	* 读取配置
+	* @param 配置名称 $key
+	* @param 指定文件 $file
+	* 
+	* @return String or Bool
+	*/
+	public function ReadConfig($keys='',$file='')
+	{
+		global $PHP300Res;
+		if($keys){
+			if(is_array($PHP300Res)){
+				foreach($PHP300Res as $key=>$val){ if($file){ if($file==$key){return (isset($val[$keys]))?($val[$keys]):(false);} }else{ return $val;}	}
+			}
+		}
+		return $PHP300Res;
+	}
+	
+	/**
+	* 创建操作对象
+	* 
+	* @return
+	*/
+	public function CreateObj()
+	{
+		$App =  '\\'.$this->ActionName . '\Action\\' . $this->ClassName . $this->ClassTail;
+		$App = new $App;
+		return $App;
+	}
+	
+	/**
+	* 设置模板引擎
+	* @param 引擎对象 $Obj
+	*/
+	function setView(&$Obj)
+	{
+		$ViewConfig = $this->ReadConfig('View','View');
+		$Obj -> template_dir = $this->CorePath . 'Template';
+		$Obj -> compile_dir = $this->CorePath . 'Cache';
+		$Obj -> caching = $ViewConfig['Cache'];
+		$Obj -> cache_lifetime = $ViewConfig['Cache.Time'];
+		$Obj -> left_delimiter = $ViewConfig['Left'];
+		$Obj -> right_delimiter = $ViewConfig['Right'];
+		Glovar('View',$Obj,'OS');
+	}
+	
+	/**
+	* 处理Url数组结构
+	* @param 参数内容 $QueryUrl
+	* 
+	*/
+	function Arrgd($QueryUrl,$Config)
+	{
+	    $Info = str_replace($Config['Tail'] , '', $QueryUrl);
+	    $UrlArr = explode($Config['Division'] , $Info);
+	    if ($Config['Division'] != '/') {
+	        array_unshift($UrlArr, $Config['Division']);
+	        $UrlArr[1] = str_replace('/', '', $UrlArr[1]);
+	    }
+	    $ArrCount = count($UrlArr);$Url='';$End=0;
+	    if ($ArrCount > 1) {
+	    	$Action = (isset($UrlArr[1]))?($UrlArr[1]):($this->ActionName);
+	    	$Class = (isset($UrlArr[2]))?($UrlArr[2]):($this->ClassName);
+	    	$Function = (isset($UrlArr[3]))?($UrlArr[3]):($this->FunctionName);
+	    	$AccessArr = array('Action'=>$Action,'Class'=>$Class,'Function'=>$Function);
+	        for ($Ned = 4; $Ned <= $ArrCount; $Ned++) { if ($Ned != $End) { $End = $Ned + 1; if (isset($UrlArr[$Ned])) { $End = $Ned + 1; if(isset($UrlArr[$Ned]) and isset($UrlArr[$End])){ $Url .= '&' . $UrlArr[$Ned] . '=' . $UrlArr[$End];} } } }
+	        parse_str($Url, $UrlNed);
+	        $_GET = $UrlNed;
+	        $this->setAccess($AccessArr,$Config);
+	    }
+	}
+	
+	/**
+	* 设置默认访问
+	* @param 实例项目名称 $Action
+	* @param 控制器名称 $Class
+	* @param 方法名称 $Function
+	* 
+	*/
+	public function setdefault($Action='Main',$Class='App',$Function='index')
+	{
+		if(empty($this->ActionName)){ $this->ActionName = $Action; }
+		if(empty($this->ClassName)){ $this->ClassName = $Class;}
+		if(empty($this->FunctionName)){ $this->FunctionName = $Function; }
+		$this->setConstant();
+		$this->ConnMysql();
+	}
+	
+	/**
+	* 统计实例项目数
+	* 
+	*/
+	function Actioncount()
+	{
+		$Path = $this->CorePath . '/Action';
+		$DirArr = $this->getDir($Path);
+		$this->ActionCount = count($DirArr);
+	}
+	
+	/**
+	* 自动连接Mysql
+	* 
+	*/
+	function ConnMysql(){
+		$MysqlConfig = Config('Mysql','Mysql');
+		if($MysqlConfig['Connect']){
+			if(is_array($MysqlConfig)){$Mysql = Libs('Mysql'); $Mysql->option($MysqlConfig); $Mysql->Connect();Glovar('Mysql',$Mysql,'OS');}
+		}
+	}
+	
+	/**
+	* 设置常量和配置信息
+	* 
+	*/
+	function setConstant(){
+		$UrlConfig = Config('Url','Url');
+		$SystemConfig = Config('System','System');
+		$Path = str_replace('\/','/',dirname($_SERVER['PHP_SELF']) . '/');
+		define('__APP__',$Path);
+		define('__TMP__',$Path . 'Template/');
+		define('__PLUG__',$Path . 'Libs/Plug/');
+		define('A_NAME',Receive($UrlConfig['Action']));
+		define('C_NAME',Receive($UrlConfig['Class']));
+		define('F_NAME',Receive($UrlConfig['Function']));
+		define('FRAMEWROK_VER',$this->Version);
+		ini_set('date.timezone',$SystemConfig['Time.zone']);
+	}
+	
+	/**
+	* 重载方法
+	* @param 名称 $name
+	* @param 参数 $arguments
+	* 
+	* @return Object Or Bool
+	*/
+	public function __call($name, $arguments) 
+    {
+    	$Class = '\Libs\Deal\\'.$name;
+    	if(class_exists($Class)){
+			$Class = new $Class;
+			return $Class;
+		}
+		return FALSE;
     }
+	
+	/**
+	* Start OS
+	* 
+	*/
+	public function Run($RunRoute=true)
+	{
+		if($RunRoute){
+			$this -> RunRoute();
+		}
+		$App = $this->CreateObj();
+		$function = $this -> FunctionName;
+		$App -> $function();
+	}
 }
 
 /**
-* 
-* 执行URL指针
+* 实例化驱动对象
 * 
 */
-ExecUrl($_GET[$CON['CLASS_NAME']], $_GET[$CON['FUNCTION_NAME']]);
+$Php300 = new Php300Deal();
+
+glovar('PHP300',$Php300,'OS');
+
+glovar('Runcount','0','OS');

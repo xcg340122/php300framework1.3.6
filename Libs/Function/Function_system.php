@@ -1,558 +1,334 @@
 <?php
 
 /**
-* 存在返回模型对象,否则返回false
-* @param 模型名称 $modelname
-* 
-* @return Object
-*/
-function M($modelname) { //返回MODEL
-    if ($modelname == '') {
-        return false;
-    }
-    if (is_object($GLOBALS[$modelname])) {
-        return $GLOBALS[$modelname];
-    }
-    return false;
-}
-
-/**
- * PHP300()
- * 返回PHP300云对象
- * @return Object
- */
-function php300() {
-    if (is_object(M('php300'))) {
-        $cache_obj = M('php300');
-        return $cache_obj;
-    } else {
-        return false;
-    }
-}
-
-/**
-* 返回配置信息
-* @param 配置名称 $configname
-* @param 指定配置文件名称 $configfile
-* 
-* @return String or Array
-*/
-function C($configname, $configfile = '') {
-    $arr = array('PHP300_CON', 'DB', 'U', 'TEMP');
-    if ($configfile != '') {
-        array_unshift($arr, $configfile);
-    }
-    foreach ($arr as $val) {
-        if (is_array($GLOBALS[$val])) {
-            if (isset($GLOBALS[$val][$configname])) {
-                return $GLOBALS[$val][$configname];
-            }
-        }
-    }
-    if (isset($GLOBALS[$configname])) {
-        return $GLOBALS[$configname];
-    }
-    return false;
-}
-
-/**
-* 获取参数[Get/Post]
-* @param 参数名称 $name
-* @param 为空返回的默认文本 $isnull
-* @param 获取类型 $type
-* @param 过滤函数 $filter
-* 
-* @return String or Array
-*/
-function I($name, $isnull = '', $type = 'GET', $filter = htmlspecialchars) {
-    if ($name != '') {
-        $value = ($type == 'GET') ? ($_GET[$name]) : ($_POST[$name]);
-        $value = ($value == NULL) ? ($_POST[$name]) : ($value);
-        $value = $value != '' ? $value : $isnull;
-        if (is_array($value)) {
-            foreach ($value as $key => $val) {
-                $value[$key] = $filter != '' ? $filter($val) : $val;
-            }
-        }
-        return $value;
-    } else {
-        return $isnull;
-    }
-}
-
-/**
-* 临时设置配置项
-* @param 键内容 $key
-* @param 值内容 $val
-* @param 配置到指定文件 $config
-* 
-* @return String or Array
-*/
-function G($key, $val, $config = '') {
-    if ($config) {
-        $GLOBALS[$config][$key] = $val;
-    } else {
-        $GLOBALS[$key] = $val;
-    }
-}
-
-/**
-* 返回MYSQL类
-* @param 表明 $db
-* 
-* @return Object
-*/
-function DB($db = '') {
-    if (C('autoconnect') == FALSE) {
-        exit('<meta charset="UTF-8">PHP300:您尚未启用DB配置项内的自动连接,无法操作数据库');
-    }
-    if (extension_loaded('Mysqli')) {
-        if (is_object(M('Mysqli'))) {
-            $cache_obj = M('Mysqli');
-            $cache_obj->set_db($db);
-            return $cache_obj;
-        } else {
-            loads('Mysqli');
-            $classname = 'Mysqli_class';
-            $classname = new $classname($db);
-            return $classname;
-        }
-    } else {
-        exit('<meta charset="UTF-8">PHP300:检测到您的Mysqli扩展没有启动,无法使用Mysql类库操作');
-    }
-    return false;
-}
-
-/**
-* 返回地址
-* @param 类/方法 $path
-* @param 附加参数 $param
-* 
-* @return String
-*/
-function U($path = '', $param = '') {
-    $params = explode('/', $path);
-    if (is_null($params[1])) {
-        $params[1] = 'index';
-    }
-    $u = __APP__ . '?c=' . $params[0] . '&f=' . $params[1] . $param;
-    return $u;
-}
-
-/**
-* 执行处理URL参数,f参数默认等于index
-* @param Class $c
-* @param Function $f
-* 
-* @return
-*/
-function ExecUrl($c, $f = '') {
-    $c = htmlspecialchars($c, ENT_QUOTES);
-    $f = htmlspecialchars($f, ENT_QUOTES);
-    $f = ($f) ? ($f) : ('index');
-    $us = array('c' => $c, 'f' => $f);
-    use_controller($us);
-}
-
-/**
 * 调用控制器
-* @param 配置数组 $option
 * 
-* @return
+* @return Object
 */
-function use_controller($option = array()) {
-    if ($option['c'] != '') {
-        $classname = substr($option['c'], 0, 1);
-        $classname = (checkcase($classname)) ? (ucwords($option['c'])) : ($option['c']); //转换首字符大写
-        if (M($classname) == false) {
-            M('System')->getErrorPage('找不到' . $classname . '控制器');
-        }
-        if (method_exists(M($classname), $option['f'])) {
-            M($classname)->$option['f']();
-            exit();
-        } else {
-            M('System')->getErrorPage('在' . $classname . '控制器中找不到' . $option['f'] . '方法');
-        }
-    }
+function Action($Name)
+{
+	$Php300 = Glovar('PHP300','','OS');
+	$Runcount = Glovar('Runcount','','OS');
+	if($Runcount > 10){
+		ShowText('PHP300::检测到调用死循环,程序已终止 -> '.$Name,true);
+	}
+	$Arr = explode('\\',$Name);
+	switch(count($Arr)){
+		case 1:
+		CheckRepeatRun($Php300->ClassName,$Arr[0]);
+		$Php300->ClassName = $Arr[0];
+			break;
+		case 2:
+		CheckRepeatRun($Php300->ActionName,$Arr[0]);
+		$Php300->ActionName = $Arr[0];
+		$Php300->ClassName = $Arr[1];
+			break;
+	}
+	return $Php300->CreateObj();
 }
 
 /**
-* 执行静态路由
-* @param 路径内容 $info
-* @param 路由配置 $U
+* 调用类库方法
+* @param 类库名称 $Name
 * 
-* @return
+* @return Object
 */
-function url_routing($info, $U) {
-    $info = str_replace($U['URL_TAIL'], '', $info);
-    $url_arr = explode($U['URL_MIDDLE'], $info);
-    if ($U['URL_MIDDLE'] != '/') { //处理分隔符
-        array_unshift($url_arr, $U['URL_MIDDLE']);
-        $url_arr[1] = str_replace('/', '', $url_arr[1]);
-    }
-    $count = count($url_arr);
-    if ($count > 1) {
-        $url_arr[2] = $url_arr[2] ? $url_arr[2] : 'index';
-        $urls .= 'c=' . $url_arr[1] . '&f=' . $url_arr[2];
-        $n = 0;
-        for ($i = 3; $i <= $count; $i++) {
-            if ($i != $n) {
-                $n = $i + 1;
-                if ($url_arr[$i] != '') {
-                    $n = $i + 1;
-                    $urls .= '&' . $url_arr[$i] . '=' . $url_arr[$n];
-                }
-            }
-        }
-        $urls = $urls;
-        parse_str($urls, $out);
-        $us = array('c' => $out['c'], 'f' => $out['f']);
-        foreach ($out as $key => $val) {
-            if ($key != 'c' and $key != 'f') {
-                $_GET[$key] = $val;
-            }
-        }
-        set_define(array('C_NAME' => $us['c'], 'F_NAME' => $us['f']));
-        G('C_AND_F', $us, 'U');
-    }
+function Libs($Name)
+{
+	$Php300 = Glovar('PHP300','','OS');
+	$Obj = $Php300 -> $Name();
+	if(is_object($Obj)){
+		return $Obj;
+	}
+	Error('PHP::没有找到该扩展类 -> '.$Name);
+}
+
+
+/**
+* 获取配置项
+* @param 配置项键 $key
+* @param 指定配置文件 $file
+* 
+* @return Array
+*/
+function Config($key='',$file='')
+{
+	global $Php300;
+	return $Php300->ReadConfig($key,$file);
 }
 
 /**
-* 预加载继承类
-* @param 类库预加载 $classname
+* 接收参数
+* @param 参数名称 $name
+* @param 为空返回 $null
+* @param 过滤方法 $function
 * 
-* @return
+* @return Array or String
 */
-function firstload($classname) {
-    if ($classname != '') {
-        $classname = str_replace('_class', '', $classname);
-        loads($classname);
-    }
+function Receive($name='',$null='',$function='htmlspecialchars')
+{
+	if(strpos($name,'.')){ $method =   explode('.',$name);$name = $method[1]; $method = $method[0]; }else{ $method = ''; }
+	switch(strtolower($method)){
+		case 'get': $Data = & $_GET; break;
+		case 'post': $Data = & $_POST; break;
+		case 'put': parse_str(file_get_contents('php://input'),$Data); break;
+		case 'globals': $Data = & $GLOBALS; break;
+		case 'session': $Data = & $_SESSION; break;
+		case 'server': $Data = & $_SERVER; break;
+		default:
+			 switch($_SERVER['REQUEST_METHOD']) { 	
+			 	default: $Data  = & $_GET; break;
+                case 'POST': $Data  = & $_POST; break; 
+                case 'PUT': parse_str(file_get_contents('php://input'),$Data); break;  };break;
+	}
+	if(empty($name)){
+		if(is_array($Data)){
+			foreach ($Data as $key => $val) { $Data[$key] = (function_exists($function))?($function($val)):($val); }
+            return $Data;
+		}
+	}else{
+		if(isset($Data[$name])){
+			return (function_exists($function))?($function($Data[$name])):($Data[$name]);
+		}
+		return ($null)?($null):('');
+	}
 }
 
 /**
-* 承接加载
-* @param 类名称 $classname
 * 
-* @return
+* @param session名称 $name
+* @param session值 $val
+* 
 */
-function loads($classname) {
-    if ($classname != '' and $classname != 'php300') {
-        if (in_array($classname, $GLOBALS['PHP300_CON'] ['CLASSLIST'])) {
-            $classname = FILE_PATH . 'Libs/Class/' . $classname . CLASS_NAME;
-        } else {
-            $p = (PHP_SAPI == 'cli') ? (str_replace('Libs' . DIRECTORY_SEPARATOR . 'Function', '', dirname(__FILE__))) : (FILE_PATH);
-            $cachename = $p . 'Cache/' . md5($classname) . '.php';
-            if (file_exists($cachename)) {
-                $classname = $cachename;
-            } else {
-                $classname = $p . 'Model/' . $classname . CLASS_NAME;
-            }
-        }
-        if (file_exists($classname)) {
-            include_once($classname);
-        }
-    }
+function Session($name='',$val='',$expire=3600)
+{
+	$Config = Config('Session','System');
+	$Session = Libs('Session');
+	if($Config['Session.start']){
+		$Session::_init($Config);
+		$Session::setExpire($expire);
+		$Session::start();
+		if(empty($name) and empty($val)){ return $Session; }
+		if(empty($val) and !empty($name)){ $val = $Session::get($name); return $val; }
+		if(!empty($name) and !empty($val)){ $Session::set($name,$val); return; }
+	}
+	return $Session;
 }
 
 /**
-* 获取中文匹配正则表达式
+* 操作Mysql
+* @param 表名 $table
 * 
-* @return String
+* @return Object
 */
-function return_key() {
-    if (file_exists(PLUG . 'php300_match.json')) {
-        $keyword = @file_get_contents(PLUG . 'php300_match.json');
-        $keyword = json_decode($keyword, true);
-        return $keyword;
-    }
-    return '';
+function Db($table = '')
+{
+	$Mysql = Glovar('Mysql','','OS');
+	if(is_object($Mysql)){
+		if(!empty($table)){
+			$Mysql->SelectDb($table);
+		}
+		return $Mysql;
+	}
+	Error('PHP300::没有连接到数据库,无法进行操作');
 }
 
 /**
-* 更新云类库
-* @param 系统配置 $CON
+* 设定全局变量
+* @param 键 $key
+* @param 值 $val
+* @param 域 $region
 * 
-* @return
+* @return String Or Array
 */
-function update_class($CON) {
-    if (!file_exists(FILE_PATH . 'Cache')) {
-        mkdir(FILE_PATH . 'Cache');
-    }
-    $cachefile = FILE_PATH . 'Cache/cache_class.php';
-    $file_link = @fopen($cachefile, 'w');
-    $object_url = 'http://yun.php300.cn/?c=get&SN=' . $CON['SN'] . '&T=' . $CON['TIME'];
-    $cacheclass = @file_get_contents($object_url);
-    if ($cacheclass == '') {
-        echo ($CON['DEBUG']) ? ('<meta charset="UTF-8">当前SN无云程序或获取云程序失败') : ('');
-    }
-    $results = json_decode($cacheclass, true);
-    if ($results != '0') {
-        $code = '';
-        if (is_array($results['data'])) {
-            foreach ($results['data'] as $val) {
-                $code .= urldecode($val['function_content']);
-            }
-        }
-        $cacheclass = "<?php class php300_class{ " . $code . " } ?>";
-        fwrite($file_link, $cacheclass);
-        fclose($file_link);
-        if ($CON['CONFUSION']) {
-            $confusion = @php_strip_whitespace($cachefile);
-            @file_put_contents($cachefile, $confusion);
-        }
-    } else {
-        fclose($file_link);
-        echo ($CON['DEBUG']) ? ($results['msg']) : ('');
-    }
+function Glovar($key='',$val='',$region='User')
+{
+	global $php300global;
+	if(empty($key)){ return (is_array($php300global[$region]))?($php300global[$$region]):(array()); }
+	if(empty($val)){ return (isset($php300global[$region][$key]))?($php300global[$region][$key]):(''); }
+	$php300global[$region][$key] = $val;
 }
 
 /**
- * 系统基本常量
- * SystemDefineInfo();
- * 
- */
-function SystemDefineInfo() {
-	$Path = str_replace('\/','/',dirname($_SERVER['PHP_SELF']) . '/');
-    $vals = array(
-        '__APP__' => $Path,
-        '__HOST__' => $_SERVER['HTTP_HOST'],
-        '__PORT__' => $_SERVER["SERVER_PORT"],
-        '__TMP__' => $Path . 'Template/',
-        '__REFERER__' => $_SERVER['HTTP_REFERER'],
-        '__PLUG__' => $Path . 'Libs/Plug/',
-        '__Jquery__'=>$Path . 'Libs/Plug/JavaScript/Jquery.js',
-        '__Layer__'=>$Path . 'Libs/Plug/Layer/layer.js',
-        'C_NAME' => $_GET[C('CLASS_NAME')],
-        'F_NAME' => $_GET[C('FUNCTION_NAME')],
-    );
-    set_define($vals);
+* 渲染并展示模板
+* @param 模板路径 $Template
+* 
+*/
+function Show($Template='index')
+{
+	if(!empty($Template)){
+		$ViewConfig = Config('View','View');
+		$View = Glovar('View','','OS');
+		$Tail = (!empty($ViewConfig['Tail']))?($ViewConfig['Tail']):('.html');
+		$View -> display($Template . $Tail);
+	}
 }
 
 /**
-* 常量预设
-* @param 常量数组 $array
+* 设置模板变量
+* @param 键 $key
+* @param 值 $val
 * 
-* @return
 */
-function set_define($array) {
-    foreach ($array as $key => $val) {
-        if (!defined($key)) {
-            define($key, $val);
-        }
-    }
-    G('System_constant', $array, 'PHP300_CON');
+function Assign($key,$val)
+{	
+	if(!empty($key) or !empty($val)){
+		$View = Glovar('View','','OS');
+		$View -> assign($key,$val);
+	}
 }
 
 /**
-* 展示错误页
-* @param 错误文本 $error
-* @param 跳转地址 $url
-* @param 等待时间 $seconds
+* 渲染并获取模板
+* @param 模板路径 $Template
 * 
-* @return
 */
-function error($error = '未知错误', $url = '', $seconds = 3) {
-    $info = array(
-        'message' => $error,
-        'url' => $url,
-        'seconds' => $seconds,
-        'state' => '0',
-    );
-    show_state_information($info);
+function Fetch($Template='index')
+{
+	if(!empty($Template)){
+		$ViewConfig = Config('View','View');
+		$View = Glovar('View','','OS');
+		$Tail = (!empty($ViewConfig['Tail']))?($ViewConfig['Tail']):('.html');
+		return $View -> fetch($Template . $Tail);
+	}
 }
 
 /**
-* 展示成功页
-* @param 错误文本 $success
-* @param 跳转地址 $url
-* @param 等待时间 $seconds
-* 
-* @return
+* 检查是否重复使用
 */
-function success($success = '操作成功', $url = '', $seconds = 3) {
-    $info = array(
-        'message' => $success,
-        'url' => $url,
-        'seconds' => $seconds,
-        'state' => '1',
-    );
-    show_state_information($info);
+function CheckRepeatRun($A,$B)
+{
+	global $Runcount;
+	if($A===$B){
+		$Runcount++;
+	}
 }
+
+/**
+* 处理错误信息
+* @param 错误代码 $errno
+* @param 错误内容 $errstr
+* @param 错误文件 $errfile
+* @param 错误行数 $errline
+* 
+*/
+function getError($errno,$errstr,$errfile,$errline)
+{
+	$Config = Config('System','System');
+	switch($errno){
+		case E_USER_WARNING:
+			$errstr = "<b>WARNING 错误</b>$errstr";
+		break;
+		default: 
+			$errstr =  "未定义的内容:[$errstr]"; 
+		break;
+	}
+	if(!$Config['Debug']){
+		ShowText('站点出现问题,请及时联系站长!',true);
+	}
+	$Data = array('errno' => $errno,'errstr' => $errstr,'errfile' => $errfile,'errline' => $errline);
+	Logs('PHP300::'.$errstr.'  文件:'.$errfile.'  行数:'.$errline,'Error');
+	ShowError($Data);
+}
+set_error_handler('getError');
+
 
 /**
 * 展示状态页
-* @param 状态配置数组 $info
+* @param 配置参数 $Data
 * 
-* @return
 */
-function show_state_information($info) {
-    if (is_array($info)) {
-        M('System')->SetVar('message', $info['message']);
-        $info['url'] = $info['url'] != '' ? $info['url'] : __REFERER__;
-        $info['url'] = $info['url'] != '' ? $info['url'] : '#';
-        M('System')->SetVar('url', $info['url']);
-        M('System')->SetVar('seconds', $info['seconds'] * 1000);
-        $state = $info['state'] == '1' ? '( ^_^ )' : '(*>﹏<*)';
-        M('System')->SetVar('state', $state);
-        $GLOBALS['TMP']->left_delimiter = '<{';
-        $GLOBALS['TMP']->right_delimiter = '}>';
-        M('System')->display('PHP300TMP/State', '2');
+function ShowPage($Data,$isLog=true,$Page='')
+{
+	if (is_array($Data)) {
+		$Config = Config('System','System');
+		$BackUrl = Receive('server.HTTP_REFERER');
+		$Url = (!empty($BackUrl))?($BackUrl):('#');
+		$Seconds = (isset($Data['Seconds']) && is_numeric($Data['Seconds']))?($Data['Seconds']):(3);
+		$Info = array(
+			'Url' => (!empty($Data['Url']))?($Data['Url']):($Url),
+			'Seconds' => $Seconds * 1000,
+			'Status' => ($Data['Status']=='1')?('( ^_^ )'):('(*>﹏<*)'),
+			'Msg' => (!empty($Data['Msg']))?($Data['Msg']):('无'),
+		);
+		$Page = (!empty($Page))?($Page):($Config['Status.Template']);
+		if($isLog){ Logs($Data['Msg']); }
+        Assign('Data',$Info);
+        Show($Page);
         exit();
     }
 }
 
 /**
- * 缓存类别名
- * 
- * @return Object
- */
-function cache() {
-    if (is_object(M('Cache'))) {
-        return M('Cache');
-    }
-    return FALSE;
-}
-
-/**
- * 文件类别名
- * 
- * @return Object
- */
-function files() {
-    if (is_object(M('File'))) {
-        return M('File');
-    }
-    return FALSE;
-}
-
-/**
- * cookies类别名
- * 
- * @return Object
- */
-function cookies() {
-    if (is_object(M('Cookies'))) {
-        return M('Cookies');
-    }
-    return FALSE;
-}
-
-/**
- * http类别名
- * 
- * @return Object
- */
-function http() {
-    if (is_object(M('Http'))) {
-        return M('Http');
-    }
-    return FALSE;
-}
-
-/**
- * session类别名
- * 
- * @return Object
- */
-function session() {
-    if (C('SESSION_START')) {
-        if (is_object(M('Session'))) {
-            return M('Session');
-        }
-        return FALSE;
-    } else {
-        exit('<meta charset="UTF-8">PHP300:抱歉,您在配置中没有启用Session,无法进行操作');
-    }
-}
-
-/**
- * Socket类别名
- * 
- * @return Object
- */
-function socket($type='http',$address='0.0.0.0',$port='2345') {
-    if (is_object(M('Socket'))) {
-        $socket = M('Socket')->option($type,$address,$port);
-        return $socket;
-    }
-    return FALSE;
-}
-
-/**
- * 判断字符是否小写
- * 
- * @return Bool
- */
-function checkcase($str) {
-    if (preg_match('/^[a-z]+$/', $str)) {
-        return true;
-    } elseif (preg_match('/^[a-z]+$/', $str)) {
-        return false;
-    }
-}
-
-/**
- * 释放垃圾变量
- */
-function ReleaseUseless() {
-    $vallist = array('keys', 'replace_arr', 'modelval');
-    foreach ($vallist as $val) {
-        unset($GLOBALS[$val]);
-    }
-}
-
-/**
-* 渲染模板
-* @param 模板文件 $filename
+* 展示错误页
+* @param 数据 $Data
 * 
-* @return
 */
-function show($filename = 'index') {
-    if ($filename != '') {
-        M('System')->display($filename);
-    }
+function ShowError($Data)
+{
+	$View = Glovar('View','','OS');
+	$View -> left_delimiter = '<{';
+	$View -> right_delimiter = '}>';
+	$Config = Config('System','System');
+	Assign('Data',$Data);
+	Show($Config['Error.Template']);
+    exit();
 }
 
 /**
-* 获取渲染内容
-* @param 模板名称 $filename
+* 状态页扩展展示方法(成功页)
+* @param 提示内容 $Msg
+* @param 跳转地址 $Url
+* @param 跳转秒数 $Seconds
 * 
-* @return String
 */
-function fetch($filename = 'index') {
-    if ($filename != '') {
-        $content = M('System')->Fetch($filename);
-    }
-    return $content;
+function Success($Msg,$Url='',$Seconds=3)
+{
+	$Data = array('Msg'=>$Msg,'Status' => '1','Seconds' => $Seconds,'Url' => $Url);
+	ShowPage($Data);
 }
 
 /**
-* 单体赋值
-* @param 键内容 $key
-* @param 值内容 $val
+* 状态页扩展展示方法(成功页)
+* @param 提示内容 $Msg
+* @param 跳转地址 $Url
+* @param 跳转秒数 $Seconds
 * 
-* @return
 */
-function assign($key, $val) {
-    if ($key != '' and $val != '') {
-        M('System')->SetVar($key, $val);
-    }
+function Error($Msg,$Url='',$Seconds=3)
+{
+	$Data = array('Msg'=>$Msg,'Status' => '0','Seconds' => $Seconds,'Url' => $Url);
+	ShowPage($Data);
 }
 
 /**
-* 取文本中间
-* @param 欲取文本 $content
-* @param 文本左边 $l
-* @param 文本右边 $r
+* 记录系统日志
+* @param 日志内容 $Msg
 * 
-* @return String
 */
-function middle_string($content,$l,$r){
-	$var = explode($l,$content);
-	if($var[1]!=''){
-		$var = explode($r,$var[1]);
-		return ($var[0])?($var[0]):('');
+function Logs($Msg,$File='Logs')
+{
+	if(!empty($Msg)){
+		$Enter = getEnter();
+		error_log($Msg .$Enter.'记录时间：'.date('Y-m-d H:i:s').$Enter.$Enter ,3,'Logs/'.$File.'.log');
 	}
-	return '';
+}
+
+/**
+* 显示一段文本
+*/
+function ShowText($Text,$isOver = false,$Char='UTF-8')
+{
+	echo('<meta charset="'.$Char.'">'.$Text);
+	if($isOver){
+		exit();
+	}
+}
+
+/**
+* 获取不同系统换行符
+* 
+*/
+function getEnter(){
+	return (strtolower(substr(PHP_OS, 0, 3))=='win')?("\r\n"):("\n");
 }

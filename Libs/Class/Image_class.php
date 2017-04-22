@@ -1,26 +1,25 @@
 <?php
+
 /**
- *  image_class.php 图片操作类
- *
- * @copyright			(C) 2015-2016 PHP300
- * @license				http://framework.php300.cn
- * @lastmodify			2016-07-02
- */
-class Image_class extends System_class{
+* @copyright: PHP300Framework
+* @author: Chungui
+* 
+*/
 
-    public $image;
+namespace Libs\Deal;
+
+class Image {
+	
+	public $Image;
+	
     private $CreateImage;
-
-    public function __construct() {
-        
-    }
     
     /**
 	*获取图片 
 	* @return 设置的图片
 	*/
     function getImage() {
-        return $this->image;
+        return $this->Image;
     }
     
     /**
@@ -29,20 +28,20 @@ class Image_class extends System_class{
 	* @return
 	*/
     function setImage($image) {
-        $this->image = $image;
+        $this->Image = $image;
 
         /* 检查扩展后缀 */
-        $FullPath = pathinfo($this->image);
+        $FullPath = pathinfo($this->Image);
         switch ($FullPath['extension']) {
             case 'jpg':
             case 'jpeg':
-                $this->CreateImage = imagecreatefromjpeg($this->image);
+                $this->CreateImage = imagecreatefromjpeg($this->Image);
                 break;
             case 'gif':
-                $this->CreateImage = imagecreatefromgif($this->image);
+                $this->CreateImage = imagecreatefromgif($this->Image);
                 break;
             case 'png':
-                $this->CreateImage = imagecreatefrompng($this->image);
+                $this->CreateImage = imagecreatefrompng($this->Image);
                 break;
             default:
                 $this->CreateImage = false;
@@ -58,9 +57,9 @@ class Image_class extends System_class{
 	* @param 对象路径 $target_path
 	* @param input名称 $uploadName
 	* 
-	* @return
+	* @return String
 	*/
-    public function upload($file, $maxSize = 4325720, $Target_name = null, $target_path = '', $uploadName = 'file') {
+    public function upload($file, $target_path = '' , $maxSize = 4325720, $Target_name = null, $uploadName = 'file') {
         /* Check if file is empty or not */
 
         if (!empty($file)) {
@@ -104,7 +103,7 @@ class Image_class extends System_class{
 	*/
     public function Height() {
     	
-    	 $size = getimagesize($this->image);
+    	 $size = getimagesize($this->Image);
         $Height = $size[1];
 
         return $Height;
@@ -116,7 +115,7 @@ class Image_class extends System_class{
 	*/
     public function Width() {
     	
-    	  $size = getimagesize($this->image);
+    	  $size = getimagesize($this->Image);
     	  
         $Width = $size[0];
 
@@ -129,7 +128,7 @@ class Image_class extends System_class{
 	*/
     public function Imagesize() {
     	
-        $dimension = getimagesize($this->image);
+        $dimension = getimagesize($this->Image);
 
         $dimension = $dimension[0] . ' x ' . $dimension[1];
         return $dimension;
@@ -141,7 +140,7 @@ class Image_class extends System_class{
 	*/
     public function Extension() {
     	
-        $FullPath = pathinfo($this->image);
+        $FullPath = pathinfo($this->Image);
         $Extension = $FullPath['extension'];
 
         return $Extension;
@@ -153,7 +152,7 @@ class Image_class extends System_class{
 	*/
     public function mime() {
     	
-    	 $size = getimagesize($this->image);
+    	 $size = getimagesize($this->Image);
         $mime = $size['mime'];
 
         return $mime;
@@ -167,7 +166,7 @@ class Image_class extends System_class{
 	*/
     public function resize($NewWidth = null, $NewHeight = null) {
     	
-        list($width, $height) = getimagesize($this->image);
+        list($width, $height) = getimagesize($this->Image);
 
         if ($NewHeight == null AND $NewWidth == null) {
             throw new Exception('Cannot resize without height or width');
@@ -233,7 +232,7 @@ class Image_class extends System_class{
             throw new Exception('flip require value');
         }
 
-        $this->image = $flip;
+        $this->Image = $flip;
         return true;
     }
     
@@ -333,7 +332,7 @@ class Image_class extends System_class{
         }
 
         $bbox = imagettfbbox(0, 0, $font, $text);
-        list($width, $height) = getimagesize($this->image);
+        list($width, $height) = getimagesize($this->Image);
 
         $text_width = $bbox[2] - $bbox[0];
         $text_height = $bbox[3] - $bbox[1];
@@ -414,7 +413,7 @@ class Image_class extends System_class{
     /**
 	* 保存
 	* @param 名称 $name
-	* @param 质量 $quality
+	* @param 图片质量 $quality
 	* @return Boolean
 	*/
     public function save($name, $quality = 100) {
@@ -425,7 +424,7 @@ class Image_class extends System_class{
                 throw new Exception('Quality gotta be a number');
             } else {
                 $PathSave = pathinfo($name);
-                $FullPath = pathinfo($this->image);
+                $FullPath = pathinfo($this->Image);
                 if (!isset($PathSave['extension'])) {
                     switch ($FullPath['extension']) {
                         case 'jpg':
@@ -475,5 +474,5 @@ class Image_class extends System_class{
         imagedestroy($this->CreateImage);
         return true;
     }
-
 }
+?>
