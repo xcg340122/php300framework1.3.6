@@ -17,7 +17,7 @@ return array(
 		
 		'Prefix' => '',			//表前缀
 		
-		'Connect' => true,		//是否启用连接
+		'Connect' => false,		//是否启用连接
 		
 		'Logs' => true,			//是否记录Mysql日志
 		
