@@ -57,13 +57,13 @@ class Php300Deal {
 	* 初始化框架
 	* 
 	*/
-	function init()
+	private function init()
 	{
 		$this->setCorePath();
 		$this->ConfigList = $this->getDir($this->CorePath.'Config');
 		$this->ActionList = $this->getDir($this->CorePath.'Action');
-		$this->FunctionList = $this->getDir($this->getFunctionPath());
-		$this->ClassList = $this->getDir($this->getClassPath());
+		$this->FunctionList = $this->getDir($this->getfullPath('Function'));
+		$this->ClassList = $this->getDir($this->getfullPath('Class'));
 		$this->loadConfig();
 		$this->loadFunction();
 		$this->loadView();
@@ -95,7 +95,7 @@ class Php300Deal {
 	function loadFunction()
 	{
 		if(count($this->FunctionList) > 0){
-			$FunctionPath = $this->getFunctionPath().DIRECTORY_SEPARATOR;
+			$FunctionPath = $this->getfullPath('Function').DIRECTORY_SEPARATOR;
 			foreach($this->FunctionList as $key=>$val){ if($this->getExtension($val) === 'php'){ $this->Readload($FunctionPath.$val); } }
 		}
 	}
@@ -129,8 +129,8 @@ class Php300Deal {
 	public function loadClass()
 	{
 		if(count($this->ClassList) > 0){
-			$ClassPath = $this->getClassPath() . DIRECTORY_SEPARATOR;
-			foreach($this->ClassList as $key=>$val){ if($this->getExtension($val) === 'php'){ $this->Readload($ClassPath.$val,substr($val,0,-4)); } }			}
+			$ClassPath = $this->getfullPath('Class') . DIRECTORY_SEPARATOR;
+			foreach($this->ClassList as $key=>$val){ if($this->getExtension($val) === 'php'){ $this->Readload($ClassPath.$val,substr($val,0,-4)); } } $this->setConstant(); $this->ConnMysql(); }
 	}
 	
 	/**
@@ -140,7 +140,7 @@ class Php300Deal {
 	*/
 	public function loadPlug($File)
 	{
-		$PlugPath = $this->getPlugPath().DIRECTORY_SEPARATOR.$File;
+		$PlugPath = $this->getfullPath('Plug').DIRECTORY_SEPARATOR.$File;
 		if(is_file($PlugPath)){
 			include_once($PlugPath);
 		}
@@ -178,12 +178,9 @@ class Php300Deal {
 	*/
 	function Directly($UrlConfig)
 	{
-		$Action = Receive($UrlConfig['Action'],$this->ActionName);
-		$Class = Receive($UrlConfig['Class'],$this->ClassName);
-		$Function = Receive($UrlConfig['Function'],$this->FunctionName);
-		$this->ActionName = $Action;
-		$this->ClassName = $Class;
-		$this->FunctionName = $Function;
+		$this->ActionName = Receive($UrlConfig['Action'],$this->ActionName);
+		$this->ClassName = Receive($UrlConfig['Class'],$this->ClassName);
+		$this->FunctionName = Receive($UrlConfig['Function'],$this->FunctionName);
 	}
 	
 	/**
@@ -195,37 +192,16 @@ class Php300Deal {
 		$Path = str_replace(DIRECTORY_SEPARATOR.'Libs','',dirname(__FILE__)).DIRECTORY_SEPARATOR;
 		$this->CorePath = $Path;
 	}
-	
+
 	/**
-	* 返回公用方法目录
+	* 返回相关路径
+	* @param 关联目录 $Path
 	* 
 	* @return String
 	*/
-	function getFunctionPath()
-	{
-		$Path = $this->CorePath.'Libs'.DIRECTORY_SEPARATOR.'Function';
-		return $Path;
-	}
-	
-	/** 
-	* 返回系统类目录
-	* 
-	* @return String
-	*/
-	function getClassPath()
-	{
-		$Path = $this->CorePath.'Libs'.DIRECTORY_SEPARATOR.'Class';
-		return $Path;
-	}
-	
-	/**
-	* 返回插件目录
-	* 
-	* @return String
-	*/
-	function getPlugPath()
-	{
-		$Path = $this->CorePath.'Libs'.DIRECTORY_SEPARATOR.'Plug';
+	function getfullPath($Path)
+	{	
+		$Path = $this->CorePath.'Libs'.DIRECTORY_SEPARATOR.$Path;
 		return $Path;
 	}
 	
@@ -316,7 +292,7 @@ class Php300Deal {
 		$Obj -> cache_lifetime = $ViewConfig['Cache.Time'];
 		$Obj -> left_delimiter = $ViewConfig['Left'];
 		$Obj -> right_delimiter = $ViewConfig['Right'];
-		Glovar('View',$Obj,'OS');
+		glovar('View',$Obj,'OS');
 	}
 	
 	/**
@@ -357,8 +333,6 @@ class Php300Deal {
 		if(empty($this->ActionName)){ $this->ActionName = $Action; }
 		if(empty($this->ClassName)){ $this->ClassName = $Class;}
 		if(empty($this->FunctionName)){ $this->FunctionName = $Function; }
-		$this->setConstant();
-		$this->ConnMysql();
 	}
 	
 	/**
@@ -376,29 +350,44 @@ class Php300Deal {
 	* 自动连接Mysql
 	* 
 	*/
-	function ConnMysql(){
-		$MysqlConfig = Config('Mysql','Mysql');
+	function ConnMysql()
+	{
+		$MysqlConfig = $this->ReadConfig('Mysql','Mysql');
 		if($MysqlConfig['Connect']){
-			if(is_array($MysqlConfig)){$Mysql = Libs('Mysql'); $Mysql->option($MysqlConfig); $Mysql->Connect();Glovar('Mysql',$Mysql,'OS');}
+			if(is_array($MysqlConfig)){$Mysql = Libs('Mysql'); $Mysql->option($MysqlConfig); $Mysql->Connect();glovar('Mysql',$Mysql,'OS');}
 		}
 	}
 	
 	/**
 	* 设置常量和配置信息
-	* 
 	*/
-	function setConstant(){
-		$UrlConfig = Config('Url','Url');
-		$SystemConfig = Config('System','System');
+	function setConstant()
+	{
+		$UrlConfig = $this->ReadConfig('Url','Url');
+		$SystemConfig = $this->ReadConfig('System','System');
 		$Path = str_replace('\/','/',dirname($_SERVER['PHP_SELF']) . '/');
-		define('__APP__',$Path);
-		define('__TMP__',$Path . 'Template/');
-		define('__PLUG__',$Path . 'Libs/Plug/');
-		define('A_NAME',Receive($UrlConfig['Action']));
-		define('C_NAME',Receive($UrlConfig['Class']));
-		define('F_NAME',Receive($UrlConfig['Function']));
-		define('FRAMEWROK_VER',$this->Version);
+		$DefineArr =  array(
+			'__APP__' => $Path,
+			'__TMP__' => $Path . 'Template/',
+			'__PLUG__' => 'Libs/Plug/',
+			'A_NAME' => Receive($UrlConfig['Action']),
+			'C_NAME' => Receive($UrlConfig['Class']),
+			'F_NAME' => Receive($UrlConfig['Function']),
+			'FRAMEWROK_VER' => $this->Version
+			);
+		foreach ($DefineArr as $key => $value) {
+			define($key,$value);
+		}
 		ini_set('date.timezone',$SystemConfig['Time.zone']);
+	}
+
+	/**
+	 * 绑定实例
+	 * @param  string $action [实例名称]
+	 */
+	public function bindAction($action = '')
+	{
+		if(!empty($action)){ $this->Action = $action; }
 	}
 	
 	/**

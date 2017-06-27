@@ -14,7 +14,13 @@ return array(
 		'Class' => 'c',		//控制器参数
 		
 		'Function' => 'f',	//方法参数
-	)
-	
+		),
+
+
+	'Routing' => array(
+
+
+
+		),
 );
 ?>

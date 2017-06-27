@@ -67,7 +67,13 @@ function Config($key='',$file='')
 */
 function Receive($name='',$null='',$function='htmlspecialchars')
 {
-	if(strpos($name,'.')){ $method =   explode('.',$name);$name = $method[1]; $method = $method[0]; }else{ $method = ''; }
+	if(strpos($name,'.')){
+		$method = explode('.',$name);
+		$name = $method[1];
+		$method = $method[0];
+	}else{
+		$method = '';
+	}
 	switch(strtolower($method)){
 		case 'get': $Data = & $_GET; break;
 		case 'post': $Data = & $_POST; break;
@@ -81,16 +87,18 @@ function Receive($name='',$null='',$function='htmlspecialchars')
                 case 'POST': $Data  = & $_POST; break; 
                 case 'PUT': parse_str(file_get_contents('php://input'),$Data); break;  };break;
 	}
-	if(empty($name)){
-		if(is_array($Data)){
-			foreach ($Data as $key => $val) { $Data[$key] = (function_exists($function))?($function($val)):($val); }
-            return $Data;
+	if(!empty($Data[$name])){
+		if(is_array($Data[$name])){
+			foreach ($Data as $key => $val) {
+				 $Data[$key] = (function_exists($function))?($function($val)):($val);
+			}
+       		return $Data[$name];
+		}else{
+			$value = (function_exists($function))?($function($Data[$name])):($Data[$name]);
+			return ($value)?($value):(($null)?($null):(''));
 		}
 	}else{
-		if(isset($Data[$name])){
-			return (function_exists($function))?($function($Data[$name])):($Data[$name]);
-		}
-		return ($null)?($null):('');
+		return $null;
 	}
 }
 

@@ -18,7 +18,7 @@ return array(
 		
 		'Error.Template'  => 'Php300/Error',//系统错误页模板
 		
-	),
+		),
 	
 	/**
 	* Session设置
@@ -35,7 +35,7 @@ return array(
 		
 		'Session_callback'	=> '',	//session回调
 	
-	),
+		),
 	
 	/**
 	* 云平台配置信息
@@ -46,6 +46,6 @@ return array(
 		
 		'Type' => '0',			//0：不启用云平台,1：启用并同步一次,2：启用并永久同步
 		'Confusion' => false,	//是否进行代码压缩
-	)
+		)
 	
 );

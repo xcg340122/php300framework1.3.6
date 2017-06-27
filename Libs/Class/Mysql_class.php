@@ -4,25 +4,25 @@ namespace Libs\Deal;
 
 class Mysql {
 	
-	private $config;
+	private $Config;
 	
-	private $queryid;
+	private $Queryid;
 	
-	private $link = null;
+	private $Link = null;
 	
-	private $sql;
+	private $Sql;
 	
-	private $db;
+	private $Db;
 	
-	private $key;
+	private $Key;
 	
-	private $fields;
+	private $Fields;
 	
-	private $data;
+	private $Data;
 	
-	private $page;
+	private $Page;
 	
-	private $deal = array(
+	private $Deal = array(
 		'join' => '',
 		'where' => '',
 		'field' => '',
@@ -34,8 +34,10 @@ class Mysql {
 		'alias' => '',
 	);
 	
-	private $handle = array('join','where','field','union','group','order','limit','page','alias');
+	private $Handle = array('join','where','field','union','group','order','limit','page','alias');
 	
+    private $Symbol = array('eq' => '=','neq' => '<>' ,'gt' => '>' ,'lt' => '<','elt' => 
+        '<=' ,'egt' => '>=' ,'like' => 'LIKE' , 'between' => 'BETWEEN' ,'notnull' => 'IS NUT NULL','null' => 'IS NULL');
 	/**
 	* 配置项
 	* @param 配置数组 $config
@@ -43,7 +45,7 @@ class Mysql {
 	*/
 	function option($config){
 		if(is_array($config)){
-			$this->config = $config;
+			$this->Config = $config;
 		}
 	}
 	
@@ -52,10 +54,10 @@ class Mysql {
 	* 
 	*/
 	function Connect(){
-		$this->link  = @mysqli_connect($this->config['Host'] . ':' . $this->config['Port'], $this->config['Username'], $this->config['Password'], $this->config['DataBase']);
-		if($this->link != null){
-			mysqli_query($this->link, "set names " . $this->config['Char']);
-        	return $this->link;
+		$this->Link  = @mysqli_connect($this->Config['Host'] . ':' . $this->Config['Port'], $this->Config['Username'], $this->Config['Password'], $this->Config['DataBase']);
+		if($this->Link != null){
+			mysqli_query($this->Link, "set names " . $this->Config['Char']);
+        	return $this->Link;
 		}else{
 			Error('PHP::Mysql连接失败!');
 		}
@@ -67,14 +69,14 @@ class Mysql {
 	* 
 	*/
 	public function SelectDb($Db=''){
-		if($this->link!=NULL){
+		if($this->Link!=NULL){
 			if(empty($Db)){
 				$TableList = $this->getTable();
 				if($TableList[0]){
-					$this->db = $TableList[0];
+					$this->Db = $TableList[0];
 				}
 			}else{
-				$this->db = $this->config['Prefix'].$Db;
+				$this->Db = $this->Config['Prefix'].$Db;
 			}
 			$this->orderField();
 			return $this;
@@ -86,8 +88,8 @@ class Mysql {
 	* 
 	*/
 	public function orderField() {
-        if ($this->db != '') {
-            $Res = $this->getFields($this->db);
+        if ($this->Db != '') {
+            $Res = $this->getFields($this->Db);
             $ResArr = array();
             foreach ($Res as $key => $val) {
                 if ($val['Default'] == NULL) {
@@ -96,12 +98,12 @@ class Mysql {
                     $ResArr[$key] = $val['Default'];
                 }
                 if ($val['Key'] == 'PRI') {
-                    $this->key = $key;
+                    $this->Key = $key;
                     unset($ResArr[$key]);
                 }
             }
         }
-        $this->data = $ResArr;
+        $this->Data = $ResArr;
     }
 	
 	/**
@@ -110,12 +112,16 @@ class Mysql {
 	* 
 	*/
 	private function execute($sql) {
-		if($this->link != null){
-			$this->queryid = mysqli_query($this->link, $sql);
-			$Status = ($this->queryid)?('Success'):('Error');
-			if($this->config['Logs']){ Logs('PHP300SQL['.$Status.']::'.$sql,'Mysql');}
-			if($this->config['Debug']){  Error('SQL执行失败：'.$sql.'<br />错误反馈:['.$this->Error().']'); }
-        	return $this->queryid;
+		if($this->Link != null){
+			$this->Queryid = mysqli_query($this->Link, $sql);
+			$Status = ($this->Queryid)?('Success'):('Error');
+			if($this->Config['Logs']){ Logs('PHP300SQL['.$Status.']::'.$sql,'Mysql');}
+			if($this->Config['Debug']){ 
+                if(!$this->Queryid){
+                    Error('SQL执行失败：'.$sql.'<br />错误反馈:['.$this->Error().']');
+                }
+            }
+        	return $this->Queryid;
 		}else{
 			Error('PHP300::获取数据连接信息失效,请检查配置文件或目标主机状态!');
 		}
@@ -135,8 +141,8 @@ class Mysql {
 	* 
 	*/
 	function fetchNext(){
-		if($this->queryid){
-			$Res = mysqli_fetch_array($this->queryid, MYSQLI_ASSOC);
+		if($this->Queryid){
+			$Res = mysqli_fetch_array($this->Queryid, MYSQLI_ASSOC);
 	        if (!$Res) {
 	            $this->freeResult();
 	        }
@@ -149,9 +155,9 @@ class Mysql {
 	* 
 	*/
 	function freeResult() {
-        if (is_resource($this->queryid)) {
-            mysqli_free_result($this->queryid);
-            $this->queryid = null;
+        if (is_resource($this->Queryid)) {
+            mysqli_free_result($this->Queryid);
+            $this->Queryid = null;
         }
     }
     
@@ -165,15 +171,15 @@ class Mysql {
         if (is_array($data)) {
         	$keys='';$vals='';
         	foreach ($data as $key => $val) {
-                $this->data[$key] = $val;
+                $this->Data[$key] = $val;
             }
-            foreach ($this->data as $key => $val) {
+            foreach ($this->Data as $key => $val) {
                 $keys .= $this->addSpecialChar($key) . ',';
                 $vals .= "'" . $val . "',";
             }
             $keys = trim($keys, '.,');$vals = trim($vals, '.,');
-            $this->sql = 'INSERT INTO ' . $this->db . ' (' . $keys . ')VALUES(' . $vals . ')';
-            return $this->execute($this->sql);
+            $this->Sql = 'INSERT INTO ' . $this->Db . ' (' . $keys . ')VALUES(' . $vals . ')';
+            return $this->execute($this->Sql);
         } else {
             return FALSE;
         }
@@ -191,7 +197,7 @@ class Mysql {
 	* 
 	*/
     public function insert_id() {
-        return mysqli_insert_id($this->link);
+        return mysqli_insert_id($this->Link);
     }
     
     /**
@@ -203,8 +209,8 @@ class Mysql {
         foreach ($data as $key => $val) {
             $vals .= $key . '=' . "'".$val."'";
         }
-        $this->sql = 'UPDATE ' . $this->db . ' set ' . $vals . $this->deal['where'];
-        return $this->execute($this->sql);
+        $this->Sql = 'UPDATE ' . $this->Db . ' set ' . $vals . $this->Deal['where'];
+        return $this->execute($this->Sql);
     }
 	
 	/**-+
@@ -221,9 +227,9 @@ class Mysql {
 	* 
 	*/
     public function select() {
-        $this->linkSql();
-        if ($this->sql != '') {
-            $this->execute($this->sql);$DataList = array();
+        $this->LinkSql();
+        if ($this->Sql != '') {
+            $this->execute($this->Sql);$DataList = array();
             while (($Res = $this->fetchNext()) != false) {
                  $DataList[] = $Res;
             }
@@ -239,10 +245,10 @@ class Mysql {
 	*/
     public function find($key = '') {
         if (is_numeric($key)) {
-            $this->where = 'where ' . $this->key . ' = ' . $key . ' ';
+            $this->where = 'where ' . $this->Key . ' = ' . $key . ' ';
         }
-        $this->linkSql();
-        $this->execute($this->sql);
+        $this->LinkSql();
+        $this->execute($this->Sql);
         $Res = $this->fetchNext();
         $this->freeResult();    
         return (is_array($Res))?($Res):(array());
@@ -255,10 +261,10 @@ class Mysql {
 	*/
     public function delete($key = '') {
         if (is_numeric($key)) {
-            $this->deal['where'] = 'where ' . $this->key . ' = ' . $key . ' ';
+            $this->Deal['where'] = 'where ' . $this->Key . ' = ' . $key . ' ';
         }
-        $this->linkSql('delete');
-        $Res = $this->execute($this->sql);
+        $this->LinkSql('delete');
+        $Res = $this->execute($this->Sql);
         return $Res;
     }
     
@@ -267,7 +273,7 @@ class Mysql {
 	* 
 	*/
 	public function del($key = ''){
-		$this->key($key);
+		$this->Key($key);
 	}
     
     
@@ -276,7 +282,7 @@ class Mysql {
 	* 
 	*/
     public function affectedRows() {
-        return mysqli_affected_rows($this->link);
+        return mysqli_affected_rows($this->Link);
     }
     
     /**
@@ -316,7 +322,7 @@ class Mysql {
         $this->execute("SHOW tables");
         $table = array();
         while ($Next = $this->fetchNext()) {
-            array_push($table, $Next['Tables_in_' . $this->config['DataBase']]);
+            array_push($table, $Next['Tables_in_' . $this->Config['DataBase']]);
         }
         return $table;
     }
@@ -365,8 +371,8 @@ class Mysql {
 	* 
 	*/
     public function NumRows($sql) {
-        $this->queryid = $this->execute($sql);
-        return mysqli_num_rows($this->queryid);
+        $this->Queryid = $this->execute($sql);
+        return mysqli_num_rows($this->Queryid);
     }
     
     /**
@@ -375,8 +381,8 @@ class Mysql {
 	* 
 	*/
     public function NumFields($sql) {
-        $this->queryid = $this->execute($sql);
-        return mysqli_num_fields($this->queryid);
+        $this->Queryid = $this->execute($sql);
+        return mysqli_num_fields($this->Queryid);
     }
     
     /**
@@ -384,7 +390,7 @@ class Mysql {
 	* 
 	*/
     public function Error() {
-        return @mysqli_error($this->link);
+        return @mysqli_error($this->Link);
     }
     
     /**
@@ -392,7 +398,7 @@ class Mysql {
 	* 
 	*/
     public function Errno() {
-        return intval(@mysqli_errno($this->link));
+        return intval(@mysqli_errno($this->Link));
     }
     
     /**
@@ -400,10 +406,10 @@ class Mysql {
 	* 
 	*/
     public function version() {
-        if (!is_resource($this->link)) {
+        if (!is_resource($this->Link)) {
             $this->Connect();
         }
-        return mysqli_get_server_info($this->link);
+        return mysqli_get_server_info($this->Link);
     }
     
     /**
@@ -411,8 +417,8 @@ class Mysql {
 	* 
 	*/
     public function Close() {
-        if (is_resource($this->link)) {
-            @mysqli_close($this->link);
+        if (is_resource($this->Link)) {
+            @mysqli_close($this->Link);
         }
     }
     
@@ -454,7 +460,7 @@ class Mysql {
 	* 
 	*/
     public function getSql() {
-        return $this->sql;
+        return $this->Sql;
     }
     
     /**
@@ -465,7 +471,7 @@ class Mysql {
 	*/
     public function join($join = '', $type = 'left') {
         if ($join != '') {
-           $this->deal['join'] .= ' ' . $type . ' join ' . $join . ' ';
+           $this->Deal['join'] .= ' ' . $type . ' join ' . $join . ' ';
         }
         return $this;
     }
@@ -478,14 +484,15 @@ class Mysql {
     public function where($where = '') {
         if (is_array($where)) {
             foreach ($where as $key => $val) {
-                if ($this->deal['where'] == '') {
-                    $this->deal['where'] .= ' where ' . $this->addSpecialChar($key) . " = '" . $val . "'";
+                $Symbol = (is_array($val))?($this->Symbol[$val[0]]):('=');
+                if ($this->Deal['where'] == '') {
+                    $this->Deal['where'] = ' where ' . $this->addSpecialChar($key) . " ".$Symbol." '" . $val . "'";
                 } else {
-                    $this->deal['where'] .= ' and `' . $this->addSpecialChar($key) . "` = '" . $val . "'";
+                    $this->Deal['where'] .= ' and `' . $this->addSpecialChar($key) . "` ".$Symbol." '" . $val . "'";
                 }
             }
         } else {
-            $this->deal['where'] = ' where ' . $where . ' ';
+            $this->Deal['where'] = ' where ' . $where . ' ';
         }
         return $this;
     }
@@ -498,11 +505,11 @@ class Mysql {
     public function field($field = '') {
         if (is_array($field)) {
             foreach ($field as $val) {
-                $this->deal['field'] .= $this->addSpecialChar($val) . ',';
+                $this->Deal['field'] .= $this->addSpecialChar($val) . ',';
             }
-            $this->deal['field'] = ' ' . trim($this->deal['field'], '.,') . ' ';
+            $this->Deal['field'] = ' ' . trim($this->Deal['field'], '.,') . ' ';
         } else {
-            $this->deal['field'] = ' ' . $field . ' ';
+            $this->Deal['field'] = ' ' . $field . ' ';
         }
         return $this;
     }
@@ -514,15 +521,15 @@ class Mysql {
 	*/
     public function order($order = '') {
         if (!is_array($order)) {
-            $this->deal['order'] = ' order by ' . $order . ' ';
+            $this->Deal['order'] = ' order by ' . $order . ' ';
         }else{
 			foreach ($order as $val) {
-                if ($this->deal['order'] == '') {
-                    $this->deal['order'] = " order by " . $this->addSpecialChar($val) . ",";
+                if ($this->Deal['order'] == '') {
+                    $this->Deal['order'] = " order by " . $this->addSpecialChar($val) . ",";
                 } else {
-                    $this->deal['order'] .= ',' . $this->addSpecialChar($val) . ',';
+                    $this->Deal['order'] .= ',' . $this->addSpecialChar($val) . ',';
                 }
-                $this->deal['order'] = trim($this->deal['order'],'.,');
+                $this->Deal['order'] = trim($this->Deal['order'],'.,');
             }
 		}
         return $this;
@@ -539,7 +546,7 @@ class Mysql {
 			$end = explode(',',$start);
 			$end = end($end);	
 		}
-		$this->deal['limit'] = ' limit ' . $start . ',' . $end . ' ';
+		$this->Deal['limit'] = ' limit ' . $start . ',' . $end . ' ';
         return $this;
     }
     
@@ -551,15 +558,15 @@ class Mysql {
     public function group($group = '') {
         if (is_array($group)) {
             foreach ($groupa as $val) {
-                if ($this->deal['group'] == '') {
-                    $this->deal['group'] = " group by " . $this->addSpecialChar($val) . ",";
+                if ($this->Deal['group'] == '') {
+                    $this->Deal['group'] = " group by " . $this->addSpecialChar($val) . ",";
                 } else {
-                    $this->deal['group'] .= '' . $this->addSpecialChar($val) . ',';
+                    $this->Deal['group'] .= '' . $this->addSpecialChar($val) . ',';
                 }
             }
-            $this->deal['group'] = trim($this->deal['group'], '.,');
+            $this->Deal['group'] = trim($this->Deal['group'], '.,');
         } else {
-            $this->deal['group'] = " group by " . $group . " ";
+            $this->Deal['group'] = " group by " . $group . " ";
         }
         return $this;
     }
@@ -573,7 +580,7 @@ class Mysql {
     public function union($union = '', $all = false) {
         if ($union != '') {
             $all = ($all) ? (' all') : ('');
-            $this->deal['union'] .= ' union' . $all . '(' . $union . ') ';
+            $this->Deal['union'] .= ' union' . $all . '(' . $union . ') ';
         }
         return $this;
     }
@@ -587,9 +594,9 @@ class Mysql {
     public function page($page = '1', $num = '10') {
         if (is_numeric($page)) {
             $page = ($page < 1) ? ('1') : ($page);
-            $this->page['page'] = $page;
-            $this->page['num'] = $num;
-            $this->page['status'] = true;
+            $this->Page['page'] = $page;
+            $this->Page['num'] = $num;
+            $this->Page['status'] = true;
         }
         return $this;
     }
@@ -601,7 +608,7 @@ class Mysql {
 	*/
     public function alias($alias = '') {
         if ($alias != '') {
-            $this->deal['alias'] = ' ' . $alias . ' ';
+            $this->Deal['alias'] = ' ' . $alias . ' ';
         }
         return $this;
     }
@@ -614,25 +621,25 @@ class Mysql {
     public function linkSql($Type = 'select') {
         switch ($Type) {
             case 'select':
-                $this->fields = ($this->fields == '') ? (' * ') : ($this->fields);
+                $this->Fields = ($this->Fields == '') ? (' * ') : ($this->Fields);
                 break;
         }
         //连接SQL
-        $this->sql = $Type . ' ' . $this->fields . 'from `' . $this->db . '`' . $this->deal['alias'] . $this->deal['union'] . $this->deal['join'] . $this->deal['where'] . $this->deal['group'] . $this->deal['order'] . $this->deal['limit'];
+        $this->Sql = $Type . ' ' . $this->Fields . 'from `' . $this->Db . '`' . $this->Deal['alias'] . $this->Deal['union'] . $this->Deal['join'] . $this->Deal['where'] . $this->Deal['group'] . $this->Deal['order'] . $this->Deal['limit'];
         //处理分页
-        if ($this->page['status']) {
-            $this->page['count'] = $this->NumRows($this->sql);
-            $this->page['start'] = $this->page['num'] * ($this->page['page'] - 1);
-            $this->page['max_page'] = ceil($this->page['count'] / $this->page['num']);
-            $this->limit($this->page['start'], $this->page['num']);
-            $this->page['status'] = false;
-            $this->linkSql();
+        if ($this->Page['status']) {
+            $this->Page['count'] = $this->NumRows($this->Sql);
+            $this->Page['start'] = $this->Page['num'] * ($this->Page['page'] - 1);
+            $this->Page['max_page'] = ceil($this->Page['count'] / $this->Page['num']);
+            $this->limit($this->Page['start'], $this->Page['num']);
+            $this->Page['status'] = false;
+            $this->LinkSql();
             return false;
         }
         //初始化所有内容
-        foreach ($this->deal as $key=>$val) {
-            $this->deal[$key] = '';
+        foreach ($this->Deal as $key=>$val) {
+            $this->Deal[$key] = '';
         }
-        return $this->sql;
+        return $this->Sql;
     }
 }

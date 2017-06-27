@@ -22,6 +22,6 @@ return array(
 		'Logs' => true,			//是否记录Mysql日志
 		
 		'Debug' => true,		//是否开启数据库调试模式	
-	)
+		)
 	
 );
