@@ -65,7 +65,7 @@ function Config($key='',$file='')
 * 
 * @return Array or String
 */
-function Receive($name='',$null='',$function='htmlspecialchars')
+function Receive($name='',$null='',$isEncode=true,$function='htmlspecialchars')
 {
 	if(strpos($name,'.')){
 		$method = explode('.',$name);
@@ -89,15 +89,18 @@ function Receive($name='',$null='',$function='htmlspecialchars')
 	}
 	if(!empty($Data[$name])){
 		if(is_array($Data[$name])){
-			foreach ($Data as $key => $val) {
-				 $Data[$key] = (function_exists($function))?($function($val)):($val);
+			foreach ($Data[$name] as $key => $val) {			
+				$Data[$key] = ($isEncode)?((function_exists($function))?($function($val)):($val)):($val);
 			}
        		return $Data[$name];
 		}else{
-			$value = (function_exists($function))?($function($Data[$name])):($Data[$name]);
+			$value = ($isEncode)?((function_exists($function))?($function($Data[$name])):($Data[$name])):($Data[$name]);
 			return ($value)?($value):(($null)?($null):(''));
 		}
 	}else{
+		if(is_array($Data)){
+			
+		}
 		return $null;
 	}
 }
@@ -238,12 +241,14 @@ function getError($errno,$errstr,$errfile,$errline)
 	Logs('PHP300::'.$errstr.'  文件:'.$errfile.'  行数:'.$errline,'Error');
 	ShowError($Data);
 }
-set_error_handler('getError');
+//set_error_handler('getError');
 
 
 /**
 * 展示状态页
 * @param 配置参数 $Data
+* @param 是否记录日志 $isLog
+* @param 渲染模板页 $Page
 * 
 */
 function ShowPage($Data,$isLog=true,$Page='')
@@ -328,9 +333,7 @@ function Logs($Msg,$File='Logs')
 function ShowText($Text,$isOver = false,$Char='UTF-8')
 {
 	echo('<meta charset="'.$Char.'">'.$Text);
-	if($isOver){
-		exit();
-	}
+	if($isOver){ exit(); }
 }
 
 /**

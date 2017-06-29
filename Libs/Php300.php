@@ -48,8 +48,8 @@ class Php300Deal {
 		if(PHP_SAPI=='cli'){
 			ini_set('include_path',dirname(__FILE__));
 		}
-		$this->Version = '1.3.1';
-		$this->UpDateTime = '2017/04/22';		
+		$this->Version = '1.3.2';
+		$this->UpDateTime = '2017/06/29';		
 		$this->init();
 	}
 	
@@ -147,43 +147,6 @@ class Php300Deal {
 	}
 	
 	/**
-	* 路由操作
-	* 
-	*/
-	public function RunRoute()
-	{
-		$UrlConfig = $this->ReadConfig('Url','Url');
-		$this->Directly($UrlConfig);
-		if($UrlConfig['Switch']){
-			$QueryArr = $this->Arrgd(Receive('server.QUERY_STRING'),$UrlConfig);
-		}
-	}
-	
-	/**
-	* 分拣数据
-	* @param 访问数组 $Arr
-	* @param 配置文件 $Config
-	* 
-	*/
-	function setAccess($Arr,$Config)
-	{
-		$this->ActionName = $Arr['Action'];
-		$this->ClassName = $Arr['Class'];
-		$this->FunctionName = $Arr['Function'];
-	}
-	
-	/**
-	* 普通get执行
-	* 
-	*/
-	function Directly($UrlConfig)
-	{
-		$this->ActionName = Receive($UrlConfig['Action'],$this->ActionName);
-		$this->ClassName = Receive($UrlConfig['Class'],$this->ClassName);
-		$this->FunctionName = Receive($UrlConfig['Function'],$this->FunctionName);
-	}
-	
-	/**
 	* 设置框架根目录
 	* 
 	*/
@@ -191,46 +154,6 @@ class Php300Deal {
 	{
 		$Path = str_replace(DIRECTORY_SEPARATOR.'Libs','',dirname(__FILE__)).DIRECTORY_SEPARATOR;
 		$this->CorePath = $Path;
-	}
-
-	/**
-	* 返回相关路径
-	* @param 关联目录 $Path
-	* 
-	* @return String
-	*/
-	function getfullPath($Path)
-	{	
-		$Path = $this->CorePath.'Libs'.DIRECTORY_SEPARATOR.$Path;
-		return $Path;
-	}
-	
-	/**
-	* 截取文件后缀
-	* @param 文件名 $file
-	* 
-	* @return String
-	*/
-	function getExtension($File)
-	{
-		$Arr = explode('.', $File);
-		return end($Arr);
-	}
-	
-	/**
-	* 获取目录文件列表
-	* @param 目录路径 $Path
-	* 
-	* @return Array
-	*/
-	function getDir($Path)
-	{
-		if(is_dir($Path)){
-			$List = scandir($Path);
-			foreach($List as $key=>$val){if ($val == "." or $val == "..") {	unset($List[$key]); } }
-			return $List;
-		}
-		return array();
 	}
 	
 	/**
@@ -247,6 +170,22 @@ class Php300Deal {
 				include_once($Path);	
 			}
 		}
+	}
+	
+	/**
+	* 设置模板引擎
+	* @param 引擎对象 $Obj
+	*/
+	function setView(&$Obj)
+	{
+		$ViewConfig = $this->ReadConfig('View','View');
+		$Obj -> template_dir = $this->CorePath . 'Template';
+		$Obj -> compile_dir = $this->CorePath . 'Cache';
+		$Obj -> caching = $ViewConfig['Cache'];
+		$Obj -> cache_lifetime = $ViewConfig['Cache.Time'];
+		$Obj -> left_delimiter = $ViewConfig['Left'];
+		$Obj -> right_delimiter = $ViewConfig['Right'];
+		glovar('View',$Obj,'OS');
 	}
 	
 	/**
@@ -280,59 +219,136 @@ class Php300Deal {
 	}
 	
 	/**
-	* 设置模板引擎
-	* @param 引擎对象 $Obj
+	* 返回相关路径
+	* @param 关联目录 $Path
+	* 
+	* @return String
 	*/
-	function setView(&$Obj)
+	function getfullPath($Path)
+	{	
+		return $this->CorePath.'Libs'.DIRECTORY_SEPARATOR.$Path;
+	}
+	
+	/**
+	* 截取文件后缀
+	* @param 文件名 $file
+	* 
+	* @return String
+	*/
+	function getExtension($File)
 	{
-		$ViewConfig = $this->ReadConfig('View','View');
-		$Obj -> template_dir = $this->CorePath . 'Template';
-		$Obj -> compile_dir = $this->CorePath . 'Cache';
-		$Obj -> caching = $ViewConfig['Cache'];
-		$Obj -> cache_lifetime = $ViewConfig['Cache.Time'];
-		$Obj -> left_delimiter = $ViewConfig['Left'];
-		$Obj -> right_delimiter = $ViewConfig['Right'];
-		glovar('View',$Obj,'OS');
+		$Arr = explode('.', $File);
+		return end($Arr);
+	}
+	
+	/**
+	* 获取目录文件列表
+	* @param 目录路径 $Path
+	* 
+	* @return Array
+	*/
+	function getDir($Path)
+	{
+		if(is_dir($Path)){
+			$List = scandir($Path);
+			foreach($List as $key=>$val){if ($val == "." or $val == "..") {	unset($List[$key]); } }
+			return $List;
+		}
+		return array();
+	}
+	
+	/**
+	* 设置访问参数
+	* @param 参数数组 $QueryArr
+	* 
+	*/
+	public function Queryparam($QueryArr){
+		if(is_array($QueryArr)){
+			$QueryArr = array_merge($QueryArr);$ParamArr = $Paramkey = $Paramval = array();
+			foreach($QueryArr as $key=>$val){
+				if($key % 2){
+					$Paramval[] = $val;
+				}else{
+					$Paramkey[] = $val;
+				}
+			}
+			if(count($Paramkey) == count($Paramval)){
+				$ParamArr = array_combine($Paramkey,$Paramval);
+				$_GET = $ParamArr;
+			}
+		}
+	}
+
+	
+	/**
+	* 普通get执行
+	* 
+	*/
+	function Directly($UrlConfig)
+	{
+		$this->ActionName = Receive($UrlConfig['Action'],$this->ActionName);
+		$this->ClassName = Receive($UrlConfig['Class'],$this->ClassName);
+		$this->FunctionName = Receive($UrlConfig['Function'],$this->FunctionName);	
+	}
+	
+	/**
+	* 路由操作
+	* 
+	*/
+	function RunRoute()
+	{
+		$UrlConfig = $this->ReadConfig('Url','Url');
+		$RoutingArr = $this->ReadConfig('Routing','Url');
+		if($UrlConfig['Switch']){
+			if(count($RoutingArr) > 0){
+				
+				//执行路由匹配
+			}
+			$QueryArr = $this->Arrgd(trim(Receive('server.PATH_INFO','',false)),$UrlConfig);
+			$this->Queryparam($QueryArr);
+			if(!empty($this->FunctionName)){
+				return;
+			}
+		}
+		$this->Directly($UrlConfig);
 	}
 	
 	/**
 	* 处理Url数组结构
 	* @param 参数内容 $QueryUrl
+	* @param URL配置 $Config 
 	* 
 	*/
 	function Arrgd($QueryUrl,$Config)
 	{
-	    $Info = str_replace($Config['Tail'] , '', $QueryUrl);
-	    $UrlArr = explode($Config['Division'] , $Info);
-	    if ($Config['Division'] != '/') {
-	        array_unshift($UrlArr, $Config['Division']);
-	        $UrlArr[1] = str_replace('/', '', $UrlArr[1]);
-	    }
-	    $ArrCount = count($UrlArr);$Url='';$End=0;
-	    if ($ArrCount > 1) {
-	    	$Action = (isset($UrlArr[1]))?($UrlArr[1]):($this->ActionName);
-	    	$Class = (isset($UrlArr[2]))?($UrlArr[2]):($this->ClassName);
-	    	$Function = (isset($UrlArr[3]))?($UrlArr[3]):($this->FunctionName);
-	    	$AccessArr = array('Action'=>$Action,'Class'=>$Class,'Function'=>$Function);
-	        for ($Ned = 4; $Ned <= $ArrCount; $Ned++) { if ($Ned != $End) { $End = $Ned + 1; if (isset($UrlArr[$Ned])) { $End = $Ned + 1; if(isset($UrlArr[$Ned]) and isset($UrlArr[$End])){ $Url .= '&' . $UrlArr[$Ned] . '=' . $UrlArr[$End];} } } }
-	        parse_str($Url, $UrlNed);
-	        $_GET = $UrlNed;
-	        $this->setAccess($AccessArr,$Config);
-	    }
-	}
-	
-	/**
-	* 设置默认访问
-	* @param 实例项目名称 $Action
-	* @param 控制器名称 $Class
-	* @param 方法名称 $Function
-	* 
-	*/
-	public function setdefault($Action='Main',$Class='App',$Function='index')
-	{
-		if(empty($this->ActionName)){ $this->ActionName = $Action; }
-		if(empty($this->ClassName)){ $this->ClassName = $Class;}
-		if(empty($this->FunctionName)){ $this->FunctionName = $Function; }
+		if($QueryUrl != ''){
+			$QueryUrl = str_replace($Config['Tail'],'',$QueryUrl);
+			$QueryArr = array_merge(array_filter(explode('/',$QueryUrl)));
+			$QueryCount = count($QueryArr);
+			if(!empty($this->ActionName)){
+				if($QueryCount > 0){
+					$FunctionName = (!empty($QueryArr[1]))?($QueryArr[1]):($Config['default.Function']);
+					$this->setVisit('',$QueryArr[0],$FunctionName);
+					unset($QueryArr[0],$QueryArr[1]);
+					return $QueryArr;
+				}else{
+					Error('PHP300 -> 系统错误,请检查您的请求地址!');
+				}
+			}else{
+				if($QueryCount > 2){
+					$this->setVisit($QueryArr[0],$QueryArr[1],$QueryArr[2]);
+					unset($QueryArr[0],$QueryArr[1],$QueryArr[2]);
+					return $QueryArr;
+				}else{
+					if($QueryCount >1){
+						$this->setVisit($Config['default.Action'],$QueryArr[0],$QueryArr[1]);
+						unset($QueryArr[0],$QueryArr[1]);
+						return $QueryArr;
+					}
+					Error('PHP300 -> 系统错误,请检查您的请求地址!');
+				}
+			}
+		}
 	}
 	
 	/**
@@ -365,7 +381,8 @@ class Php300Deal {
 	{
 		$UrlConfig = $this->ReadConfig('Url','Url');
 		$SystemConfig = $this->ReadConfig('System','System');
-		$Path = str_replace('\/','/',dirname($_SERVER['PHP_SELF']) . '/');
+		$Path = str_replace('\/','/',dirname(Receive('server.PHP_SELF')) . '/');
+		$Path = explode('/',$Path); $Path = (!empty($Path[1]))?((strpos('.php',$Path[1])===FALSE)?('/'.$Path[1].'/'):('/')):('/');
 		$DefineArr =  array(
 			'__APP__' => $Path,
 			'__TMP__' => $Path . 'Template/',
@@ -380,14 +397,27 @@ class Php300Deal {
 		}
 		ini_set('date.timezone',$SystemConfig['Time.zone']);
 	}
+	
+	/**
+	* 设置默认访问
+	* @param 实例名称 $action
+	* @param 控制器名称 $class
+	* @param 方法名称 $function
+	* 
+	*/
+	public function setVisit($action,$class,$function){
+		if(!empty($action)){ $this->ActionName =  $action; }
+		if(!empty($class)){ $this->ClassName = $class; }
+		if(!empty($function)){ $this->FunctionName = $function; }	
+	}
 
 	/**
 	 * 绑定实例
-	 * @param  string $action [实例名称]
+	 * @param string $action [实例名称]
 	 */
 	public function bindAction($action = '')
 	{
-		if(!empty($action)){ $this->Action = $action; }
+		if(!empty($action)){ $this->ActionName = $action; }
 	}
 	
 	/**
@@ -411,11 +441,9 @@ class Php300Deal {
 	* Start OS
 	* 
 	*/
-	public function Run($RunRoute=true)
+	public function Run()
 	{
-		if($RunRoute){
-			$this -> RunRoute();
-		}
+		$this -> RunRoute();
 		$App = $this->CreateObj();
 		$function = $this -> FunctionName;
 		$App -> $function();
