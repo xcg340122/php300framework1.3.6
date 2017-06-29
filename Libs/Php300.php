@@ -141,9 +141,7 @@ class Php300Deal {
 	public function loadPlug($File)
 	{
 		$PlugPath = $this->getfullPath('Plug').DIRECTORY_SEPARATOR.$File;
-		if(is_file($PlugPath)){
-			include_once($PlugPath);
-		}
+		if(is_file($PlugPath)){ include_once($PlugPath); }
 	}
 	
 	/**
@@ -163,13 +161,7 @@ class Php300Deal {
 	public function Readload($Path,$name='',$Type='Class')
 	{	
 		if(is_file($Path)){
-			if($Type==='Config'){
-				global $PHP300Res;
-				$PHP300Res[$name] = include_once($Path);
-			}else{
-				include_once($Path);	
-			}
-		}
+			if($Type==='Config'){ global $PHP300Res; $PHP300Res[$name] = include_once($Path); }else{ include_once($Path); } }
 	}
 	
 	/**
@@ -405,7 +397,8 @@ class Php300Deal {
 	* @param 方法名称 $function
 	* 
 	*/
-	public function setVisit($action,$class,$function){
+	public function setVisit($action,$class,$function)
+	{
 		if(!empty($action)){ $this->ActionName =  $action; }
 		if(!empty($class)){ $this->ClassName = $class; }
 		if(!empty($function)){ $this->FunctionName = $function; }	
