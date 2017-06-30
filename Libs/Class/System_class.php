@@ -13,6 +13,7 @@ class System {
 	*/
 	public function __call($name, $arguments) 
     {
+    	header("status:400 Bad Request");
     	Error('PHP300::没有捕获到该方法活动 -> ' .$name);
     }
 	

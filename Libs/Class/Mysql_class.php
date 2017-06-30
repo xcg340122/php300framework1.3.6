@@ -59,6 +59,7 @@ class Mysql {
 			mysqli_query($this->Link, "set names " . $this->Config['Char']);
         	return $this->Link;
 		}else{
+			header("status:400 Bad Request");
 			Error('PHP::Mysql连接失败!');
 		}
 	}
@@ -118,11 +119,13 @@ class Mysql {
 			if($this->Config['Logs']){ Logs('PHP300SQL['.$Status.']::'.$sql,'Mysql');}
 			if($this->Config['Debug']){ 
                 if(!$this->Queryid){
+                	header("status:400 Bad Request");
                     Error('SQL执行失败：'.$sql.'<br />错误反馈:['.$this->Error().']');
                 }
             }
         	return $this->Queryid;
 		}else{
+			header("status:400 Bad Request");
 			Error('PHP300::获取数据连接信息失效,请检查配置文件或目标主机状态!');
 		}
     }

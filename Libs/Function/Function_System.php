@@ -40,7 +40,8 @@ function Libs($Name)
 	if(is_object($Obj)){
 		return $Obj;
 	}
-	Error('PHP::没有找到该扩展类 -> '.$Name);
+	header("status:400 Bad Request");
+	Error('没有找到该扩展类 -> '.$Name);
 }
 
 
@@ -61,6 +62,7 @@ function Config($key='',$file='')
 * 接收参数
 * @param 参数名称 $name
 * @param 为空返回 $null
+* @param 是否进行转码 $isEncode
 * @param 过滤方法 $function
 * 
 * @return Array or String
@@ -109,21 +111,18 @@ function Receive($name='',$null='',$isEncode=true,$function='htmlspecialchars')
 * 
 * @param session名称 $name
 * @param session值 $val
+* @param session过期时间 $expire
 * 
 */
-function Session($name='',$val='',$expire=3600)
+function Session($name='',$val='',$expire='0')
 {
-	$Config = Config('Session','System');
 	$Session = Libs('Session');
-	if($Config['Session.start']){
-		$Session::_init($Config);
-		$Session::setExpire($expire);
-		$Session::start();
-		if(empty($name) and empty($val)){ return $Session; }
-		if(empty($val) and !empty($name)){ $val = $Session::get($name); return $val; }
-		if(!empty($name) and !empty($val)){ $Session::set($name,$val); return; }
-	}
-	return $Session;
+	$Session -> Second = $expire;
+	if($name===''){ return $Session->get(); }
+	if($name != '' && $val===''){ return $Session->get($name);}
+	if($name && $val){ return $Session->set($name,$val); }
+	if($name && $val===NULL){ return $Session->del($name); }
+	if($name === NULL && $val===NULL){ $Session -> del(); }	
 }
 
 /**

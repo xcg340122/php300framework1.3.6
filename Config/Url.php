@@ -5,8 +5,6 @@ return array(
 	* URL访问配置
 	*/
 	'Url' => array(
-			
-		'Switch' => true,	//路由开关
 		
 		'Tail' => '.html',	//伪静态后缀
 	
@@ -26,9 +24,18 @@ return array(
 	* 路由匹配
 	*/
 	'Routing' => array(
-
-
-
+	
+		'Switch' => false,	//路由开关
+		
+		/**
+		* 规则列表
+		* '/New\/Item\/id_(\d+)/'	=> 'New/Item/id/:1'
+		*/
+		'Rules'	=>	array(
+		
+			
+			)
+		
 		),
 );
 ?>

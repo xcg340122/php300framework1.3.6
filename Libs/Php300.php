@@ -45,11 +45,9 @@ class Php300Deal {
 	
 	function __construct()
 	{
-		if(PHP_SAPI=='cli'){
-			ini_set('include_path',dirname(__FILE__));
-		}
+		if(PHP_SAPI=='cli'){ ini_set('include_path',dirname(__FILE__)); }
 		$this->Version = '1.3.2';
-		$this->UpDateTime = '2017/06/29';		
+		$this->UpDateTime = '2017/06/30';		
 		$this->init();
 	}
 	
@@ -84,7 +82,9 @@ class Php300Deal {
 		if(is_file($Path)){
 			include_once($Path);
 		}else{
-			ShowText('PHP300::找不到类 -> '.$Class,true);
+			$PathArr = explode('\\',$Class);
+			header("status:400 Bad Request");
+			Error('文件或类不存在于实例中,请检查：Action\\'.$PathArr[0].'\\'.$PathArr[2].'.php');
 		}
 	}
 	
@@ -161,7 +161,7 @@ class Php300Deal {
 	public function Readload($Path,$name='',$Type='Class')
 	{	
 		if(is_file($Path)){
-			if($Type==='Config'){ global $PHP300Res; $PHP300Res[$name] = include_once($Path); }else{ include_once($Path); } }
+			if($Type==='Config'){ global $Php300Res; $Php300Res[$name] = include_once($Path); }else{ include_once($Path); } }
 	}
 	
 	/**
@@ -189,13 +189,13 @@ class Php300Deal {
 	*/
 	public function ReadConfig($keys='',$file='')
 	{
-		global $PHP300Res;
+		global $Php300Res;
 		if($keys){
-			if(is_array($PHP300Res)){
-				foreach($PHP300Res as $key=>$val){ if($file){ if($file==$key){return (isset($val[$keys]))?($val[$keys]):(false);} }else{ return $val;}	}
+			if(is_array($Php300Res)){
+				foreach($Php300Res as $key=>$val){ if($file){ if($file==$key){return (isset($val[$keys]))?($val[$keys]):(false);} }else{ return $val;}	}
 			}
 		}
-		return $PHP300Res;
+		return $Php300Res;
 	}
 	
 	/**
@@ -254,19 +254,15 @@ class Php300Deal {
 	* @param 参数数组 $QueryArr
 	* 
 	*/
-	public function Queryparam($QueryArr){
+	public function Queryparam($QueryArr)
+	{
 		if(is_array($QueryArr)){
 			$QueryArr = array_merge($QueryArr);$ParamArr = $Paramkey = $Paramval = array();
 			foreach($QueryArr as $key=>$val){
-				if($key % 2){
-					$Paramval[] = $val;
-				}else{
-					$Paramkey[] = $val;
-				}
+				if($key % 2){ $Paramval[] = $val; }else{ $Paramkey[] = $val; }
 			}
 			if(count($Paramkey) == count($Paramval)){
-				$ParamArr = array_combine($Paramkey,$Paramval);
-				$_GET = $ParamArr;
+				$ParamArr = array_combine($Paramkey,$Paramval); $_GET = $ParamArr;
 			}
 		}
 	}
@@ -280,7 +276,7 @@ class Php300Deal {
 	{
 		$this->ActionName = Receive($UrlConfig['Action'],$this->ActionName);
 		$this->ClassName = Receive($UrlConfig['Class'],$this->ClassName);
-		$this->FunctionName = Receive($UrlConfig['Function'],$this->FunctionName);	
+		$this->FunctionName = Receive($UrlConfig['Function'],$this->FunctionName);
 	}
 	
 	/**
@@ -290,18 +286,14 @@ class Php300Deal {
 	function RunRoute()
 	{
 		$UrlConfig = $this->ReadConfig('Url','Url');
-		$RoutingArr = $this->ReadConfig('Routing','Url');
-		if($UrlConfig['Switch']){
-			if(count($RoutingArr) > 0){
-				
-				//执行路由匹配
-			}
-			$QueryArr = $this->Arrgd(trim(Receive('server.PATH_INFO','',false)),$UrlConfig);
-			$this->Queryparam($QueryArr);
-			if(!empty($this->FunctionName)){
-				return;
-			}
+		$RoutingConfig = $this->ReadConfig('Routing','Url');
+		$QueryUrl = trim(Receive('server.PATH_INFO','',false));
+		$QueryUrl = str_replace($UrlConfig['Tail'],'',$QueryUrl);
+		if($RoutingConfig['Switch']){
+			if(count($RoutingConfig['Rules'])>0){foreach($RoutingConfig['Rules'] as $key=>$val){preg_match($key,$QueryUrl,$Res);unset($Res[0]);if(count($Res)>0){foreach($Res as $Nowkey =>$Nowval){$QueryUrl = str_replace(':'.$Nowkey,$Nowval,$val);if($QueryUrl!= $val){$QueryArr = $this->Arrgd($QueryUrl,$UrlConfig);if(!empty($QueryArr)){$this->Queryparam($QueryArr);} return;}}}}}
 		}
+		$QueryArr = $this->Arrgd($QueryUrl,$UrlConfig);
+		if(!empty($QueryArr)){ $this->Queryparam($QueryArr); return; }
 		$this->Directly($UrlConfig);
 	}
 	
@@ -314,32 +306,7 @@ class Php300Deal {
 	function Arrgd($QueryUrl,$Config)
 	{
 		if($QueryUrl != ''){
-			$QueryUrl = str_replace($Config['Tail'],'',$QueryUrl);
-			$QueryArr = array_merge(array_filter(explode('/',$QueryUrl)));
-			$QueryCount = count($QueryArr);
-			if(!empty($this->ActionName)){
-				if($QueryCount > 0){
-					$FunctionName = (!empty($QueryArr[1]))?($QueryArr[1]):($Config['default.Function']);
-					$this->setVisit('',$QueryArr[0],$FunctionName);
-					unset($QueryArr[0],$QueryArr[1]);
-					return $QueryArr;
-				}else{
-					Error('PHP300 -> 系统错误,请检查您的请求地址!');
-				}
-			}else{
-				if($QueryCount > 2){
-					$this->setVisit($QueryArr[0],$QueryArr[1],$QueryArr[2]);
-					unset($QueryArr[0],$QueryArr[1],$QueryArr[2]);
-					return $QueryArr;
-				}else{
-					if($QueryCount >1){
-						$this->setVisit($Config['default.Action'],$QueryArr[0],$QueryArr[1]);
-						unset($QueryArr[0],$QueryArr[1]);
-						return $QueryArr;
-					}
-					Error('PHP300 -> 系统错误,请检查您的请求地址!');
-				}
-			}
+			$QueryArr = array_merge(array_filter(explode('/',$QueryUrl)));$QueryCount = count($QueryArr);if(!empty($this->ActionName)){if($QueryCount>0){$FunctionName =(!empty($QueryArr[1]))?($QueryArr[1]):($Config['default.Function']);$this->setVisit('',$QueryArr[0],$FunctionName);unset($QueryArr[0],$QueryArr[1]);return $QueryArr;}else{header("status:404 Not Found");Error('PHP300 -> 系统错误,请检查您的请求地址!');}}else{if($QueryCount>2){$this->setVisit($QueryArr[0],$QueryArr[1],$QueryArr[2]);unset($QueryArr[0],$QueryArr[1],$QueryArr[2]);return $QueryArr;}else{if($QueryCount>1){$this->setVisit($Config['default.Action'],$QueryArr[0],$QueryArr[1]);unset($QueryArr[0],$QueryArr[1]);return $QueryArr;}header("status:404 Not Found");Error('PHP300 -> 系统错误,请检查您的请求地址!');}}
 		}
 	}
 	
@@ -371,6 +338,7 @@ class Php300Deal {
 	*/
 	function setConstant()
 	{
+		header("X-Powered-By:PHP300Framework");
 		$UrlConfig = $this->ReadConfig('Url','Url');
 		$SystemConfig = $this->ReadConfig('System','System');
 		$Path = str_replace('\/','/',dirname(Receive('server.PHP_SELF')) . '/');
@@ -439,7 +407,12 @@ class Php300Deal {
 		$this -> RunRoute();
 		$App = $this->CreateObj();
 		$function = $this -> FunctionName;
-		$App -> $function();
+		if(method_exists($App,$function)){
+			$App -> $function();
+			return;
+		}
+		header("status:400 Bad Request");
+		Error('未找到该方法,请检查：Action\\'.$this->ActionName.'\\'.$this->ClassName.'_class.php -> '.$this->FunctionName.'()');
 	}
 }
 
@@ -447,8 +420,4 @@ class Php300Deal {
 * 实例化驱动对象
 * 
 */
-$Php300 = new Php300Deal();
-
-glovar('PHP300',$Php300,'OS');
-
-glovar('Runcount','0','OS');
+$Php300 = new Php300Deal();Glovar('PHP300',$Php300,'OS'); Glovar('Runcount','0','OS');
