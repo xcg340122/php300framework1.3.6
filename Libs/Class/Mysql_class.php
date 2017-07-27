@@ -37,7 +37,7 @@ class Mysql {
 	private $Handle = array('join','where','field','union','group','order','limit','page','alias');
 	
     private $Symbol = array('eq' => '=','neq' => '<>' ,'gt' => '>' ,'lt' => '<','elt' => 
-        '<=' ,'egt' => '>=' ,'like' => 'LIKE' , 'between' => 'BETWEEN' ,'notnull' => 'IS NUT NULL','null' => 'IS NULL');
+        '<=' ,'egt' => '>=' ,'like' => 'LIKE','in' => 'IN', 'between' => 'BETWEEN' ,'notnull' => 'IS NUT NULL','null' => 'IS NULL');
 	/**
 	* 配置项
 	* @param 配置数组 $config
@@ -488,10 +488,11 @@ class Mysql {
         if (is_array($where)) {
             foreach ($where as $key => $val) {
                 $Symbol = (is_array($val))?($this->Symbol[$val[0]]):('=');
+                $Symbols = (in_array($Symbol,array('IN','BETWEEN')))?(''):("'");
                 if ($this->Deal['where'] == '') {
-                    $this->Deal['where'] = ' where ' . $this->addSpecialChar($key) . " ".$Symbol." '" . $val . "'";
+                    $this->Deal['where'] = ' where ' . $this->addSpecialChar($key) . ' '.$Symbol." '" . $val . "'";
                 } else {
-                    $this->Deal['where'] .= ' and `' . $this->addSpecialChar($key) . "` ".$Symbol." '" . $val . "'";
+                    $this->Deal['where'] .= ' and ' . $this->addSpecialChar($key) . ' '.$Symbol.' '.$Symbols . $val . $Symbols."";
                 }
             }
         } else {
@@ -624,11 +625,11 @@ class Mysql {
     public function linkSql($Type = 'select') {
         switch ($Type) {
             case 'select':
-                $this->Fields = ($this->Fields == '') ? (' * ') : ($this->Fields);
+                $this->Deal['field'] = ($this->Deal['field'] == '') ? (' * ') : ($this->Deal['field']);
                 break;
         }
         //连接SQL
-        $this->Sql = $Type . ' ' . $this->Fields . 'from `' . $this->Db . '`' . $this->Deal['alias'] . $this->Deal['union'] . $this->Deal['join'] . $this->Deal['where'] . $this->Deal['group'] . $this->Deal['order'] . $this->Deal['limit'];
+        $this->Sql = $Type . ' ' . $this->Deal['field'] . 'from `' . $this->Db . '`' . $this->Deal['alias'] . $this->Deal['union'] . $this->Deal['join'] . $this->Deal['where'] . $this->Deal['group'] . $this->Deal['order'] . $this->Deal['limit'];
         //处理分页
         if ($this->Page['status']) {
             $this->Page['count'] = $this->NumRows($this->Sql);

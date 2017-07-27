@@ -2,27 +2,29 @@
 
 /**
 * 调用控制器
-* 
+*
 * @return Object
 */
 function Action($Name)
 {
-	$Php300 = Glovar('PHP300','','OS');
+	$Php300   = Glovar('PHP300','','OS');
 	$Runcount = Glovar('Runcount','','OS');
-	if($Runcount > 10){
+	if($Runcount > 10)
+	{
 		ShowText('PHP300::检测到调用死循环,程序已终止 -> '.$Name,true);
 	}
 	$Arr = explode('\\',$Name);
-	switch(count($Arr)){
+	switch(count($Arr))
+	{
 		case 1:
 		CheckRepeatRun($Php300->ClassName,$Arr[0]);
 		$Php300->ClassName = $Arr[0];
-			break;
+		break;
 		case 2:
 		CheckRepeatRun($Php300->ActionName,$Arr[0]);
 		$Php300->ActionName = $Arr[0];
 		$Php300->ClassName = $Arr[1];
-			break;
+		break;
 	}
 	return $Php300->CreateObj();
 }
@@ -30,31 +32,31 @@ function Action($Name)
 /**
 * 调用类库方法
 * @param 类库名称 $Name
-* 
+*
 * @return Object
 */
 function Libs($Name)
 {
 	$Php300 = Glovar('PHP300','','OS');
-	$Obj = $Php300 -> $Name();
-	if(is_object($Obj)){
+	$Obj    = $Php300 -> $Name();
+	if(is_object($Obj))
+	{
 		return $Obj;
 	}
 	header("status:400 Bad Request");
 	Error('没有找到该扩展类 -> '.$Name);
 }
 
-
 /**
 * 获取配置项
 * @param 配置项键 $key
 * @param 指定配置文件 $file
-* 
+*
 * @return Array
 */
-function Config($key='',$file='')
+function Config($key = '',$file = '')
 {
-	global $Php300;
+	$Php300 = Glovar('PHP300','','OS');
 	return $Php300->ReadConfig($key,$file);
 }
 
@@ -64,19 +66,23 @@ function Config($key='',$file='')
 * @param 为空返回 $null
 * @param 是否进行转码 $isEncode
 * @param 过滤方法 $function
-* 
+*
 * @return Array or String
 */
-function Receive($name='',$null='',$isEncode=true,$function='htmlspecialchars')
+function Receive($name = '',$null = '',$isEncode = true,$function = 'htmlspecialchars')
 {
-	if(strpos($name,'.')){
+	if(strpos($name,'.'))
+	{
 		$method = explode('.',$name);
-		$name = $method[1];
+		$name   = $method[1];
 		$method = $method[0];
-	}else{
+	}
+	else
+	{
 		$method = '';
 	}
-	switch(strtolower($method)){
+	switch(strtolower($method))
+	{
 		case 'get': $Data = & $_GET; break;
 		case 'post': $Data = & $_POST; break;
 		case 'put': parse_str(file_get_contents('php://input'),$Data); break;
@@ -84,58 +90,117 @@ function Receive($name='',$null='',$isEncode=true,$function='htmlspecialchars')
 		case 'session': $Data = & $_SESSION; break;
 		case 'server': $Data = & $_SERVER; break;
 		default:
-			 switch($_SERVER['REQUEST_METHOD']) { 	
-			 	default: $Data  = & $_GET; break;
-                case 'POST': $Data  = & $_POST; break; 
-                case 'PUT': parse_str(file_get_contents('php://input'),$Data); break;  };break;
+		switch($_SERVER['REQUEST_METHOD'])
+		{
+			default: $Data = & $_GET; break;
+			case 'POST': $Data = & $_POST; break;
+			case 'PUT': parse_str(file_get_contents('php://input'),$Data); break;
+		};break;
 	}
-	if(!empty($Data[$name])){
-		if(is_array($Data[$name])){
-			foreach ($Data[$name] as $key => $val) {			
+	if(!empty($Data[$name]))
+	{
+		if(is_array($Data[$name]))
+		{
+			foreach($Data[$name] as $key => $val)
+			{
 				$Data[$key] = ($isEncode)?((function_exists($function))?($function($val)):($val)):($val);
 			}
-       		return $Data[$name];
-		}else{
+			return $Data[$name];
+		}
+		else
+		{
 			$value = ($isEncode)?((function_exists($function))?($function($Data[$name])):($Data[$name])):($Data[$name]);
 			return ($value)?($value):(($null)?($null):(''));
 		}
-	}else{
-		if(is_array($Data)){
-			
+	}
+	else
+	{
+		if(is_array($Data))
+		{
+
 		}
 		return $null;
 	}
 }
 
 /**
-* 
+* Session操作
 * @param session名称 $name
 * @param session值 $val
 * @param session过期时间 $expire
-* 
+*
 */
-function Session($name='',$val='',$expire='0')
+function Session($name = '',$val = '',$expire = '0')
 {
 	$Session = Libs('Session');
 	$Session -> Second = $expire;
-	if($name===''){ return $Session->get(); }
-	if($name != '' && $val===''){ return $Session->get($name);}
-	if($name && $val){ return $Session->set($name,$val); }
-	if($name && $val===NULL){ return $Session->del($name); }
-	if($name === NULL && $val===NULL){ $Session -> del(); }	
+	if($name === '')
+	{
+		return $Session->get();
+	}
+	if($name != '' && $val === '')
+	{
+		return $Session->get($name);
+	}
+	if($name && $val)
+	{
+		return $Session->set($name,$val);
+	}
+	if($name && is_null($val))
+	{
+		return $Session->del($name);
+	}
+	if(is_null($name) && is_null($val))
+	{
+		$Session -> del();
+	}
+}
+
+/**
+* Cookie操作
+* @param cookie名称 $name
+* @param cookie值 $value
+* @param cookie参数 $option
+*
+*/
+function Cookie($name = '', $val = '', $expire = '0')
+{
+	$prefix = 'PHP300_';
+	if($name === '')
+	{
+		return $_COOKIE;
+	}
+	if($name != '' && $val === '')
+	{
+		return (!empty($_COOKIE[$prefix.$name]))?($_COOKIE[$prefix.$name]):(NULL);
+	}
+	if($name && $val)
+	{
+		return setcookie($prefix.$name,$val,$expire);
+	}
+	if($name && is_null($val))
+	{
+		return setcookie($prefix.$name,$val,time() - 1);
+	}
+	if(is_null($name) && is_null($val))
+	{
+		$_COOKIE = NULL;
+	}
 }
 
 /**
 * 操作Mysql
 * @param 表名 $table
-* 
+*
 * @return Object
 */
 function Db($table = '')
 {
 	$Mysql = Glovar('Mysql','','OS');
-	if(is_object($Mysql)){
-		if(!empty($table)){
+	if(is_object($Mysql))
+	{
+		if(!empty($table))
+		{
 			$Mysql->SelectDb($table);
 		}
 		return $Mysql;
@@ -148,28 +213,35 @@ function Db($table = '')
 * @param 键 $key
 * @param 值 $val
 * @param 域 $region
-* 
+*
 * @return String Or Array
 */
-function Glovar($key='',$val='',$region='User')
+function Glovar($key = '',$val = '',$region = 'User')
 {
 	global $php300global;
-	if(empty($key)){ return (is_array($php300global[$region]))?($php300global[$$region]):(array()); }
-	if(empty($val)){ return (isset($php300global[$region][$key]))?($php300global[$region][$key]):(''); }
+	if(empty($key))
+	{
+		return (is_array($php300global[$region]))?($php300global[$$region]):(array());
+	}
+	if(empty($val))
+	{
+		return (isset($php300global[$region][$key]))?($php300global[$region][$key]):('');
+	}
 	$php300global[$region][$key] = $val;
 }
 
 /**
 * 渲染并展示模板
 * @param 模板路径 $Template
-* 
+*
 */
-function Show($Template='index')
+function Show($Template = 'index')
 {
-	if(!empty($Template)){
+	if(!empty($Template))
+	{
 		$ViewConfig = Config('View','View');
-		$View = Glovar('View','','OS');
-		$Tail = (!empty($ViewConfig['Tail']))?($ViewConfig['Tail']):('.html');
+		$View       = Glovar('View','','OS');
+		$Tail       = (!empty($ViewConfig['Tail']))?($ViewConfig['Tail']):('.html');
 		$View -> display($Template . $Tail);
 	}
 }
@@ -178,11 +250,12 @@ function Show($Template='index')
 * 设置模板变量
 * @param 键 $key
 * @param 值 $val
-* 
+*
 */
 function Assign($key,$val)
-{	
-	if(!empty($key) or !empty($val)){
+{
+	if(!empty($key) or !empty($val))
+	{
 		$View = Glovar('View','','OS');
 		$View -> assign($key,$val);
 	}
@@ -191,15 +264,161 @@ function Assign($key,$val)
 /**
 * 渲染并获取模板
 * @param 模板路径 $Template
-* 
+*
 */
-function Fetch($Template='index')
+function Fetch($Template = 'index')
 {
-	if(!empty($Template)){
+	if(!empty($Template))
+	{
 		$ViewConfig = Config('View','View');
-		$View = Glovar('View','','OS');
-		$Tail = (!empty($ViewConfig['Tail']))?($ViewConfig['Tail']):('.html');
+		$View       = Glovar('View','','OS');
+		$Tail       = (!empty($ViewConfig['Tail']))?($ViewConfig['Tail']):('.html');
 		return $View -> fetch($Template . $Tail);
+	}
+}
+
+/**
+* 展示状态页
+* @param 配置参数 $Data
+* @param 是否记录日志 $isLog
+* @param 渲染模板页 $Page
+*
+*/
+function ShowPage($Data,$isLog = true,$Page = '')
+{
+	if(is_array($Data))
+	{
+		$Config = Config('System','System');
+		$BackUrl= Receive('server.HTTP_REFERER');
+		$Url    = (!empty($BackUrl))?($BackUrl):('#');
+		$Seconds = (isset($Data['Seconds']) && is_numeric($Data['Seconds']))?($Data['Seconds']):(3);
+		$Info = array(
+			'Url'    => (!empty($Data['Url']))?($Data['Url']):($Url),
+			'Seconds'=> $Seconds * 1000,
+			'Status' => ($Data['Status'] == '1')?('( ^_^ )'):('(*>﹏<*)'),
+			'Msg'    => (!empty($Data['Msg']))?($Data['Msg']):('无'),
+		);
+		$Page = (!empty($Page))?($Page):($Config['Status.Template']);
+		$View = Glovar('View','','OS');
+		$View -> left_delimiter = '<{';
+		$View -> right_delimiter = '}>';Glovar('View',$View,'OS');
+		if($isLog)
+		{
+			Logs($Data['Msg']);
+		}
+		Assign('Data',$Info);
+		Show($Page);
+		exit();
+	}
+}
+
+/**
+* 展示错误页
+* @param 数据 $Data
+*
+*/
+function ShowError($Data)
+{
+	$View = Glovar('View','','OS');
+	$View -> left_delimiter = '<{';
+	$View -> right_delimiter = '}>';
+	Glovar('View',$View,'OS');
+	$Config = Config('System','System');
+	Assign('Data',$Data);
+	Show($Config['Error.Template']);
+	exit();
+}
+
+/**
+* 状态页扩展展示方法(成功页)
+* @param 提示内容 $Msg
+* @param 跳转地址 $Url
+* @param 跳转秒数 $Seconds
+*
+*/
+function Success($Msg,$Url = '',$Seconds = 3)
+{
+	$Data = array('Msg'    =>$Msg,'Status' =>'1','Seconds'=>$Seconds,'Url'    =>$Url);
+	ShowPage($Data);
+}
+
+/**
+* 状态页扩展展示方法(成功页)
+* @param 提示内容 $Msg
+* @param 跳转地址 $Url
+* @param 跳转秒数 $Seconds
+*
+*/
+function Error($Msg,$Url = '',$Seconds = 3)
+{
+	$Data = array('Msg'    =>$Msg,'Status' =>'0','Seconds'=>$Seconds,'Url'    =>$Url);
+	ShowPage($Data);
+}
+
+
+function Yun()
+{
+	$fileName = './Libs/Class/Yun_class.php';
+	if(file_exists($fileName))
+	{
+		$YunObj = Libs('Yun');
+		return $YunObj;
+	}
+	else
+	{
+		//获取云函数
+		$Config = Config('YUN','System');
+		if($Config['Type'] == '1')
+		{
+			if($Config['SN'] == '')
+			{
+				return FALSE;
+			}
+			$objectUrl = 'http://yun.php300.cn/?c=get&SN='.$Config['SN'].'&T='.time();
+			$cacheClass= @file_get_contents($objectUrl);
+			if(!empty($cacheClass))
+			{
+				$cacheClass = json_decode($cacheClass,true); $Code = '';
+				foreach($cacheClass['data'] as $val)
+				{
+					$Code .= urldecode($val['function_content']);
+				}
+				$cacheCode = "<?php namespace Libs\Deal; class Yun{ ".$Code." } ?>";
+				file_put_contents($fileName,StripWhitespace($cacheCode));
+				include_once($fileName);
+				return Libs('Yun');
+			}
+		}
+	}
+}
+
+/**
+* 记录系统日志
+* @param 日志内容 $Msg
+*
+*/
+function Logs($Msg,$File = 'Logs')
+{
+	if(!empty($Msg))
+	{
+		$Enter = getEnter();
+		error_log($Msg .$Enter.'记录时间：'.date('Y-m-d H:i:s').$Enter.$Enter ,3,'Logs/'.$File.'.log');
+	}
+}
+
+/**
+* 显示一段文本
+* @param 显示的文本 $Text
+* @param 是否结束脚本 $isOver
+* @param 输出的编码类型 $Char
+*
+*/
+function ShowText($Text,$isOver = false,$Char = 'UTF-8')
+{
+	echo('<meta charset="'.$Char.'">'.$Text);
+	if($isOver)
+	{
+		exit();
 	}
 }
 
@@ -209,136 +428,87 @@ function Fetch($Template='index')
 function CheckRepeatRun($A,$B)
 {
 	global $Runcount;
-	if($A===$B){
+	if($A === $B)
+	{
 		$Runcount++;
 	}
 }
 
 /**
-* 处理错误信息
-* @param 错误代码 $errno
-* @param 错误内容 $errstr
-* @param 错误文件 $errfile
-* @param 错误行数 $errline
-* 
-*/
-function getError($errno,$errstr,$errfile,$errline)
-{
-	$Config = Config('System','System');
-	switch($errno){
-		case E_USER_WARNING:
-			$errstr = "<b>WARNING 错误</b>$errstr";
-		break;
-		default: 
-			$errstr =  "未定义的内容:[$errstr]"; 
-		break;
-	}
-	if(!$Config['Debug']){
-		ShowText('站点出现问题,请及时联系站长!',true);
-	}
-	$Data = array('errno' => $errno,'errstr' => $errstr,'errfile' => $errfile,'errline' => $errline);
-	Logs('PHP300::'.$errstr.'  文件:'.$errfile.'  行数:'.$errline,'Error');
-	ShowError($Data);
-}
-//set_error_handler('getError');
-
-
-/**
-* 展示状态页
-* @param 配置参数 $Data
-* @param 是否记录日志 $isLog
-* @param 渲染模板页 $Page
-* 
-*/
-function ShowPage($Data,$isLog=true,$Page='')
-{
-	if (is_array($Data)) {
-		$Config = Config('System','System');
-		$BackUrl = Receive('server.HTTP_REFERER');
-		$Url = (!empty($BackUrl))?($BackUrl):('#');
-		$Seconds = (isset($Data['Seconds']) && is_numeric($Data['Seconds']))?($Data['Seconds']):(3);
-		$Info = array(
-			'Url' => (!empty($Data['Url']))?($Data['Url']):($Url),
-			'Seconds' => $Seconds * 1000,
-			'Status' => ($Data['Status']=='1')?('( ^_^ )'):('(*>﹏<*)'),
-			'Msg' => (!empty($Data['Msg']))?($Data['Msg']):('无'),
-		);
-		$Page = (!empty($Page))?($Page):($Config['Status.Template']);
-		if($isLog){ Logs($Data['Msg']); }
-        Assign('Data',$Info);
-        Show($Page);
-        exit();
-    }
-}
-
-/**
-* 展示错误页
-* @param 数据 $Data
-* 
-*/
-function ShowError($Data)
-{
-	$View = Glovar('View','','OS');
-	$View -> left_delimiter = '<{';
-	$View -> right_delimiter = '}>';
-	$Config = Config('System','System');
-	Assign('Data',$Data);
-	Show($Config['Error.Template']);
-    exit();
-}
-
-/**
-* 状态页扩展展示方法(成功页)
-* @param 提示内容 $Msg
-* @param 跳转地址 $Url
-* @param 跳转秒数 $Seconds
-* 
-*/
-function Success($Msg,$Url='',$Seconds=3)
-{
-	$Data = array('Msg'=>$Msg,'Status' => '1','Seconds' => $Seconds,'Url' => $Url);
-	ShowPage($Data);
-}
-
-/**
-* 状态页扩展展示方法(成功页)
-* @param 提示内容 $Msg
-* @param 跳转地址 $Url
-* @param 跳转秒数 $Seconds
-* 
-*/
-function Error($Msg,$Url='',$Seconds=3)
-{
-	$Data = array('Msg'=>$Msg,'Status' => '0','Seconds' => $Seconds,'Url' => $Url);
-	ShowPage($Data);
-}
-
-/**
-* 记录系统日志
-* @param 日志内容 $Msg
-* 
-*/
-function Logs($Msg,$File='Logs')
-{
-	if(!empty($Msg)){
-		$Enter = getEnter();
-		error_log($Msg .$Enter.'记录时间：'.date('Y-m-d H:i:s').$Enter.$Enter ,3,'Logs/'.$File.'.log');
-	}
-}
-
-/**
-* 显示一段文本
-*/
-function ShowText($Text,$isOver = false,$Char='UTF-8')
-{
-	echo('<meta charset="'.$Char.'">'.$Text);
-	if($isOver){ exit(); }
-}
-
-/**
 * 获取不同系统换行符
-* 
+*
 */
-function getEnter(){
-	return (strtolower(substr(PHP_OS, 0, 3))=='win')?("\r\n"):("\n");
+function getEnter()
+{
+	return (strtolower(substr(PHP_OS, 0, 3)) == 'win')?("\r\n"):("\n");
+}
+
+/**
+* 压缩代码
+* @param 代码内容 $content
+*
+* @return String
+*/
+function StripWhitespace($content)
+{
+	$stripStr   = '';
+	$CodeArr    = token_get_all($content);
+	$last_space = false;
+	for($i = 0, $j = count($CodeArr); $i < $j; $i++)
+	{
+		if(is_string($CodeArr[$i]))
+		{
+			$last_space = false;
+			$stripStr .= $CodeArr[$i];
+		}
+		else
+		{
+			switch($CodeArr[$i][0])
+			{
+				//过滤各种PHP注释
+				case T_COMMENT:
+				case T_DOC_COMMENT:
+				break;
+				//过滤空格
+				case T_WHITESPACE:
+				if(!$last_space)
+				{
+					$stripStr .= ' ';
+					$last_space = true;
+				}
+				break;
+				default:
+				$last_space = false;
+				$stripStr .= $CodeArr[$i][1];
+			}
+		}
+	}
+	return $stripStr;
+}
+
+/**
+* 获取客户端IP地址
+*
+*/
+function getClientip()
+{
+	if(getenv("HTTP_CLIENT_IP"))
+	{
+		$ip = getenv("HTTP_CLIENT_IP");
+	}
+	else
+	if(getenv("HTTP_X_FORWARDED_FOR"))
+	{
+		$ip = getenv("HTTP_X_FORWARDED_FOR");
+	}
+	else
+	if(getenv("REMOTE_ADDR"))
+	{
+		$ip = getenv("REMOTE_ADDR");
+	}
+	else
+	{
+		$ip = "Unknow";
+	}
+	return $ip;
 }

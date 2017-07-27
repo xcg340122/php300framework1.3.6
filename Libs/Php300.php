@@ -35,8 +35,6 @@ class Php300Deal {
 	
 	private $ClassTail = '_class';
 	
-	private $ActionCount = 0;
-	
 	private $ClassList = array();
 	
 	private $FunctionList = array();
@@ -46,8 +44,8 @@ class Php300Deal {
 	function __construct()
 	{
 		if(PHP_SAPI=='cli'){ ini_set('include_path',dirname(__FILE__)); }
-		$this->Version = '1.3.2';
-		$this->UpDateTime = '2017/06/30';		
+		$this->Version = '1.3.3';
+		$this->UpDateTime = '2017/07/21';
 		$this->init();
 	}
 	
@@ -77,14 +75,14 @@ class Php300Deal {
 	*/
 	public function Autoload($Class)
 	{
-		$Path = (strpos($Class,'Action'))?($this->CorePath . 'Action/' . str_replace('\Action','',$Class)):($this->CorePath . 'Libs/Class/' . $Class);
-		$Path = $Path  . '.php';
-		if(is_file($Path)){
-			include_once($Path);
+		$PathFull = (strpos($Class,'Libs\Deal')!==FALSE)?(str_replace('Libs\Deal\\','',$Class)):($Class);
+		$PathFull = (strpos($PathFull,'Action'))?($this->CorePath . 'Action/' . str_replace('\Action','',$PathFull)):($this->CorePath . 'Libs/Class/' . $PathFull.'_class');
+		$PathFull = str_replace('\\','/',$PathFull).'.php';
+		if(is_file($PathFull)){	
+			include_once($PathFull);
 		}else{
-			$PathArr = explode('\\',$Class);
 			header("status:400 Bad Request");
-			Error('文件或类不存在于实例中,请检查：Action\\'.$PathArr[0].'\\'.$PathArr[2].'.php');
+			Error('文件或类不存在于实例中,请检查：'.$PathFull);
 		}
 	}
 	
@@ -98,6 +96,7 @@ class Php300Deal {
 			$FunctionPath = $this->getfullPath('Function').DIRECTORY_SEPARATOR;
 			foreach($this->FunctionList as $key=>$val){ if($this->getExtension($val) === 'php'){ $this->Readload($FunctionPath.$val); } }
 		}
+		Glovar('PHP300',$this,'OS');
 	}
 	
 	/**
@@ -130,7 +129,7 @@ class Php300Deal {
 	{
 		if(count($this->ClassList) > 0){
 			$ClassPath = $this->getfullPath('Class') . DIRECTORY_SEPARATOR;
-			foreach($this->ClassList as $key=>$val){ if($this->getExtension($val) === 'php'){ $this->Readload($ClassPath.$val,substr($val,0,-4)); } } $this->setConstant(); $this->ConnMysql(); }
+			foreach($this->ClassList as $key=>$val){ if($this->getExtension($val) === 'php'){ $this->Readload($ClassPath.$val,substr($val,0,-4)); } } $this->ConnMysql(); }
 	}
 	
 	/**
@@ -167,6 +166,7 @@ class Php300Deal {
 	/**
 	* 设置模板引擎
 	* @param 引擎对象 $Obj
+	* 
 	*/
 	function setView(&$Obj)
 	{
@@ -177,7 +177,7 @@ class Php300Deal {
 		$Obj -> cache_lifetime = $ViewConfig['Cache.Time'];
 		$Obj -> left_delimiter = $ViewConfig['Left'];
 		$Obj -> right_delimiter = $ViewConfig['Right'];
-		glovar('View',$Obj,'OS');
+		Glovar('View',$Obj,'OS');
 	}
 	
 	/**
@@ -243,7 +243,7 @@ class Php300Deal {
 	{
 		if(is_dir($Path)){
 			$List = scandir($Path);
-			foreach($List as $key=>$val){if ($val == "." or $val == "..") {	unset($List[$key]); } }
+			foreach($List as $key=>$val){if (strpos($val,'.php')===FALSE) {	unset($List[$key]); } }
 			return $List;
 		}
 		return array();
@@ -295,6 +295,7 @@ class Php300Deal {
 		$QueryArr = $this->Arrgd($QueryUrl,$UrlConfig);
 		if(!empty($QueryArr)){ $this->Queryparam($QueryArr); return; }
 		$this->Directly($UrlConfig);
+		$this->setConstant();
 	}
 	
 	/**
@@ -311,17 +312,6 @@ class Php300Deal {
 	}
 	
 	/**
-	* 统计实例项目数
-	* 
-	*/
-	function Actioncount()
-	{
-		$Path = $this->CorePath . '/Action';
-		$DirArr = $this->getDir($Path);
-		$this->ActionCount = count($DirArr);
-	}
-	
-	/**
 	* 自动连接Mysql
 	* 
 	*/
@@ -329,7 +319,7 @@ class Php300Deal {
 	{
 		$MysqlConfig = $this->ReadConfig('Mysql','Mysql');
 		if($MysqlConfig['Connect']){
-			if(is_array($MysqlConfig)){$Mysql = Libs('Mysql'); $Mysql->option($MysqlConfig); $Mysql->Connect();glovar('Mysql',$Mysql,'OS');}
+			if(is_array($MysqlConfig)){$Mysql = $this->Mysql(); $Mysql->option($MysqlConfig); $Mysql->Connect();Glovar('Mysql',$Mysql,'OS');}
 		}
 	}
 	
@@ -342,14 +332,14 @@ class Php300Deal {
 		$UrlConfig = $this->ReadConfig('Url','Url');
 		$SystemConfig = $this->ReadConfig('System','System');
 		$Path = str_replace('\/','/',dirname(Receive('server.PHP_SELF')) . '/');
-		$Path = explode('/',$Path); $Path = (!empty($Path[1]))?((strpos('.php',$Path[1])===FALSE)?('/'.$Path[1].'/'):('/')):('/');
+		$Path = explode('/',$Path); $Path = (!empty($Path[1]))?((strpos($Path[1],'.php')===FALSE)?('/'.$Path[1].'/'):('/')):('/');
 		$DefineArr =  array(
 			'__APP__' => $Path,
 			'__TMP__' => $Path . 'Template/',
 			'__PLUG__' => 'Libs/Plug/',
-			'A_NAME' => Receive($UrlConfig['Action']),
-			'C_NAME' => Receive($UrlConfig['Class']),
-			'F_NAME' => Receive($UrlConfig['Function']),
+			'A_NAME' => $this->ActionName,
+			'C_NAME' => $this->ClassName,
+			'F_NAME' => $this->FunctionName,
 			'FRAMEWROK_VER' => $this->Version
 			);
 		foreach ($DefineArr as $key => $value) {
@@ -420,4 +410,4 @@ class Php300Deal {
 * 实例化驱动对象
 * 
 */
-$Php300 = new Php300Deal();Glovar('PHP300',$Php300,'OS'); Glovar('Runcount','0','OS');
+$Php300 = new Php300Deal(); Glovar('Runcount','0','OS');

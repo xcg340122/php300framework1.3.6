@@ -2,8 +2,7 @@
 
 namespace Main\Action;
 
-use \Libs\Deal\System;
-class App_class extends System{
+class App_class{
 	
 	public function index()
 	{

@@ -9,7 +9,7 @@ return array(
 		
 		'Username' => 'root',	//用户名
 		
-		'Password' => 'root',	//密码
+		'Password' => 'root1',	//密码
 		
 		'DataBase' => 'mysql',	//目标库
 		

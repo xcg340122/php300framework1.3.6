@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>{$Data.Status}</title>
+<title><{$Data.Status}></title>
 <meta name="Copyright" content="Copyright @ PHP300 http://framework.php300.cn" />
 <style>
 body {
@@ -77,17 +77,17 @@ body {
 <body>
 
   <div class="state">
-    <div class="message_title">{$Data.Status}</div>
+    <div class="message_title"><{$Data.Status}></div>
     <div class="message_title-des">
-    	{$Data.Msg}
+    	<{$Data.Msg}>
     	<br/>
-    	<span>{if $Data.Url!='#'}程序正在<a href="{$Data.Url}">跳转</a>中,请稍后. . .{/if}</span>
+    	<span><{if $Data.Url!='#'}>程序正在<a href="<{$Data.Url}>">跳转</a>中,请稍后. . .<{/if}></span>
     </div>
   </div>
 </body>
 	<script type="text/javascript">
-		var url = '{$Data.Url}';
-		var seconds = '{$Data.Seconds}';
+		var url = '<{$Data.Url}>';
+		var seconds = '<{$Data.Seconds}>';
 		if(url!='' && url!='#'){
 			setTimeout("location.href='"+url+"'",seconds);
 			url = '';		
