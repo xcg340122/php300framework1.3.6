@@ -48,8 +48,8 @@ class Php300Deal
 		{
 			ini_set('include_path',dirname(__FILE__));
 		}
-		$this->Version = '1.3.3';
-		$this->UpDateTime = '2017/07/21';
+		$this->Version = '1.3.4';
+		$this->UpDateTime = '2017/08/10';
 		$this->init();
 	}
 
