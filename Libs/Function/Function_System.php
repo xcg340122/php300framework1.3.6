@@ -9,11 +9,13 @@ function Action($Name)
 {
 	$Php300   = Glovar('PHP300','','OS');
 	$Runcount = Glovar('Runcount','','OS');
-	if($Runcount > 10){
+	if($Runcount > 10)
+	{
 		ShowText('PHP300::检测到调用死循环,程序已终止 -> '.$Name,true);
 	}
 	$Arr = explode('\\',$Name);
-	switch(count($Arr)){
+	switch(count($Arr))
+	{
 		case 1:
 		CheckRepeatRun($Php300->ClassName,$Arr[0]);
 		$Php300->ClassName = $Arr[0];
@@ -37,7 +39,8 @@ function Libs($Name)
 {
 	$Php300 = Glovar('PHP300','','OS');
 	$Obj    = $Php300 -> $Name();
-	if(is_object($Obj)){
+	if(is_object($Obj))
+	{
 		return $Obj;
 	}
 	header("status:400 Bad Request");
@@ -68,7 +71,8 @@ function Config($key = '',$file = '')
 */
 function Receive($name = '',$null = '',$isEncode = true,$function = 'htmlspecialchars')
 {
-	if(strpos($name,'.')){
+	if(strpos($name,'.'))
+	{
 		$method = explode('.',$name);
 		$name   = $method[1];
 		$method = $method[0];
@@ -77,7 +81,8 @@ function Receive($name = '',$null = '',$isEncode = true,$function = 'htmlspecial
 	{
 		$method = '';
 	}
-	switch(strtolower($method)){
+	switch(strtolower($method))
+	{
 		case 'get': $Data = & $_GET; break;
 		case 'post': $Data = & $_POST; break;
 		case 'put': parse_str(file_get_contents('php://input'),$Data); break;
@@ -85,15 +90,19 @@ function Receive($name = '',$null = '',$isEncode = true,$function = 'htmlspecial
 		case 'session': $Data = & $_SESSION; break;
 		case 'server': $Data = & $_SERVER; break;
 		default:
-		switch($_SERVER['REQUEST_METHOD']){
+		switch($_SERVER['REQUEST_METHOD'])
+		{
 			default: $Data = & $_GET; break;
 			case 'POST': $Data = & $_POST; break;
 			case 'PUT': parse_str(file_get_contents('php://input'),$Data); break;
 		};break;
 	}
-	if(!empty($Data[$name])){
-		if(is_array($Data[$name])){
-			foreach($Data[$name] as $key => $val){
+	if(!empty($Data[$name]))
+	{
+		if(is_array($Data[$name]))
+		{
+			foreach($Data[$name] as $key => $val)
+			{
 				$Data[$key] = ($isEncode)?((function_exists($function))?($function($val)):($val)):($val);
 			}
 			return $Data[$name];
@@ -106,7 +115,8 @@ function Receive($name = '',$null = '',$isEncode = true,$function = 'htmlspecial
 	}
 	else
 	{
-		if(is_array($Data)){
+		if(is_array($Data))
+		{
 
 		}
 		return $null;
@@ -124,19 +134,24 @@ function Session($name = '',$val = '',$expire = '0')
 {
 	$Session = Libs('Session');
 	$Session -> Second = $expire;
-	if($name === ''){
+	if($name === '')
+	{
 		return $Session->get();
 	}
-	if($name != '' && $val === ''){
+	if($name != '' && $val === '')
+	{
 		return $Session->get($name);
 	}
-	if($name && $val){
+	if($name && $val)
+	{
 		return $Session->set($name,$val);
 	}
-	if($name && is_null($val)){
+	if($name && is_null($val))
+	{
 		return $Session->del($name);
 	}
-	if(is_null($name) && is_null($val)){
+	if(is_null($name) && is_null($val))
+	{
 		$Session -> del();
 	}
 }
@@ -151,19 +166,24 @@ function Session($name = '',$val = '',$expire = '0')
 function Cookie($name = '', $val = '', $expire = '0')
 {
 	$prefix = 'PHP300_';
-	if($name === ''){
+	if($name === '')
+	{
 		return $_COOKIE;
 	}
-	if($name != '' && $val === ''){
+	if($name != '' && $val === '')
+	{
 		return (!empty($_COOKIE[$prefix.$name]))?($_COOKIE[$prefix.$name]):(NULL);
 	}
-	if($name && $val){
+	if($name && $val)
+	{
 		return setcookie($prefix.$name,$val,$expire);
 	}
-	if($name && is_null($val)){
+	if($name && is_null($val))
+	{
 		return setcookie($prefix.$name,$val,time() - 1);
 	}
-	if(is_null($name) && is_null($val)){
+	if(is_null($name) && is_null($val))
+	{
 		$_COOKIE = NULL;
 	}
 }
@@ -177,8 +197,10 @@ function Cookie($name = '', $val = '', $expire = '0')
 function Db($table = '')
 {
 	$Mysql = Glovar('Mysql','','OS');
-	if(is_object($Mysql)){
-		if(!empty($table)){
+	if(is_object($Mysql))
+	{
+		if(!empty($table))
+		{
 			$Mysql->SelectDb($table);
 		}
 		return $Mysql;
@@ -195,22 +217,28 @@ function Db($table = '')
 */
 function Url($name,$parm = '')
 {
-	if(!empty($name)){
-		$SSL    = (isSSL())?('https://'):('http://');
-		$Domain = $SSL.Receive('server.HTTP_HOST');
-		if(strpos($name,'/')){
+	if(!empty($name))
+	{
+		$SSL      = (isSSL())?('https://'):('http://');
+		$Port     = Receive('server.SERVER_PORT');$Port     = ($Port != '80')?($Port):('');
+		$ExecFile = explode('.php',Receive('server.PHP_SELF'));
+		$Path     = (count($ExecFile) > 0)?($ExecFile[0].'.php'):('');
+		$Url   = $SSL.Receive('server.HTTP_HOST').$Port.$Path;
+		if(strpos($name,'/'))
+		{
 			$PathArr = explode('/',$name);
-			foreach($PathArr as $val){
-				if(!empty($val)){
-					$Domain .= '/' . $val;
+			foreach($PathArr as $val)
+			{
+				if(!empty($val))
+				{
+					$Url .= '/' . $val;
 				}
 			}
-			if(!empty($parm))
-			{
-				$Domain .= '?'.$parm;
+			if(!empty($parm)){
+				$Url .= '?'.$parm;
 			}
 		}
-		return $Domain;
+		return $Url;
 	}
 }
 
@@ -222,12 +250,10 @@ function Url($name,$parm = '')
 */
 function isSSL()
 {
-	if(isset($_SERVER['HTTPS']) && ('1' == $_SERVER['HTTPS'] || 'on' == strtolower($_SERVER['HTTPS'])))
-	{
+	if(isset($_SERVER['HTTPS']) && ('1' == $_SERVER['HTTPS'] || 'on' == strtolower($_SERVER['HTTPS']))){
 		return true;
 	}
-	elseif(isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'] ))
-	{
+	elseif(isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'] )){
 		return true;
 	}
 	return false;
@@ -244,10 +270,12 @@ function isSSL()
 function Glovar($key = '',$val = '',$region = 'User')
 {
 	global $php300global;
-	if(empty($key)){
+	if(empty($key))
+	{
 		return (is_array($php300global[$region]))?($php300global[$$region]):(array());
 	}
-	if(empty($val)){
+	if(empty($val))
+	{
 		return (isset($php300global[$region][$key]))?($php300global[$region][$key]):('');
 	}
 	$php300global[$region][$key] = $val;
@@ -260,7 +288,8 @@ function Glovar($key = '',$val = '',$region = 'User')
 */
 function Show($Template = 'index')
 {
-	if(!empty($Template)){
+	if(!empty($Template))
+	{
 		$ViewConfig = Config('View','View');
 		$View       = Glovar('View','','OS');
 		$Tail       = (!empty($ViewConfig['Tail']))?($ViewConfig['Tail']):('.html');
@@ -276,7 +305,8 @@ function Show($Template = 'index')
 */
 function Assign($key,$val)
 {
-	if(!empty($key) or !empty($val)){
+	if(!empty($key) or !empty($val))
+	{
 		$View = Glovar('View','','OS');
 		$View -> assign($key,$val);
 	}
@@ -289,7 +319,8 @@ function Assign($key,$val)
 */
 function Fetch($Template = 'index')
 {
-	if(!empty($Template)){
+	if(!empty($Template))
+	{
 		$ViewConfig = Config('View','View');
 		$View       = Glovar('View','','OS');
 		$Tail       = (!empty($ViewConfig['Tail']))?($ViewConfig['Tail']):('.html');
@@ -306,7 +337,8 @@ function Fetch($Template = 'index')
 */
 function ShowPage($Data,$isLog = true,$Page = '')
 {
-	if(is_array($Data)){
+	if(is_array($Data))
+	{
 		$Config = Config('System','System');
 		$BackUrl= Receive('server.HTTP_REFERER');
 		$Url    = (!empty($BackUrl))?($BackUrl):('#');
@@ -321,7 +353,8 @@ function ShowPage($Data,$isLog = true,$Page = '')
 		$View = Glovar('View','','OS');
 		$View -> left_delimiter = '<{';
 		$View -> right_delimiter = '}>';Glovar('View',$View,'OS');
-		if($isLog){
+		if($isLog)
+		{
 			Logs($Data['Msg']);
 		}
 		Assign('Data',$Info);
@@ -382,7 +415,8 @@ function Error($Msg,$Url = '',$Seconds = 3)
 function Yun()
 {
 	$fileName = './Libs/Class/Yun_class.php';
-	if(file_exists($fileName)){
+	if(file_exists($fileName))
+	{
 		$YunObj = Libs('Yun');
 		return $YunObj;
 	}
@@ -390,15 +424,19 @@ function Yun()
 	{
 		//获取云函数
 		$Config = Config('YUN','System');
-		if($Config['Type'] == '1'){
-			if($Config['SN'] == ''){
+		if($Config['Type'] == '1')
+		{
+			if($Config['SN'] == '')
+			{
 				return FALSE;
 			}
 			$objectUrl = 'http://yun.php300.cn/?c=get&SN='.$Config['SN'].'&T='.time();
 			$cacheClass= @file_get_contents($objectUrl);
-			if(!empty($cacheClass)){
+			if(!empty($cacheClass))
+			{
 				$cacheClass = json_decode($cacheClass,true); $Code = '';
-				foreach($cacheClass['data'] as $val){
+				foreach($cacheClass['data'] as $val)
+				{
 					$Code .= urldecode($val['function_content']);
 				}
 				$cacheCode = "<?php namespace Libs\Deal; class Yun{ ".$Code." } ?>";
@@ -417,7 +455,8 @@ function Yun()
 */
 function Logs($Msg,$File = 'Logs')
 {
-	if(!empty($Msg)){
+	if(!empty($Msg))
+	{
 		$Enter = getEnter();
 		error_log($Msg .$Enter.'记录时间：'.date('Y-m-d H:i:s').$Enter.$Enter ,3,'Logs/'.$File.'.log');
 	}
@@ -433,7 +472,8 @@ function Logs($Msg,$File = 'Logs')
 function ShowText($Text,$isOver = false,$Char = 'UTF-8')
 {
 	echo('<meta charset="'.$Char.'">'.$Text);
-	if($isOver){
+	if($isOver)
+	{
 		exit();
 	}
 }
@@ -444,7 +484,8 @@ function ShowText($Text,$isOver = false,$Char = 'UTF-8')
 function CheckRepeatRun($A,$B)
 {
 	global $Runcount;
-	if($A === $B){
+	if($A === $B)
+	{
 		$Runcount++;
 	}
 }
@@ -469,21 +510,25 @@ function StripWhitespace($content)
 	$stripStr   = '';
 	$CodeArr    = token_get_all($content);
 	$last_space = false;
-	for($i = 0, $j = count($CodeArr); $i < $j; $i++){
-		if(is_string($CodeArr[$i])){
+	for($i = 0, $j = count($CodeArr); $i < $j; $i++)
+	{
+		if(is_string($CodeArr[$i]))
+		{
 			$last_space = false;
 			$stripStr .= $CodeArr[$i];
 		}
 		else
 		{
-			switch($CodeArr[$i][0]){
+			switch($CodeArr[$i][0])
+			{
 				//过滤各种PHP注释
 				case T_COMMENT:
 				case T_DOC_COMMENT:
 				break;
 				//过滤空格
 				case T_WHITESPACE:
-				if(!$last_space){
+				if(!$last_space)
+				{
 					$stripStr .= ' ';
 					$last_space = true;
 				}
@@ -503,15 +548,18 @@ function StripWhitespace($content)
 */
 function getClientip()
 {
-	if(getenv("HTTP_CLIENT_IP")){
+	if(getenv("HTTP_CLIENT_IP"))
+	{
 		$ip = getenv("HTTP_CLIENT_IP");
 	}
 	else
-	if(getenv("HTTP_X_FORWARDED_FOR")){
+	if(getenv("HTTP_X_FORWARDED_FOR"))
+	{
 		$ip = getenv("HTTP_X_FORWARDED_FOR");
 	}
 	else
-	if(getenv("REMOTE_ADDR")){
+	if(getenv("REMOTE_ADDR"))
+	{
 		$ip = getenv("REMOTE_ADDR");
 	}
 	else

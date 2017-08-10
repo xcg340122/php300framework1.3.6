@@ -8,9 +8,9 @@ return array(
 
 		'Time.zone'      =>	'Asia/Shanghai',//系统时区
 
-		'Debug'=>	true,//是否开启debug
+		'Debug'=>	TRUE,//是否开启debug
 
-		'Logs'=>	true,//是否开启日志记录
+		'Logs'=>	TRUE,//是否开启日志记录
 
 		'Upload'=>	'Uploads/',//上传路径
 
