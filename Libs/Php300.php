@@ -88,8 +88,13 @@ class Php300Deal
 		}
 		else
 		{
-			header("status:400 Bad Request");
-			Error('文件或类不存在于实例中,请检查：'.$PathFull);
+			$SystemConfig = $this->ReadConfig('System','System');
+			if($SystemConfig['Debug'] !== TRUE){
+				header("status:400 Bad Request");
+				Error('文件或类不存在于实例中,请检查：'.$PathFull);
+			}else{
+				ShowText('您访问的文件或目录不存在！',TRUE);
+			}
 		}
 	}
 
@@ -416,7 +421,12 @@ class Php300Deal
 				}
 				else
 				{
-					header("status:404 Not Found");Error('PHP300 -> 系统错误,请检查您的请求地址!');
+					$SystemConfig = $this->ReadConfig('System','System');
+					if($SystemConfig['Debug'] !== TRUE){
+						header("status:404 Not Found");Error('PHP300 -> 系统错误,请检查您的请求地址!');
+					}else{
+						ShowText('系统异常!',TRUE);
+					}
 				}
 			}
 			else
@@ -430,7 +440,7 @@ class Php300Deal
 					if($QueryCount > 1)
 					{
 						$this->setVisit($Config['default.Action'],$QueryArr[0],$QueryArr[1]);unset($QueryArr[0],$QueryArr[1]);return $QueryArr;
-					}header("status:404 Not Found");Error('PHP300 -> 系统错误,请检查您的请求地址!');
+					}
 				}
 			}
 		}

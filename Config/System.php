@@ -21,23 +21,6 @@ return array(
 	),
 
 	/**
-	* Session设置
-	*/
-	'Session' => array(
-
-		'Session.start'   => true,//是否开启session
-
-		'Cookie.domain'=> '',//session有效域
-
-		'Session.name'=> 'Php300',//session名称
-
-		'Session.path'=> '',//session保存路径
-
-		'Session.callback'=> '',//session回调
-
-	),
-
-	/**
 	* 云平台配置信息
 	*/
 	'YUN' => array(
