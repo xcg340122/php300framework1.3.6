@@ -3,6 +3,7 @@
 /**
 * PHP300Framework默认入口
 */
+
 if(substr(PHP_VERSION,0,3) < 5.3)
 {
 

@@ -27,19 +27,47 @@ class Php300Deal
 	* @var String
 	*/
 	public $UpDateTime;
-
+	
+	/**
+	* 实例名称
+	* @var String
+	*/
 	public $ActionName = '';
-
+	
+	/**
+	* 控制器名称
+	* @var String
+	*/
 	public $ClassName = '';
-
+	
+	/**
+	* 方法名称
+	* @var String
+	*/
 	public $FunctionName = '';
-
+	
+	/**
+	* 类库后缀
+	* @var String
+	*/
 	private $ClassTail = '_class';
-
+	
+	/**
+	* 类库文件列表
+	* @var array
+	*/
 	private $ClassList = array();
-
+	
+	/**
+	* 方法文件列表
+	* @var array
+	*/
 	private $FunctionList = array();
-
+	
+	/**
+	* 配置文件列表
+	* @var array
+	*/
 	private $ConfigList = array();
 
 	function __construct()
@@ -47,8 +75,8 @@ class Php300Deal
 		if(PHP_SAPI == 'cli'){
 			ini_set('include_path',dirname(__FILE__));
 		}
-		$this->Version = '1.3.4';
-		$this->UpDateTime = '2017/08/10';
+		$this->Version = '1.3.5';
+		$this->UpDateTime = '2017/08/22';
 		$this->init();
 	}
 
@@ -226,21 +254,7 @@ class Php300Deal
 	public function ReadConfig($keys = '',$file = '')
 	{
 		global $Php300Res;
-		if($keys){
-			if(is_array($Php300Res)){
-				foreach($Php300Res as $key=>$val){
-					if($file){
-						if($file == $key){
-							return (isset($val[$keys]))?($val[$keys]):(false);
-						}
-					}
-					else
-					{
-						return $val;
-					}
-				}
-			}
-		}
+		if($keys){if(is_array($Php300Res)){foreach($Php300Res as $key=>$val){if($file){if($file == $key){return (isset($val[$keys]))?($val[$keys]):(false);}}else{return $val;}}}}
 		return $Php300Res;
 	}
 
@@ -306,21 +320,7 @@ class Php300Deal
 	*/
 	public function Queryparam($QueryArr)
 	{
-		if(is_array($QueryArr)){
-			$QueryArr = array_merge($QueryArr);$ParamArr = $Paramkey = $Paramval = array();
-			foreach($QueryArr as $key=>$val){
-				if($key % 2){
-					$Paramval[] = $val;
-				}
-				else
-				{
-					$Paramkey[] = $val;
-				}
-			}
-			if(count($Paramkey) == count($Paramval)){
-				$ParamArr = array_combine($Paramkey,$Paramval); $_GET     = $ParamArr;
-			}
-		}
+		if(is_array($QueryArr)){$QueryArr = array_merge($QueryArr);$ParamArr = $Paramkey = $Paramval = array();foreach($QueryArr as $key=>$val){if($key % 2){$Paramval[] = $val;}else{$Paramkey[] = $val;}}if(count($Paramkey) == count($Paramval)){$ParamArr = array_combine($Paramkey,$Paramval);$_GET = $ParamArr;}}
 	}
 
 
@@ -346,22 +346,7 @@ class Php300Deal
 		$QueryUrl      = trim(Receive('server.PATH_INFO','',false));
 		$QueryUrl = str_replace($UrlConfig['Tail'],'',$QueryUrl);
 		if($RoutingConfig['Switch']){
-			if(count($RoutingConfig['Rules']) > 0){
-				foreach($RoutingConfig['Rules'] as $key=>$val){
-					preg_match($key,$QueryUrl,$Res);unset($Res[0]);
-					if(count($Res) > 0){
-						foreach($Res as $Nowkey =>$Nowval){
-							$QueryUrl = str_replace(':'.$Nowkey,$Nowval,$val);
-							if($QueryUrl != $val){
-								$QueryArr = $this->Arrgd($QueryUrl,$UrlConfig);
-								if(!empty($QueryArr)){
-									$this->Queryparam($QueryArr);
-								}return;
-							}
-						}
-					}
-				}
-			}
+			if(count($RoutingConfig['Rules']) > 0){foreach($RoutingConfig['Rules'] as $key=>$val){preg_match($key,$QueryUrl,$Res);unset($Res[0]);if(count($Res) > 0){foreach($Res as $Nowkey =>$Nowval){$QueryUrl = str_replace(':'.$Nowkey,$Nowval,$val);if($QueryUrl != $val){$QueryArr = $this->Arrgd($QueryUrl,$UrlConfig);if(!empty($QueryArr)){$this->Queryparam($QueryArr);}return;}}}}}
 		}
 		$QueryArr = $this->Arrgd($QueryUrl,$UrlConfig);
 		if(!empty($QueryArr)){
@@ -381,36 +366,7 @@ class Php300Deal
 	{
 		if($QueryUrl != ''){
 			$QueryArr   = array_merge(array_filter(explode('/',$QueryUrl)));$QueryCount = count($QueryArr);
-			if(!empty($this->ActionName)){
-				if($QueryCount > 0){
-					$FunctionName = (!empty($QueryArr[1]))?($QueryArr[1]):($Config['default.Function']);$this->setVisit('',$QueryArr[0],$FunctionName);unset($QueryArr[0],$QueryArr[1]);return $QueryArr;
-				}
-				else
-				{
-					$SystemConfig = $this->ReadConfig('System','System');
-					if($SystemConfig['Debug'])
-					{
-						header("status:404 Not Found");
-						Error('PHP300 -> 系统错误,请检查您的请求地址!');
-					}
-					else
-					{
-						ShowText('系统异常!',TRUE);
-					}
-				}
-			}
-			else
-			{
-				if($QueryCount > 2){
-					$this->setVisit($QueryArr[0],$QueryArr[1],$QueryArr[2]);unset($QueryArr[0],$QueryArr[1],$QueryArr[2]);return $QueryArr;
-				}
-				else
-				{
-					if($QueryCount > 1){
-						$this->setVisit($Config['default.Action'],$QueryArr[0],$QueryArr[1]);unset($QueryArr[0],$QueryArr[1]);return $QueryArr;
-					}
-				}
-			}
+			if(!empty($this->ActionName)){if($QueryCount > 0){$FunctionName = (!empty($QueryArr[1]))?($QueryArr[1]):($Config['default.Function']);$this->setVisit('',$QueryArr[0],$FunctionName);unset($QueryArr[0],$QueryArr[1]);return $QueryArr;}else{$SystemConfig = $this->ReadConfig('System','System');if($SystemConfig['Debug']){header("status:404 Not Found");Error('PHP300 -> 系统错误,请检查您的请求地址!');}else{ShowText('系统异常!',TRUE);}}}else{if($QueryCount > 2){$this->setVisit($QueryArr[0],$QueryArr[1],$QueryArr[2]);unset($QueryArr[0],$QueryArr[1],$QueryArr[2]);return $QueryArr;}else{if($QueryCount > 1){$this->setVisit($Config['default.Action'],$QueryArr[0],$QueryArr[1]);unset($QueryArr[0],$QueryArr[1]);return $QueryArr;}}}
 		}
 	}
 

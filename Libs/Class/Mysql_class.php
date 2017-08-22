@@ -46,8 +46,7 @@ class Mysql
 	*/
 	function option($config)
 	{
-		if(is_array($config))
-		{
+		if(is_array($config)){
 			$this->Config = $config;
 		}
 	}
@@ -59,8 +58,7 @@ class Mysql
 	function Connect()
 	{
 		$this->Link = @mysqli_connect($this->Config['Host'] . ':' . $this->Config['Port'], $this->Config['Username'], $this->Config['Password'], $this->Config['DataBase']);
-		if($this->Link != null)
-		{
+		if($this->Link != null){
 			mysqli_query($this->Link, "set names " . $this->Config['Char']);
 			return $this->Link;
 		}
@@ -78,13 +76,10 @@ class Mysql
 	*/
 	public function SelectDb($Db = '')
 	{
-		if($this->Link != NULL)
-		{
-			if(empty($Db))
-			{
+		if($this->Link != NULL){
+			if(empty($Db)){
 				$TableList = $this->getTable();
-				if($TableList[0])
-				{
+				if($TableList[0]){
 					$this->Db = $TableList[0];
 				}
 			}
@@ -103,22 +98,18 @@ class Mysql
 	*/
 	public function orderField()
 	{
-		if($this->Db != '')
-		{
+		if(!empty($this->Db)){
 			$Res    = $this->getFields($this->Db);
 			$ResArr = array();
-			foreach($Res as $key => $val)
-			{
-				if($val['Default'] == NULL)
-				{
+			foreach($Res as $key => $val){
+				if($val['Default'] == NULL){
 					$ResArr[$key] = '';
 				}
 				else
 				{
 					$ResArr[$key] = $val['Default'];
 				}
-				if($val['Key'] == 'PRI')
-				{
+				if($val['Key'] == 'PRI'){
 					$this->Key = $key;
 					unset($ResArr[$key]);
 				}
@@ -134,19 +125,15 @@ class Mysql
 	*/
 	private function execute($sql)
 	{
-		if($this->Link != null)
-		{
+		if($this->Link != NULL){
 			$this->Queryid = mysqli_query($this->Link, $sql);
 			$Status = ($this->Queryid)?('Success'):('Error');
-			if($this->Config['Logs'])
-			{
+			if($this->Config['Logs']){
 				Logs('PHP300SQL['.$Status.']::'.$sql,'Mysql');
 			}
-			if($this->Config['Debug'])
-			{
-				if(!$this->Queryid)
-				{
-					header("status:400 Bad Request");
+			if($this->Config['Debug']){
+				if(!$this->Queryid){
+					header("status:500 Internal Server Error");
 					Error('SQL执行失败：'.$sql.'<br />错误反馈:['.$this->Error().']');
 				}
 			}
@@ -154,7 +141,7 @@ class Mysql
 		}
 		else
 		{
-			header("status:400 Bad Request");
+			header("status:500 Internal Server Error");
 			Error('PHP300::获取数据连接信息失效,请检查配置文件或目标主机状态!');
 		}
 	}
@@ -164,9 +151,18 @@ class Mysql
 	* @param sql语句 $sql
 	*
 	*/
-	function query($sql)
+	function query($sql,$isReS = FALSE)
 	{
-		$this->execute($sql);
+		$DataList = $this->execute($sql);
+		if($isReS === FALSE)
+		{
+			$DataList = array();
+			while(($Res = $this->fetchNext()) != false){
+				$DataList[] = $Res;
+			}
+			$this->freeResult();
+		}
+		return $DataList;
 	}
 
 	/**
@@ -175,11 +171,9 @@ class Mysql
 	*/
 	function fetchNext()
 	{
-		if($this->Queryid)
-		{
+		if($this->Queryid){
 			$Res = mysqli_fetch_array($this->Queryid, MYSQLI_ASSOC);
-			if(!$Res)
-			{
+			if(!$Res){
 				$this->freeResult();
 			}
 			return $Res;
@@ -192,8 +186,7 @@ class Mysql
 	*/
 	function freeResult()
 	{
-		if(is_resource($this->Queryid))
-		{
+		if(is_resource($this->Queryid)){
 			mysqli_free_result($this->Queryid);
 			$this->Queryid = null;
 		}
@@ -207,21 +200,26 @@ class Mysql
 	*/
 	public function insert($data = array())
 	{
-		if(is_array($data))
-		{
+		if(is_array($data)){
 			$keys = '';$vals = '';
-			foreach($data as $key => $val)
-			{
+			foreach($data as $key => $val){
 				$this->Data[$key] = $val;
 			}
-			foreach($this->Data as $key => $val)
-			{
+			foreach($this->Data as $key => $val){
 				$keys .= $this->addSpecialChar($key) . ',';
 				$vals .= "'" . $val . "',";
 			}
 			$keys = trim($keys, '.,');$vals = trim($vals, '.,');
 			$this->Sql = 'INSERT INTO ' . $this->Db . ' (' . $keys . ')VALUES(' . $vals . ')';
-			return $this->execute($this->Sql);
+			$res = $this->execute($this->Sql);
+			if($res === TRUE)
+			{
+				return $this->insert_id();
+			}
+			else
+			{
+				return FALSE;
+			}
 		}
 		else
 		{
@@ -253,10 +251,11 @@ class Mysql
 	*/
 	public function update($data = array())
 	{
-		foreach($data as $key => $val)
-		{
-			$vals .= $key . '=' . "'".$val."'";
+		$vals = '';
+		foreach($data as $key => $val){
+			$vals .= $key . '=' . "'".$val."',";
 		}
+		$vals = trim($vals,'.,');
 		$this->Sql = 'UPDATE ' . $this->Db . ' set ' . $vals . $this->Deal['where'];
 		return $this->execute($this->Sql);
 	}
@@ -278,11 +277,9 @@ class Mysql
 	public function select()
 	{
 		$this->LinkSql();
-		if($this->Sql != '')
-		{
+		if($this->Sql != ''){
 			$this->execute($this->Sql);$DataList = array();
-			while(($Res = $this->fetchNext()) != false)
-			{
+			while(($Res = $this->fetchNext()) != false){
 				$DataList[] = $Res;
 			}
 			$this->freeResult();
@@ -297,8 +294,7 @@ class Mysql
 	*/
 	public function find($key = '')
 	{
-		if(is_numeric($key))
-		{
+		if(is_numeric($key)){
 			$this->where = 'where ' . $this->Key . ' = ' . $key . ' ';
 		}
 		$this->LinkSql();
@@ -315,8 +311,7 @@ class Mysql
 	*/
 	public function delete($key = '')
 	{
-		if(is_numeric($key))
-		{
+		if(is_numeric($key)){
 			$this->Deal['where'] = 'where ' . $this->Key . ' = ' . $key . ' ';
 		}
 		$this->LinkSql('delete');
@@ -330,7 +325,7 @@ class Mysql
 	*/
 	public function del($key = '')
 	{
-		$this->Key($key);
+		return $this->delete($key);
 	}
 
 
@@ -350,10 +345,8 @@ class Mysql
 	public function getPrimary($table)
 	{
 		$this->execute("SHOW COLUMNS FROM ".$table);
-		while($Next = $this->fetchNext())
-		{
-			if($Next['Key'] == 'PRI')
-			{
+		while($Next = $this->fetchNext()){
+			if($Next['Key'] == 'PRI'){
 				break;
 			}
 		}
@@ -368,8 +361,7 @@ class Mysql
 	{
 		$fields = array();
 		$this->execute('SHOW COLUMNS FROM `' .$table.'`');
-		while($Next = $this->fetchNext())
-		{
+		while($Next = $this->fetchNext()){
 			$fields[$Next['Field']] = $Next;
 		}
 		return $fields;
@@ -385,8 +377,7 @@ class Mysql
 		$fields = array();
 		$this->execute("SHOW tables");
 		$table = array();
-		while($Next = $this->fetchNext())
-		{
+		while($Next = $this->fetchNext()){
 			array_push($table, $Next['Tables_in_' . $this->Config['DataBase']]);
 		}
 		return $table;
@@ -402,10 +393,8 @@ class Mysql
 	{
 		$fields   = $this->getFields($table);
 		$nofields = array();
-		foreach($array as $val)
-		{
-			if(!array_key_exists($val, $fields))
-			{
+		foreach($array as $val){
+			if(!array_key_exists($val, $fields)){
 				$nofields[] = $val;
 			}
 		}
@@ -481,8 +470,7 @@ class Mysql
 	*/
 	public function version()
 	{
-		if(!is_resource($this->Link))
-		{
+		if(!is_resource($this->Link)){
 			$this->Connect();
 		}
 		return mysqli_get_server_info($this->Link);
@@ -494,8 +482,7 @@ class Mysql
 	*/
 	public function Close()
 	{
-		if(is_resource($this->Link))
-		{
+		if(is_resource($this->Link)){
 			@mysqli_close($this->Link);
 		}
 	}
@@ -507,16 +494,14 @@ class Mysql
 	*/
 	public function addSpecialChar( & $value)
 	{
-		if('*' == $value || false !== strpos($value, '(') || false !== strpos($value, '.') || false !== strpos($value, '`'))
-		{
+		if('*' == $value || false !== strpos($value, '(') || false !== strpos($value, '.') || false !== strpos($value, '`')){
 			//不处理包含 * 或者 使用了sql方法。
 		}
 		else
 		{
 			$value = '`' . trim($value) . '`';
 		}
-		if(preg_match("/\b(select|insert|update|delete)\b/i", $value))
-		{
+		if(preg_match("/\b(select|insert|update|delete)\b/i", $value)){
 			$value = preg_replace("/\b(select|insert|update|delete)\b/i", '', $value);
 		}
 		return $value;
@@ -531,8 +516,7 @@ class Mysql
 	*/
 	public function escape_string( & $value, $key = '', $quotation = 1)
 	{
-		if($quotation)
-		{
+		if($quotation){
 			$String = '\'';
 		}
 		else
@@ -560,8 +544,7 @@ class Mysql
 	*/
 	public function join($join = '', $type = 'left')
 	{
-		if($join != '')
-		{
+		if($join != ''){
 			$this->Deal['join'] .= ' ' . $type . ' join ' . $join . ' ';
 		}
 		return $this;
@@ -574,19 +557,16 @@ class Mysql
 	*/
 	public function where($where = '')
 	{
-		if(is_array($where))
-		{
-			foreach($where as $key => $val)
-			{
+		if(is_array($where)){
+			foreach($where as $key => $val){
 				$Symbol = (is_array($val))?($this->Symbol[$val[0]]):('=');
 				$Symbols= (in_array($Symbol,array('IN','BETWEEN')))?(''):("'");
-				if($this->Deal['where'] == '')
-				{
+				if(empty($this->Deal['where'])){
 					$this->Deal['where'] = ' where ' . $this->addSpecialChar($key) . ' '.$Symbol." '" . $val . "'";
 				}
 				else
 				{
-					$this->Deal['where'] .= ' and ' . $this->addSpecialChar($key) . ' '.$Symbol.' '.$Symbols . $val . $Symbols."";
+					$this->Deal['where'] .= ' and ' . $this->addSpecialChar($key) . ' '.$Symbol.' '.$Symbols . $val . $Symbols;
 				}
 			}
 		}
@@ -604,10 +584,8 @@ class Mysql
 	*/
 	public function field($field = '')
 	{
-		if(is_array($field))
-		{
-			foreach($field as $val)
-			{
+		if(is_array($field)){
+			foreach($field as $val){
 				$this->Deal['field'] .= $this->addSpecialChar($val) . ',';
 			}
 			$this->Deal['field'] = ' ' . trim($this->Deal['field'], '.,') . ' ';
@@ -626,16 +604,13 @@ class Mysql
 	*/
 	public function order($order = '')
 	{
-		if(!is_array($order))
-		{
+		if(!is_array($order)){
 			$this->Deal['order'] = ' order by ' . $order . ' ';
 		}
 		else
 		{
-			foreach($order as $val)
-			{
-				if($this->Deal['order'] == '')
-				{
+			foreach($order as $val){
+				if($this->Deal['order'] == ''){
 					$this->Deal['order'] = " order by " . $this->addSpecialChar($val) . ",";
 				}
 				else
@@ -656,8 +631,7 @@ class Mysql
 	*/
 	public function limit($start = 0, $end = 30)
 	{
-		if(strpos($start,',') && is_string($start))
-		{
+		if(strpos($start,',') && is_string($start)){
 			$end = explode(',',$start);
 			$end = end($end);
 		}
@@ -672,12 +646,9 @@ class Mysql
 	*/
 	public function group($group = '')
 	{
-		if(is_array($group))
-		{
-			foreach($groupa as $val)
-			{
-				if($this->Deal['group'] == '')
-				{
+		if(is_array($group)){
+			foreach($groupa as $val){
+				if($this->Deal['group'] == ''){
 					$this->Deal['group'] = " group by " . $this->addSpecialChar($val) . ",";
 				}
 				else
@@ -702,8 +673,7 @@ class Mysql
 	*/
 	public function union($union = '', $all = false)
 	{
-		if($union != '')
-		{
+		if($union != ''){
 			$all = ($all) ? (' all') : ('');
 			$this->Deal['union'] .= ' union' . $all . '(' . $union . ') ';
 		}
@@ -718,8 +688,7 @@ class Mysql
 	*/
 	public function page($page = '1', $num = '10')
 	{
-		if(is_numeric($page))
-		{
+		if(is_numeric($page)){
 			$page = ($page < 1) ? ('1') : ($page);
 			$this->Page['page'] = $page;
 			$this->Page['num'] = $num;
@@ -735,8 +704,7 @@ class Mysql
 	*/
 	public function alias($alias = '')
 	{
-		if($alias != '')
-		{
+		if($alias != ''){
 			$this->Deal['alias'] = ' ' . $alias . ' ';
 		}
 		return $this;
@@ -749,8 +717,7 @@ class Mysql
 	*/
 	public function linkSql($Type = 'select')
 	{
-		switch($Type)
-		{
+		switch($Type){
 			case 'select':
 			$this->Deal['field'] = ($this->Deal['field'] == '') ? (' * ') : ($this->Deal['field']);
 			break;
@@ -758,8 +725,7 @@ class Mysql
 		//连接SQL
 		$this->Sql = $Type . ' ' . $this->Deal['field'] . 'from `' . $this->Db . '`' . $this->Deal['alias'] . $this->Deal['union'] . $this->Deal['join'] . $this->Deal['where'] . $this->Deal['group'] . $this->Deal['order'] . $this->Deal['limit'];
 		//处理分页
-		if($this->Page['status'])
-		{
+		if($this->Page['status']){
 			$this->Page['count'] = $this->NumRows($this->Sql);
 			$this->Page['start'] = $this->Page['num'] * ($this->Page['page'] - 1);
 			$this->Page['max_page'] = ceil($this->Page['count'] / $this->Page['num']);
@@ -769,8 +735,7 @@ class Mysql
 			return false;
 		}
 		//初始化所有内容
-		foreach($this->Deal as $key=>$val)
-		{
+		foreach($this->Deal as $key=>$val){
 			$this->Deal[$key] = '';
 		}
 		return $this->Sql;
