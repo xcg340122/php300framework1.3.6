@@ -19,7 +19,7 @@ class Cache
 	/**
 	* 设置文件名
 	*/
-	protected $settingFile = './settings.cache.php';
+	protected $settingFile = './Cache/settings.cache.php';
 	
 	/**
 	* 缓存后缀
