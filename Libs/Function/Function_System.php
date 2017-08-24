@@ -410,32 +410,43 @@ function Error($Msg,$Url = '',$Seconds = 3)
 
 /**
 * 云函数调用
+* @param 更新周期 $Update
 *
 * @return Object
 */
-function Yun()
+function Yun($Update=FALSE)
 {
 	$fileName = './Libs/Class/Yun_class.php';
 	if(file_exists($fileName)){
 		$YunObj = Libs('Yun');
+		if(is_numeric($Update)){
+			$Time = time();
+			$DendTime = ($Time - $YunObj->UpdateTime);
+			if($DendTime > $Update){
+				if(@unlink($fileName)){
+					$YunObj = Yun();
+				}else{
+					ShowText('Yun函数处理文件异常,请检查增删权限!',TRUE);	
+				}
+			}
+		}
 		return $YunObj;
-	}
-	else
-	{
+	}else{
 		//获取云函数
 		$Config = Config('YUN','System');
 		if($Config['Type'] == '1'){
 			if($Config['SN'] == ''){
-				return FALSE;
+				ShowText('请先配置系统文件中的SN!',TRUE);
 			}
-			$objectUrl = 'http://yun.php300.cn/?c=get&SN='.$Config['SN'].'&T='.time();
-			$cacheClass= @file_get_contents($objectUrl);
+			$objectUrl = 'http://yun.php300.cn/index.php/Function/GetFunction/SN/'.$Config['SN'].'/T/'.time();
+			$cacheClass = @file_get_contents($objectUrl);
 			if(!empty($cacheClass)){
-				$cacheClass = json_decode($cacheClass,true); $Code = '';
+				$cacheClass = json_decode($cacheClass,true); $Code='';
 				foreach($cacheClass['data'] as $val){
-					$Code .= urldecode($val['function_content']);
+					$Code .= base64_decode($val['function_content']);
 				}
-				$cacheCode = "<?php namespace Libs\Deal; class Yun{ ".$Code." } ?>";
+				$UpdateTime = 'public $UpdateTme = \''.time().'\';';
+				$cacheCode = "<?php namespace Libs\Deal; class Yun{ ".$UpdateTime.' '.$Code." } ?>";
 				file_put_contents($fileName,StripWhitespace($cacheCode));
 				include_once($fileName);
 				return Libs('Yun');
