@@ -5,7 +5,7 @@ return array(
 
 		'Tail'      => '.html',//视图文件后缀
 
-		'Cache'=> true,//是否开启缓存
+		'Cache'=> TRUE,//是否开启缓存
 
 		'Cache.Time'=> '0',//缓存更新周期
 

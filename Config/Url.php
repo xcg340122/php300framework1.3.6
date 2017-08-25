@@ -6,7 +6,7 @@ return array(
 	*/
 	'Url' => array(
 
-		'Tail'            => '.html',//伪静态后缀
+		'Tail'=> '.html',//伪静态后缀
 
 		'Action'=> 'a',//实例项目参数
 
@@ -25,7 +25,7 @@ return array(
 	*/
 	'Routing' => array(
 
-		'Switch'=> false,//路由开关
+		'Switch'=> FALSE,//路由开关
 
 		/**
 		* 规则列表

@@ -17,11 +17,11 @@ return array(
 
 		'Prefix'=> '',//表前缀
 
-		'Connect'=> false,//是否启用连接
+		'Connect'=> FALSE,//是否启用连接
 
-		'Logs'=> true,//是否记录Mysql日志
+		'Logs'=> TRUE,//是否记录Mysql日志
 
-		'Debug'=> true,		//是否开启数据库调试模式
+		'Debug'=> TRUE,		//是否开启数据库调试模式
 
 	)
 
