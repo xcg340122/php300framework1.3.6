@@ -10,4 +10,5 @@ class App_class{
 		
 		Show('Php300/Welcome/index');
 	}
+	
 }

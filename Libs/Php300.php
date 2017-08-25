@@ -75,8 +75,8 @@ class Php300Deal
 		if(PHP_SAPI == 'cli'){
 			ini_set('include_path',dirname(__FILE__));
 		}
-		$this->Version = '1.3.5';
-		$this->UpDateTime = '2017/08/22';
+		$this->Version = '1.3.6';
+		$this->UpDateTime = '2017/08/26';
 		$this->init();
 	}
 
@@ -106,15 +106,19 @@ class Php300Deal
 	*/
 	public function Autoload($Class)
 	{
+		$SystemConfig = $this->ReadConfig('System','System');
 		$PathFull = (strpos($Class,'Libs\Deal') !== FALSE)?(str_replace('Libs\Deal\\','',$Class)):($Class);
 		$PathFull = (strpos($PathFull,'Action'))?($this->CorePath . 'Action/' . str_replace('\Action','',$PathFull)):($this->CorePath . 'Libs/Class/' . $PathFull.'_class');
 		$PathFull = str_replace('\\','/',$PathFull).'.php';
 		if(is_file($PathFull)){
+			if($SystemConfig['Chinese.Compile']){
+				$Obj = Libs('Chinese');
+				$PathFull = $Obj->Dnfile($PathFull);
+			}
 			include_once($PathFull);
 		}
 		else
 		{
-			$SystemConfig = $this->ReadConfig('System','System');
 			header("status:404 Not Found");
 			if($SystemConfig['Debug'])
 			{
@@ -386,6 +390,7 @@ class Php300Deal
 
 	/**
 	* 设置常量和配置信息
+	* 
 	*/
 	function setConstant()
 	{
@@ -406,7 +411,7 @@ class Php300Deal
 		foreach($DefineArr as $key => $value){
 			define($key,$value);
 		}
-		ini_set('date.timezone',$SystemConfig['Time.zone']);
+		date_default_timezone_set($SystemConfig['Time.zone']);
 	}
 
 	/**
@@ -432,6 +437,7 @@ class Php300Deal
 	/**
 	* 绑定实例
 	* @param string $action [实例名称]
+	* 
 	*/
 	public function bindAction($action = '')
 	{

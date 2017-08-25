@@ -17,6 +17,8 @@ return array(
 		'Status.Template'=>	'Php300/Msg',//状态页模板
 
 		'Error.Template'=>	'Php300/Error',//系统错误页模板
+		
+		'Chinese.Compile'=>	FALSE,	//是否开启中文编译
 
 	),
 
@@ -25,7 +27,7 @@ return array(
 	*/
 	'YUN' => array(
 
-		'SN'  => 'q70SAj9Hq998024',//云平台SN
+		'SN'  => '',//云平台SN
 
 		'Type'=> '0',			//0：不启用云平台,1：启用并初始同步
 
