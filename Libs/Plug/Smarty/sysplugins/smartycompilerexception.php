@@ -1,39 +1,37 @@
 <?php
 
 /**
- * Smarty compiler exception class
- *
- * @package Smarty
+ * Smarty compiler exception class.
  */
-class SmartyCompilerException extends SmartyException
+class smartycompilerexception extends SmartyException
 {
     public function __toString()
     {
-        return ' --> Smarty Compiler: ' . $this->message . ' <-- ';
+        return ' --> Smarty Compiler: '.$this->message.' <-- ';
     }
 
     /**
-     * The line number of the template error
+     * The line number of the template error.
      *
-     * @type int|null
+     * @var int|null
      */
     public $line = null;
     /**
-     * The template source snippet relating to the error
+     * The template source snippet relating to the error.
      *
-     * @type string|null
+     * @var string|null
      */
     public $source = null;
     /**
-     * The raw text of the error message
+     * The raw text of the error message.
      *
-     * @type string|null
+     * @var string|null
      */
     public $desc = null;
     /**
-     * The resource identifier or template name
+     * The resource identifier or template name.
      *
-     * @type string|null
+     * @var string|null
      */
     public $template = null;
 }

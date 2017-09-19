@@ -1,65 +1,60 @@
 <?php
 /**
  * Smarty Internal Plugin Smarty Template Compiler Base
- * This file contains the basic classes and methods for compiling Smarty templates with lexer/parser
+ * This file contains the basic classes and methods for compiling Smarty templates with lexer/parser.
  *
- * @package    Smarty
- * @subpackage Compiler
  * @author     Uwe Tews
  */
 
 /**
- * Class SmartyTemplateCompiler
- *
- * @package    Smarty
- * @subpackage Compiler
+ * Class SmartyTemplateCompiler.
  */
 class Smarty_Internal_SmartyTemplateCompiler extends Smarty_Internal_TemplateCompilerBase
 {
     /**
-     * Lexer class name
+     * Lexer class name.
      *
      * @var string
      */
     public $lexer_class;
 
     /**
-     * Parser class name
+     * Parser class name.
      *
      * @var string
      */
     public $parser_class;
 
     /**
-     * array of vars which can be compiled in local scope
+     * array of vars which can be compiled in local scope.
      *
      * @var array
      */
-    public $local_var = array();
+    public $local_var = [];
 
     /**
-     * array of callbacks called when the normal compile process of template is finished
+     * array of callbacks called when the normal compile process of template is finished.
      *
      * @var array
      */
-    public $postCompileCallbacks = array();
+    public $postCompileCallbacks = [];
 
     /**
-     * prefix code
+     * prefix code.
      *
      * @var string
      */
     public $prefixCompiledCode = '';
 
     /**
-     * postfix code
+     * postfix code.
      *
      * @var string
      */
     public $postfixCompiledCode = '';
 
     /**
-     * Initialize compiler
+     * Initialize compiler.
      *
      * @param string $lexer_class  class name
      * @param string $parser_class class name
@@ -74,13 +69,14 @@ class Smarty_Internal_SmartyTemplateCompiler extends Smarty_Internal_TemplateCom
     }
 
     /**
-     * method to compile a Smarty template
+     * method to compile a Smarty template.
      *
-     * @param  mixed $_content template source
-     * @param bool   $isTemplateSource
+     * @param mixed $_content         template source
+     * @param bool  $isTemplateSource
+     *
+     * @throws \SmartyCompilerException
      *
      * @return bool true if compiling succeeded, false if it failed
-     * @throws \SmartyCompilerException
      */
     protected function doCompile($_content, $isTemplateSource = false)
     {
@@ -89,7 +85,7 @@ class Smarty_Internal_SmartyTemplateCompiler extends Smarty_Internal_TemplateCom
           then written to compiled files. */
         // init the lexer/parser to compile the template
         $this->parser =
-            new $this->parser_class(new $this->lexer_class(str_replace(array("\r\n", "\r"), "\n", $_content), $this),
+            new $this->parser_class(new $this->lexer_class(str_replace(["\r\n", "\r"], "\n", $_content), $this),
                                     $this);
         if ($isTemplateSource && $this->template->caching) {
             $this->parser->insertPhpCode("<?php\n\$_smarty_tpl->compiled->nocache_hash = '{$this->nocache_hash}';\n?>\n");
@@ -108,8 +104,8 @@ class Smarty_Internal_SmartyTemplateCompiler extends Smarty_Internal_TemplateCom
         // get tokens from lexer and parse them
         while ($this->parser->lex->yylex()) {
             if ($this->smarty->_parserdebug) {
-                echo "<pre>Line {$this->parser->lex->line} Parsing  {$this->parser->yyTokenName[$this->parser->lex->token]} Token " .
-                    htmlentities($this->parser->lex->value) . "</pre>";
+                echo "<pre>Line {$this->parser->lex->line} Parsing  {$this->parser->yyTokenName[$this->parser->lex->token]} Token ".
+                    htmlentities($this->parser->lex->value).'</pre>';
             }
             $this->parser->doParse($this->parser->lex->token, $this->parser->lex->value);
         }
@@ -123,7 +119,7 @@ class Smarty_Internal_SmartyTemplateCompiler extends Smarty_Internal_TemplateCom
         if (count($this->_tag_stack) > 0) {
             // get stacked info
             list($openTag, $_data) = array_pop($this->_tag_stack);
-            $this->trigger_template_error("unclosed {$this->smarty->left_delimiter}" . $openTag .
+            $this->trigger_template_error("unclosed {$this->smarty->left_delimiter}".$openTag.
                                           "{$this->smarty->right_delimiter} tag");
         }
         // call post compile callbacks
@@ -133,19 +129,19 @@ class Smarty_Internal_SmartyTemplateCompiler extends Smarty_Internal_TemplateCom
             call_user_func_array($cb[0], $parameter);
         }
         // return compiled code
-        return $this->prefixCompiledCode . $this->parser->retvalue . $this->postfixCompiledCode;
+        return $this->prefixCompiledCode.$this->parser->retvalue.$this->postfixCompiledCode;
     }
 
     /**
      * Register a post compile callback
-     * - when the callback is called after template compiling the compiler object will be inserted as first parameter
+     * - when the callback is called after template compiling the compiler object will be inserted as first parameter.
      *
      * @param callback $callback
      * @param array    $parameter optional parameter array
      * @param string   $key       optional key for callback
      * @param bool     $replace   if true replace existing keyed callback
      */
-    public function registerPostCompileCallback($callback, $parameter = array(), $key = null, $replace = false)
+    public function registerPostCompileCallback($callback, $parameter = [], $key = null, $replace = false)
     {
         array_unshift($parameter, $callback);
         if (isset($key)) {
@@ -158,7 +154,7 @@ class Smarty_Internal_SmartyTemplateCompiler extends Smarty_Internal_TemplateCom
     }
 
     /**
-     * Remove a post compile callback
+     * Remove a post compile callback.
      *
      * @param string $key callback key
      */

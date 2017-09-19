@@ -1,9 +1,7 @@
 <?php
 /**
- * Smarty Internal Plugin Resource Eval
+ * Smarty Internal Plugin Resource Eval.
  *
- * @package    Smarty
- * @subpackage TemplateResources
  * @author     Uwe Tews
  * @author     Rodney Rehm
  */
@@ -11,18 +9,15 @@
 /**
  * Smarty Internal Plugin Resource Eval
  * Implements the strings as resource for Smarty template
- * {@internal unlike string-resources the compiled state of eval-resources is NOT saved for subsequent access}}
- *
- * @package    Smarty
- * @subpackage TemplateResources
+ * {@internal unlike string-resources the compiled state of eval-resources is NOT saved for subsequent access}.
  */
 class Smarty_Internal_Resource_Eval extends Smarty_Resource_Recompiled
 {
     /**
-     * populate Source Object with meta data from Resource
+     * populate Source Object with meta data from Resource.
      *
-     * @param  Smarty_Template_Source   $source    source object
-     * @param  Smarty_Internal_Template $_template template object
+     * @param Smarty_Template_Source   $source    source object
+     * @param Smarty_Internal_Template $_template template object
      *
      * @return void
      */
@@ -34,13 +29,13 @@ class Smarty_Internal_Resource_Eval extends Smarty_Resource_Recompiled
     }
 
     /**
-     * Load template's source from $resource_name into current template object
+     * Load template's source from $resource_name into current template object.
      *
      * @uses decode() to decode base64 and urlencoded template_resources
      *
-     * @param  Smarty_Template_Source $source source object
+     * @param Smarty_Template_Source $source source object
      *
-     * @return string                 template source
+     * @return string template source
      */
     public function getContent(Smarty_Template_Source $source)
     {
@@ -48,9 +43,9 @@ class Smarty_Internal_Resource_Eval extends Smarty_Resource_Recompiled
     }
 
     /**
-     * decode base64 and urlencode
+     * decode base64 and urlencode.
      *
-     * @param  string $string template_resource to decode
+     * @param string $string template_resource to decode
      *
      * @return string decoded template_resource
      */
@@ -69,25 +64,25 @@ class Smarty_Internal_Resource_Eval extends Smarty_Resource_Recompiled
     }
 
     /**
-     * modify resource_name according to resource handlers specifications
+     * modify resource_name according to resource handlers specifications.
      *
-     * @param  Smarty  $smarty        Smarty instance
-     * @param  string  $resource_name resource_name to make unique
-     * @param  boolean $isConfig      flag for config resource
+     * @param Smarty $smarty        Smarty instance
+     * @param string $resource_name resource_name to make unique
+     * @param bool   $isConfig      flag for config resource
      *
      * @return string unique resource name
      */
     public function buildUniqueResourceName(Smarty $smarty, $resource_name, $isConfig = false)
     {
-        return get_class($this) . '#' . $this->decode($resource_name);
+        return get_class($this).'#'.$this->decode($resource_name);
     }
 
     /**
-     * Determine basename for compiled filename
+     * Determine basename for compiled filename.
      *
-     * @param  Smarty_Template_Source $source source object
+     * @param Smarty_Template_Source $source source object
      *
-     * @return string                 resource's basename
+     * @return string resource's basename
      */
     public function getBasename(Smarty_Template_Source $source)
     {

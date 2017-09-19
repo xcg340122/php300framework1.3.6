@@ -3,22 +3,18 @@
 /**
  * Double quoted string inside a tag.
  *
- * @package    Smarty
- * @subpackage Compiler
  * @ignore
  */
 
 /**
  * Double quoted string inside a tag.
  *
- * @package    Smarty
- * @subpackage Compiler
  * @ignore
  */
 class Smarty_Internal_ParseTree_Dq extends Smarty_Internal_ParseTree
 {
     /**
-     * Create parse tree buffer for double quoted string subtrees
+     * Create parse tree buffer for double quoted string subtrees.
      *
      * @param object                    $parser  parser object
      * @param Smarty_Internal_ParseTree $subtree parse tree buffer
@@ -32,7 +28,7 @@ class Smarty_Internal_ParseTree_Dq extends Smarty_Internal_ParseTree
     }
 
     /**
-     * Append buffer to subtree
+     * Append buffer to subtree.
      *
      * @param \Smarty_Internal_Templateparser $parser
      * @param Smarty_Internal_ParseTree       $subtree parse tree buffer
@@ -42,9 +38,9 @@ class Smarty_Internal_ParseTree_Dq extends Smarty_Internal_ParseTree
         $last_subtree = count($this->subtrees) - 1;
         if ($last_subtree >= 0 && $this->subtrees[$last_subtree] instanceof Smarty_Internal_ParseTree_Tag && $this->subtrees[$last_subtree]->saved_block_nesting < $parser->block_nesting_level) {
             if ($subtree instanceof Smarty_Internal_ParseTree_Code) {
-                $this->subtrees[$last_subtree]->data = $parser->compiler->appendCode($this->subtrees[$last_subtree]->data, '<?php echo ' . $subtree->data . ';?>');
+                $this->subtrees[$last_subtree]->data = $parser->compiler->appendCode($this->subtrees[$last_subtree]->data, '<?php echo '.$subtree->data.';?>');
             } elseif ($subtree instanceof Smarty_Internal_ParseTree_DqContent) {
-                $this->subtrees[$last_subtree]->data = $parser->compiler->appendCode($this->subtrees[$last_subtree]->data, '<?php echo "' . $subtree->data . '";?>');
+                $this->subtrees[$last_subtree]->data = $parser->compiler->appendCode($this->subtrees[$last_subtree]->data, '<?php echo "'.$subtree->data.'";?>');
             } else {
                 $this->subtrees[$last_subtree]->data = $parser->compiler->appendCode($this->subtrees[$last_subtree]->data, $subtree->data);
             }
@@ -57,7 +53,7 @@ class Smarty_Internal_ParseTree_Dq extends Smarty_Internal_ParseTree
     }
 
     /**
-     * Merge subtree buffer content together
+     * Merge subtree buffer content together.
      *
      * @param \Smarty_Internal_Templateparser $parser
      *
@@ -67,8 +63,8 @@ class Smarty_Internal_ParseTree_Dq extends Smarty_Internal_ParseTree
     {
         $code = '';
         foreach ($this->subtrees as $subtree) {
-            if ($code !== "") {
-                $code .= ".";
+            if ($code !== '') {
+                $code .= '.';
             }
             if ($subtree instanceof Smarty_Internal_ParseTree_Tag) {
                 $more_php = $subtree->assign_to_var($parser);

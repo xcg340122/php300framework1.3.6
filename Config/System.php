@@ -1,36 +1,37 @@
 <?php
-return array(
 
-	/**
-	* 系统设置
-	*/
-	'System' => array(
+return [
 
-		'Time.zone'      =>	'Asia/Shanghai',//系统时区
+    /*
+    * 系统设置
+    */
+    'System' => [
 
-		'Debug'=>	TRUE,//是否开启debug
+        'Time.zone'      => 'Asia/Shanghai', //系统时区
 
-		'Logs'=>	TRUE,//是否开启日志记录
+        'Debug'=> true, //是否开启debug
 
-		'Upload'=>	'Uploads/',//上传路径
+        'Logs'=> true, //是否开启日志记录
 
-		'Status.Template'=>	'Php300/Msg',//状态页模板
+        'Upload'=> 'Uploads/', //上传路径
 
-		'Error.Template'=>	'Php300/Error',//系统错误页模板
-		
-		'Chinese.Compile'=>	FALSE,	//是否开启中文编译
+        'Status.Template'=> 'Php300/Msg', //状态页模板
 
-	),
+        'Error.Template'=> 'Php300/Error', //系统错误页模板
 
-	/**
-	* 云平台配置信息
-	*/
-	'YUN' => array(
+        'Chinese.Compile'=> false,    //是否开启中文编译
 
-		'SN'  => '',//云平台SN
+    ],
 
-		'Type'=> '0',			//0：不启用云平台,1：启用并初始同步
+    /*
+    * 云平台配置信息
+    */
+    'YUN' => [
 
-	)
+        'SN'  => '', //云平台SN
 
-);
+        'Type'=> '0',            //0：不启用云平台,1：启用并初始同步
+
+    ],
+
+];

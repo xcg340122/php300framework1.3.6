@@ -1,9 +1,6 @@
 <?php
 /**
- * Smarty plugin to format text blocks
- *
- * @package    Smarty
- * @subpackage PluginsBlock
+ * Smarty plugin to format text blocks.
  */
 
 /**
@@ -20,7 +17,7 @@
  * - wrap_char     - string ("\n")
  * - indent_char   - string (" ")
  * - wrap_boundary - boolean (true)
- * </pre>
+ * </pre>.
  *
  * @link   http://www.smarty.net/manual/en/language.function.textformat.php {textformat}
  *         (Smarty online manual)
@@ -28,9 +25,10 @@
  * @param array                    $params   parameters
  * @param string                   $content  contents of the block
  * @param Smarty_Internal_Template $template template object
- * @param boolean                  &$repeat  repeat flag
+ * @param bool                     &$repeat  repeat flag
  *
  * @return string content re-formatted
+ *
  * @author Monte Ohrt <monte at ohrt dot com>
  */
 function smarty_block_textformat($params, $content, $template, &$repeat)
@@ -83,14 +81,14 @@ function smarty_block_textformat($params, $content, $template, &$repeat)
             continue;
         }
         // convert mult. spaces & special chars to single space
-        $_paragraph = preg_replace(array('!\s+!' . Smarty::$_UTF8_MODIFIER, '!(^\s+)|(\s+$)!' . Smarty::$_UTF8_MODIFIER), array(' ', ''), $_paragraph);
+        $_paragraph = preg_replace(['!\s+!'.Smarty::$_UTF8_MODIFIER, '!(^\s+)|(\s+$)!'.Smarty::$_UTF8_MODIFIER], [' ', ''], $_paragraph);
         // indent first line
         if ($indent_first > 0) {
-            $_paragraph = str_repeat($indent_char, $indent_first) . $_paragraph;
+            $_paragraph = str_repeat($indent_char, $indent_first).$_paragraph;
         }
         // wordwrap sentences
         if (Smarty::$_MBSTRING) {
-            require_once(SMARTY_PLUGINS_DIR . 'shared.mb_wordwrap.php');
+            require_once SMARTY_PLUGINS_DIR.'shared.mb_wordwrap.php';
             $_paragraph = smarty_mb_wordwrap($_paragraph, $wrap - $indent, $wrap_char, $wrap_cut);
         } else {
             $_paragraph = wordwrap($_paragraph, $wrap - $indent, $wrap_char, $wrap_cut);
@@ -100,7 +98,7 @@ function smarty_block_textformat($params, $content, $template, &$repeat)
             $_paragraph = preg_replace('!^!m', str_repeat($indent_char, $indent), $_paragraph);
         }
     }
-    $_output = implode($wrap_char . $wrap_char, $_paragraphs);
+    $_output = implode($wrap_char.$wrap_char, $_paragraphs);
 
     if ($assign) {
         $template->assign($assign, $_output);
