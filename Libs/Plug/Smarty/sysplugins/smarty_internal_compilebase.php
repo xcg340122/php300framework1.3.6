@@ -1,64 +1,59 @@
 <?php
 /**
- * Smarty Internal Plugin CompileBase
+ * Smarty Internal Plugin CompileBase.
  *
- * @package    Smarty
- * @subpackage Compiler
  * @author     Uwe Tews
  */
 
 /**
- * This class does extend all internal compile plugins
- *
- * @package    Smarty
- * @subpackage Compiler
+ * This class does extend all internal compile plugins.
  */
 abstract class Smarty_Internal_CompileBase
 {
     /**
-     * Array of names of required attribute required by tag
+     * Array of names of required attribute required by tag.
      *
      * @var array
      */
-    public $required_attributes = array();
+    public $required_attributes = [];
 
     /**
      * Array of names of optional attribute required by tag
-     * use array('_any') if there is no restriction of attributes names
+     * use array('_any') if there is no restriction of attributes names.
      *
      * @var array
      */
-    public $optional_attributes = array();
+    public $optional_attributes = [];
 
     /**
-     * Shorttag attribute order defined by its names
+     * Shorttag attribute order defined by its names.
      *
      * @var array
      */
-    public $shorttag_order = array();
+    public $shorttag_order = [];
 
     /**
-     * Array of names of valid option flags
+     * Array of names of valid option flags.
      *
      * @var array
      */
-    public $option_flags = array('nocache');
+    public $option_flags = ['nocache'];
 
     /**
      * This function checks if the attributes passed are valid
      * The attributes passed for the tag to compile are checked against the list of required and
      * optional attributes. Required attributes must be present. Optional attributes are check against
      * the corresponding list. The keyword '_any' specifies that any attribute will be accepted
-     * as valid
+     * as valid.
      *
-     * @param  object $compiler   compiler object
-     * @param  array  $attributes attributes applied to the tag
+     * @param object $compiler   compiler object
+     * @param array  $attributes attributes applied to the tag
      *
-     * @return array  of mapped attributes for further processing
+     * @return array of mapped attributes for further processing
      */
     public function getAttributes($compiler, $attributes)
     {
-        $_indexed_attr = array();
+        $_indexed_attr = [];
         // loop over attributes
         foreach ($attributes as $key => $mixed) {
             // shorthand ?
@@ -80,13 +75,13 @@ abstract class Smarty_Internal_CompileBase
                 if (in_array($kv['key'], $this->option_flags)) {
                     if (is_bool($kv['value'])) {
                         $_indexed_attr[$kv['key']] = $kv['value'];
-                    } elseif (is_string($kv['value']) && in_array(trim($kv['value'], '\'"'), array('true', 'false'))) {
+                    } elseif (is_string($kv['value']) && in_array(trim($kv['value'], '\'"'), ['true', 'false'])) {
                         if (trim($kv['value']) == 'true') {
                             $_indexed_attr[$kv['key']] = true;
                         } else {
                             $_indexed_attr[$kv['key']] = false;
                         }
-                    } elseif (is_numeric($kv['value']) && in_array($kv['value'], array(0, 1))) {
+                    } elseif (is_numeric($kv['value']) && in_array($kv['value'], [0, 1])) {
                         if ($kv['value'] == 1) {
                             $_indexed_attr[$kv['key']] = true;
                         } else {
@@ -105,15 +100,15 @@ abstract class Smarty_Internal_CompileBase
         // check if all required attributes present
         foreach ($this->required_attributes as $attr) {
             if (!array_key_exists($attr, $_indexed_attr)) {
-                $compiler->trigger_template_error("missing \"" . $attr . "\" attribute", null, true);
+                $compiler->trigger_template_error('missing "'.$attr.'" attribute', null, true);
             }
         }
         // check for not allowed attributes
-        if ($this->optional_attributes != array('_any')) {
+        if ($this->optional_attributes != ['_any']) {
             $tmp_array = array_merge($this->required_attributes, $this->optional_attributes, $this->option_flags);
             foreach ($_indexed_attr as $key => $dummy) {
                 if (!in_array($key, $tmp_array) && $key !== 0) {
-                    $compiler->trigger_template_error("unexpected \"" . $key . "\" attribute", null, true);
+                    $compiler->trigger_template_error('unexpected "'.$key.'" attribute', null, true);
                 }
             }
         }
@@ -129,7 +124,7 @@ abstract class Smarty_Internal_CompileBase
 
     /**
      * Push opening tag name on stack
-     * Optionally additional data can be saved on stack
+     * Optionally additional data can be saved on stack.
      *
      * @param object $compiler compiler object
      * @param string $openTag  the opening tag's name
@@ -137,17 +132,17 @@ abstract class Smarty_Internal_CompileBase
      */
     public function openTag($compiler, $openTag, $data = null)
     {
-        array_push($compiler->_tag_stack, array($openTag, $data));
+        array_push($compiler->_tag_stack, [$openTag, $data]);
     }
 
     /**
      * Pop closing tag
-     * Raise an error if this stack-top doesn't match with expected opening tags
+     * Raise an error if this stack-top doesn't match with expected opening tags.
      *
-     * @param  object       $compiler    compiler object
-     * @param  array|string $expectedTag the expected opening tag names
+     * @param object       $compiler    compiler object
+     * @param array|string $expectedTag the expected opening tag names
      *
-     * @return mixed        any type the opening tag's name or saved data
+     * @return mixed any type the opening tag's name or saved data
      */
     public function closeTag($compiler, $expectedTag)
     {
@@ -165,14 +160,12 @@ abstract class Smarty_Internal_CompileBase
                 }
             }
             // wrong nesting of tags
-            $compiler->trigger_template_error("unclosed {$compiler->smarty->left_delimiter}" . $_openTag .
+            $compiler->trigger_template_error("unclosed {$compiler->smarty->left_delimiter}".$_openTag.
                                               "{$compiler->smarty->right_delimiter} tag");
 
             return;
         }
         // wrong nesting of tags
-        $compiler->trigger_template_error("unexpected closing tag", null, true);
-
-        return;
+        $compiler->trigger_template_error('unexpected closing tag', null, true);
     }
 }

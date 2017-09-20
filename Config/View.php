@@ -1,17 +1,18 @@
 <?php
-return array(
 
-	'View' => array(
+return [
 
-		'Tail'      => '.html',//视图文件后缀
+    'View' => [
 
-		'Cache'=> TRUE,//是否开启缓存
+        'Tail'      => '.html', //视图文件后缀
 
-		'Cache.Time'=> '0',//缓存更新周期
+        'Cache'=> true, //是否开启缓存
 
-		'Left'=> '{',//视图修饰符左
+        'Cache.Time'=> '0', //缓存更新周期
 
-		'Right'=> '}',				//视图修饰符右
-	)
+        'Left'=> '{', //视图修饰符左
 
-);
+        'Right'=> '}',                //视图修饰符右
+    ],
+
+];

@@ -1,28 +1,29 @@
 <?php
-return array(
 
-	'Mysql' => array(
+return [
 
-		'Host'    => '127.0.0.1',//目标主机
+    'Mysql' => [
 
-		'Port'=> 3306,//目标端口
+        'Host'    => '127.0.0.1', //目标主机
 
-		'Username'=> 'root',//用户名
+        'Port'=> 3306, //目标端口
 
-		'Password'=> 'root',//密码
+        'Username'=> 'root', //用户名
 
-		'DataBase'=> 'mysql',//目标库
+        'Password'=> 'root', //密码
 
-		'Char'=> 'utf8',//字符编码
+        'DataBase'=> 'mysql', //目标库
 
-		'Prefix'=> '',//表前缀
+        'Char'=> 'utf8', //字符编码
 
-		'Connect'=> FALSE,//是否启用连接
+        'Prefix'=> '', //表前缀
 
-		'Logs'=> TRUE,//是否记录Mysql日志
+        'Connect'=> false, //是否启用连接
 
-		'Debug'=> TRUE,		//是否开启数据库调试模式
+        'Logs'=> true, //是否记录Mysql日志
 
-	)
+        'Debug'=> true,        //是否开启数据库调试模式
 
-);
+    ],
+
+];

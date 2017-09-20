@@ -1,25 +1,22 @@
 <?php
 
 /**
- * Smarty Method AddAutoloadFilters
+ * Smarty Method AddAutoloadFilters.
  *
  * Smarty::addAutoloadFilters() method
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_AddAutoloadFilters extends Smarty_Internal_Method_SetAutoloadFilters
 {
-
     /**
-     * Add autoload filters
+     * Add autoload filters.
      *
      * @api Smarty::setAutoloadFilters()
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
-     * @param  array                                                          $filters filters to load automatically
-     * @param  string                                                         $type    "pre", "output", … specify the
+     * @param array                                                           $filters filters to load automatically
+     * @param string                                                          $type    "pre", "output", … specify the
      *                                                                                 filter type to set. Defaults to
      *                                                                                 none treating $filters' keys as
      *                                                                                 the appropriate types
@@ -46,6 +43,7 @@ class Smarty_Internal_Method_AddAutoloadFilters extends Smarty_Internal_Method_S
                 }
             }
         }
+
         return $obj;
     }
 }

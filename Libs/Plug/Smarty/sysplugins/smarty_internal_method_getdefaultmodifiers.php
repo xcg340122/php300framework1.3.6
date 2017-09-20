@@ -1,25 +1,23 @@
 <?php
 
 /**
- * Smarty Method GetDefaultModifiers
+ * Smarty Method GetDefaultModifiers.
  *
  * Smarty::getDefaultModifiers() method
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_GetDefaultModifiers
 {
     /**
-     * Valid for Smarty and template object
+     * Valid for Smarty and template object.
      *
      * @var int
      */
     public $objMap = 3;
 
     /**
-     * Get default modifiers
+     * Get default modifiers.
      *
      * @api Smarty::getDefaultModifiers()
      *
@@ -30,6 +28,7 @@ class Smarty_Internal_Method_GetDefaultModifiers
     public function getDefaultModifiers(Smarty_Internal_TemplateBase $obj)
     {
         $smarty = isset($obj->smarty) ? $obj->smarty : $obj;
+
         return $smarty->default_modifiers;
     }
 }

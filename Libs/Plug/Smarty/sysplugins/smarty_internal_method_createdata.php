@@ -1,27 +1,26 @@
 <?php
 
 /**
- * Smarty Method CreateData
+ * Smarty Method CreateData.
  *
  * Smarty::createData() method
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_CreateData
 {
     /**
-     * Valid for Smarty and template object
+     * Valid for Smarty and template object.
      *
      * @var int
      */
     public $objMap = 3;
 
     /**
-     * creates a data object
+     * creates a data object.
      *
      * @api  Smarty::createData()
+     *
      * @link http://www.smarty.net/docs/en/api.create.data.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty      $obj
@@ -39,6 +38,7 @@ class Smarty_Internal_Method_CreateData
         if ($smarty->debugging) {
             Smarty_Internal_Debug::register_data($dataObj);
         }
+
         return $dataObj;
     }
 }

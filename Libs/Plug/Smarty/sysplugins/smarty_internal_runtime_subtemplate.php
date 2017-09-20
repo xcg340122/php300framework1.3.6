@@ -1,45 +1,40 @@
 <?php
 
 /**
- * Sub Template Runtime Methods render, setupSubTemplate
+ * Sub Template Runtime Methods render, setupSubTemplate.
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
- *
  **/
 class Smarty_Internal_Runtime_SubTemplate
 {
-
     /**
-     * Subtemplate template object cache
+     * Subtemplate template object cache.
      *
      * @var Smarty_Internal_Template[]
      */
-    public $tplObjects = array();
+    public $tplObjects = [];
 
     /**
-     * Subtemplate call count
+     * Subtemplate call count.
      *
      * @var int[]
      */
-    public $subTplInfo = array();
+    public $subTplInfo = [];
 
     /**
-     * Runtime function to render subtemplate
+     * Runtime function to render subtemplate.
      *
      * @param \Smarty_Internal_Template $parent
      * @param string                    $template       template name
      * @param mixed                     $cache_id       cache id
      * @param mixed                     $compile_id     compile id
-     * @param integer                   $caching        cache mode
-     * @param integer                   $cache_lifetime life time of cache data
+     * @param int                       $caching        cache mode
+     * @param int                       $cache_lifetime life time of cache data
      * @param array                     $data           passed parameter template variables
      * @param int                       $scope          scope in which {include} should execute
      * @param bool                      $forceTplCache  cache template object
      * @param string                    $uid            file dependency uid
      * @param string                    $content_func   function name
-     *
      */
     public function render(Smarty_Internal_Template $parent, $template, $cache_id, $compile_id, $caching,
                            $cache_lifetime, $data, $scope, $forceTplCache, $uid = null, $content_func = null)
@@ -186,7 +181,7 @@ class Smarty_Internal_Runtime_SubTemplate
     }
 
     /**
-     * Get called subtemplates from compiled template and save call count
+     * Get called subtemplates from compiled template and save call count.
      *
      * @param \Smarty_Internal_Template $tpl
      */

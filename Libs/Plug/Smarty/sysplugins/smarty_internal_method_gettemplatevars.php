@@ -1,33 +1,32 @@
 <?php
 
 /**
- * Smarty Method GetTemplateVars
+ * Smarty Method GetTemplateVars.
  *
  * Smarty::getTemplateVars() method
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_GetTemplateVars
 {
     /**
-     * Valid for all objects
+     * Valid for all objects.
      *
      * @var int
      */
     public $objMap = 7;
 
     /**
-     * Returns a single or all template variables
+     * Returns a single or all template variables.
      *
      * @api  Smarty::getTemplateVars()
+     *
      * @link http://www.smarty.net/docs/en/api.get.template.vars.tpl
      *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
-     * @param  string                                                 $varName        variable name or null
-     * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $_ptr           optional pointer to data object
-     * @param  bool                                                   $searchParents include parent templates?
+     * @param string                                                  $varName       variable name or null
+     * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $_ptr          optional pointer to data object
+     * @param bool                                                    $searchParents include parent templates?
      *
      * @return mixed variable value or or array of variables
      */
@@ -38,15 +37,15 @@ class Smarty_Internal_Method_GetTemplateVars
             if (is_object($_var)) {
                 return $_var->value;
             } else {
-                return null;
+                return;
             }
         } else {
-            $_result = array();
+            $_result = [];
             if ($_ptr === null) {
                 $_ptr = $data;
             }
             while ($_ptr !== null) {
-                foreach ($_ptr->tpl_vars AS $key => $var) {
+                foreach ($_ptr->tpl_vars as $key => $var) {
                     if (!array_key_exists($key, $_result)) {
                         $_result[$key] = $var->value;
                     }
@@ -59,23 +58,24 @@ class Smarty_Internal_Method_GetTemplateVars
                 }
             }
             if ($searchParents && isset(Smarty::$global_tpl_vars)) {
-                foreach (Smarty::$global_tpl_vars AS $key => $var) {
+                foreach (Smarty::$global_tpl_vars as $key => $var) {
                     if (!array_key_exists($key, $_result)) {
                         $_result[$key] = $var->value;
                     }
                 }
             }
+
             return $_result;
         }
     }
 
     /**
-     * gets the object of a Smarty variable
+     * gets the object of a Smarty variable.
      *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
-     * @param string                                                 $varName       the name of the Smarty variable
-     * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $_ptr           optional pointer to data object
-     * @param bool                                                   $searchParents search also in parent data
+     * @param string                                                  $varName       the name of the Smarty variable
+     * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $_ptr          optional pointer to data object
+     * @param bool                                                    $searchParents search also in parent data
      * @param bool                                                    $errorEnable
      *
      * @return \Smarty_Variable
@@ -108,7 +108,6 @@ class Smarty_Internal_Method_GetTemplateVars
             $x = $$varName;
         }
 
-        return new Smarty_Undefined_Variable;
+        return new Smarty_Undefined_Variable();
     }
-
 }

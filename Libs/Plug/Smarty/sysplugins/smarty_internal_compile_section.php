@@ -1,18 +1,13 @@
 <?php
 /**
  * Smarty Internal Plugin Compile Section
- * Compiles the {section} {sectionelse} {/section} tags
+ * Compiles the {section} {sectionelse} {/section} tags.
  *
- * @package    Smarty
- * @subpackage Compiler
  * @author     Uwe Tews
  */
 
 /**
- * Smarty Internal Plugin Compile Section Class
- *
- * @package    Smarty
- * @subpackage Compiler
+ * Smarty Internal Plugin Compile Section Class.
  */
 class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_ForeachSection
 {
@@ -20,99 +15,103 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
      * Attribute definition: Overwrites base class.
      *
      * @var array
+     *
      * @see Smarty_Internal_CompileBase
      */
-    public $required_attributes = array('name', 'loop');
+    public $required_attributes = ['name', 'loop'];
 
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
+     *
      * @see Smarty_Internal_CompileBase
      */
-    public $shorttag_order = array('name', 'loop');
+    public $shorttag_order = ['name', 'loop'];
 
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
+     *
      * @see Smarty_Internal_CompileBase
      */
-    public $optional_attributes = array('start', 'step', 'max', 'show');
+    public $optional_attributes = ['start', 'step', 'max', 'show'];
 
     /**
-     * counter
+     * counter.
      *
      * @var int
      */
     public $counter = 0;
 
     /**
-     * Name of this tag
+     * Name of this tag.
      *
      * @var string
      */
     public $tagName = 'section';
 
     /**
-     * Valid properties of $smarty.section.name.xxx variable
+     * Valid properties of $smarty.section.name.xxx variable.
      *
      * @var array
      */
-    public $nameProperties = array('first', 'last', 'index', 'iteration', 'show', 'total', 'rownum',
-                                          'index_prev', 'index_next');
+    public $nameProperties = ['first', 'last', 'index', 'iteration', 'show', 'total', 'rownum',
+                                          'index_prev', 'index_next', ];
 
     /**
-     * {section} tag has no item properties
+     * {section} tag has no item properties.
      *
      * @var array
      */
     public $itemProperties = null;
 
     /**
-     * {section} tag has always name attribute
+     * {section} tag has always name attribute.
      *
      * @var bool
      */
     public $isNamed = true;
 
     /**
-     * Compiles code for the {section} tag
+     * Compiles code for the {section} tag.
      *
-     * @param  array                                 $args     array with attributes from parser
-     * @param  \Smarty_Internal_TemplateCompilerBase $compiler compiler object
+     * @param array                                 $args     array with attributes from parser
+     * @param \Smarty_Internal_TemplateCompilerBase $compiler compiler object
+     *
+     * @throws \SmartyCompilerException
      *
      * @return string compiled code
-     * @throws \SmartyCompilerException
      */
     public function compile($args, Smarty_Internal_TemplateCompilerBase $compiler)
     {
         $compiler->loopNesting++;
         // check and get attributes
         $_attr = $this->getAttributes($compiler, $args);
-        $attributes = array('name' => $compiler->getId($_attr['name']));
+        $attributes = ['name' => $compiler->getId($_attr['name'])];
         unset($_attr['name']);
         foreach ($attributes as $a => $v) {
             if ($v === false) {
                 $compiler->trigger_template_error("'{$a}' attribute/variable has illegal value", null, true);
             }
         }
-        $local = "\$__section_{$attributes['name']}_" . $this->counter ++ . '_';
+        $local = "\$__section_{$attributes['name']}_".$this->counter++.'_';
         $sectionVar = "\$_smarty_tpl->tpl_vars['__smarty_section_{$attributes['name']}']";
-        $this->openTag($compiler, 'section', array('section', $compiler->nocache, $local, $sectionVar));
+        $this->openTag($compiler, 'section', ['section', $compiler->nocache, $local, $sectionVar]);
         // maybe nocache because of nocache variables
         $compiler->nocache = $compiler->nocache | $compiler->tag_nocache;
 
-        $initLocal = array('saved' => "isset(\$_smarty_tpl->tpl_vars['__smarty_section_{$attributes['name']}']) ? \$_smarty_tpl->tpl_vars['__smarty_section_{$attributes['name']}'] : false",);
-        $initNamedProperty = array();
-        $initFor = array();
-        $incFor = array();
-        $cmpFor = array();
-        $propValue = array('index'     => "{$sectionVar}->value['index']", 'show' => 'true', 'step' => 1,
+        $initLocal = ['saved' => "isset(\$_smarty_tpl->tpl_vars['__smarty_section_{$attributes['name']}']) ? \$_smarty_tpl->tpl_vars['__smarty_section_{$attributes['name']}'] : false"];
+        $initNamedProperty = [];
+        $initFor = [];
+        $incFor = [];
+        $cmpFor = [];
+        $propValue = ['index'          => "{$sectionVar}->value['index']", 'show' => 'true', 'step' => 1,
                            'iteration' => "{$local}iteration",
 
-        );
-        $propType = array('index' => 2, 'iteration' => 2, 'show' => 0, 'step' => 0,);
+        ];
+        $propType = ['index' => 2, 'iteration' => 2, 'show' => 0, 'step' => 0];
         // search for used tag attributes
         $this->scanForProperties($attributes, $compiler);
         if (!empty($this->matchResults['named'])) {
@@ -194,7 +193,7 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
             } elseif ($propValue['step'] > 1) {
                 $incFor['index'] = "{$sectionVar}->value['index'] += {$propValue['step']}";
             } else {
-                $incFor['index'] = "{$sectionVar}->value['index'] -= " . - $propValue['step'];
+                $incFor['index'] = "{$sectionVar}->value['index'] -= ".-$propValue['step'];
             }
         } else {
             $incFor['index'] = "{$sectionVar}->value['index'] += {$propValue['step']}";
@@ -214,15 +213,15 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
         }
 
         if (!isset($propValue['start'])) {
-            $start_code = array(1 => "{$propValue['step']} > 0 ? ", 2 => '0', 3 => ' : ', 4 => $propValue['loop'],
-                                5 => ' - 1');
+            $start_code = [1      => "{$propValue['step']} > 0 ? ", 2 => '0', 3 => ' : ', 4 => $propValue['loop'],
+                                5 => ' - 1', ];
             if ($propType['loop'] == 0) {
                 $start_code[5] = '';
                 $start_code[4] = $propValue['loop'] - 1;
             }
             if ($propType['step'] == 0) {
                 if ($propValue['step'] > 0) {
-                    $start_code = array(1 => '0');
+                    $start_code = [1 => '0'];
                     $propType['start'] = 0;
                 } else {
                     $start_code[1] = $start_code[2] = $start_code[3] = '';
@@ -231,15 +230,15 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
             } else {
                 $propType['start'] = 1;
             }
-            $propValue['start'] = join('', $start_code);
+            $propValue['start'] = implode('', $start_code);
         } else {
-            $start_code = array(1  => "{$propValue['start']} < 0 ? ", 2 => 'max(', 3 => "{$propValue['step']} > 0 ? ",
+            $start_code = [1       => "{$propValue['start']} < 0 ? ", 2 => 'max(', 3 => "{$propValue['step']} > 0 ? ",
                                 4  => '0', 5 => ' : ', 6 => '-1', 7 => ', ',
                                 8  => "{$propValue['start']} + {$propValue['loop']}", 10 => ')', 11 => ' : ',
                                 12 => 'min(', 13 => $propValue['start'], 14 => ', ',
                                 15 => "{$propValue['step']} > 0 ? ", 16 => $propValue['loop'], 17 => ' : ',
                                 18 => $propType['loop'] == 0 ? $propValue['loop'] - 1 : "{$propValue['loop']} - 1",
-                                19 => ')');
+                                19 => ')', ];
             if ($propType['step'] == 0) {
                 $start_code[3] = $start_code[5] = $start_code[15] = $start_code[17] = '';
                 if ($propValue['step'] > 0) {
@@ -255,24 +254,24 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
                 $propType['start'] = $propType['step'] + $propType['loop'];
                 $start_code[1] = '';
                 if ($propValue['start'] < 0) {
-                    for ($i = 11; $i <= 19; $i ++) {
+                    for ($i = 11; $i <= 19; $i++) {
                         $start_code[$i] = '';
                     }
                     if ($propType['start'] == 0) {
-                        $start_code = array(max($propValue['step'] > 0 ? 0 : - 1, $propValue['start'] +
-                                                                                $propValue['loop']));
+                        $start_code = [max($propValue['step'] > 0 ? 0 : -1, $propValue['start'] +
+                                                                                $propValue['loop'])];
                     }
                 } else {
-                    for ($i = 1; $i <= 11; $i ++) {
+                    for ($i = 1; $i <= 11; $i++) {
                         $start_code[$i] = '';
                     }
                     if ($propType['start'] == 0) {
-                        $start_code = array(min($propValue['step'] > 0 ? $propValue['loop'] : $propValue['loop'] -
-                            1, $propValue['start']));
+                        $start_code = [min($propValue['step'] > 0 ? $propValue['loop'] : $propValue['loop'] -
+                            1, $propValue['start'])];
                     }
                 }
             }
-            $propValue['start'] = join('', $start_code);
+            $propValue['start'] = implode('', $start_code);
         }
         if ($propType['start'] != 0) {
             $initLocal['start'] = $propValue['start'];
@@ -291,10 +290,10 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
                                                    $propValue['start'] : (int) $propValue['start'] + 1) /
                                                abs($propValue['step'])), $propValue['max']);
             } else {
-                $total_code = array(1  => 'min(', 2 => 'ceil(', 3 => '(', 4 => "{$propValue['step']} > 0 ? ",
+                $total_code = [1       => 'min(', 2 => 'ceil(', 3 => '(', 4 => "{$propValue['step']} > 0 ? ",
                                     5  => $propValue['loop'], 6 => ' - ', 7 => $propValue['start'], 8 => ' : ',
                                     9  => $propValue['start'], 10 => '+ 1', 11 => ')', 12 => '/ ', 13 => 'abs(',
-                                    14 => $propValue['step'], 15 => ')', 16 => ')', 17 => ", {$propValue['max']})",);
+                                    14 => $propValue['step'], 15 => ')', 16 => ')', 17 => ", {$propValue['max']})", ];
                 if (!isset($propValue['max'])) {
                     $total_code[1] = $total_code[17] = '';
                 }
@@ -308,10 +307,10 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
                 }
                 if ($propType['step'] == 0) {
                     $total_code[13] = $total_code[15] = '';
-                    if ($propValue['step'] == 1 || $propValue['step'] == - 1) {
+                    if ($propValue['step'] == 1 || $propValue['step'] == -1) {
                         $total_code[2] = $total_code[12] = $total_code[14] = $total_code[16] = '';
                     } elseif ($propValue['step'] < 0) {
-                        $total_code[14] = - $propValue['step'];
+                        $total_code[14] = -$propValue['step'];
                     }
                     $total_code[4] = '';
                     if ($propValue['step'] > 0) {
@@ -320,7 +319,7 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
                         $total_code[5] = $total_code[6] = $total_code[7] = $total_code[8] = '';
                     }
                 }
-                $propValue['total'] = join('', $total_code);
+                $propValue['total'] = implode('', $total_code);
             }
         }
 
@@ -340,7 +339,7 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
             $output .= "{$local}{$key} = {$code};\n";
         }
 
-        $_vars = 'array(' . join(', ', $initNamedProperty) . ')';
+        $_vars = 'array('.implode(', ', $initNamedProperty).')';
         $output .= "{$sectionVar} = new Smarty_Variable({$_vars});\n";
         $cond_code = "{$propValue['total']} != 0";
         if ($propType['total'] == 0) {
@@ -358,9 +357,9 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
         } else {
             $output .= "if (false) {\n";
         }
-        $jinit = join(', ', $initFor);
-        $jcmp = join(', ', $cmpFor);
-        $jinc = join(', ', $incFor);
+        $jinit = implode(', ', $initFor);
+        $jcmp = implode(', ', $cmpFor);
+        $jinc = implode(', ', $incFor);
         $output .= "for ({$jinit}; {$jcmp}; {$jinc}){\n";
         if (isset($namedAttr['rownum'])) {
             $output .= "{$sectionVar}->value['rownum'] = {$propValue['iteration']};\n";
@@ -377,24 +376,21 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_Compile_Private_Fo
         if (isset($namedAttr['last'])) {
             $output .= "{$sectionVar}->value['last'] = ({$propValue['iteration']} == {$propValue['total']});\n";
         }
-        $output .= "?>";
+        $output .= '?>';
 
         return $output;
     }
 }
 
 /**
- * Smarty Internal Plugin Compile Sectionelse Class
- *
- * @package    Smarty
- * @subpackage Compiler
+ * Smarty Internal Plugin Compile Sectionelse Class.
  */
 class Smarty_Internal_Compile_Sectionelse extends Smarty_Internal_CompileBase
 {
     /**
-     * Compiles code for the {sectionelse} tag
+     * Compiles code for the {sectionelse} tag.
      *
-     * @param  array                                $args     array with attributes from parser
+     * @param array                                 $args     array with attributes from parser
      * @param \Smarty_Internal_TemplateCompilerBase $compiler compiler object
      *
      * @return string compiled code
@@ -404,25 +400,22 @@ class Smarty_Internal_Compile_Sectionelse extends Smarty_Internal_CompileBase
         // check and get attributes
         $_attr = $this->getAttributes($compiler, $args);
 
-        list($openTag, $nocache, $local, $sectionVar) = $this->closeTag($compiler, array('section'));
-        $this->openTag($compiler, 'sectionelse', array('sectionelse', $nocache, $local, $sectionVar));
+        list($openTag, $nocache, $local, $sectionVar) = $this->closeTag($compiler, ['section']);
+        $this->openTag($compiler, 'sectionelse', ['sectionelse', $nocache, $local, $sectionVar]);
 
         return "<?php }} else {\n ?>";
     }
 }
 
 /**
- * Smarty Internal Plugin Compile Sectionclose Class
- *
- * @package    Smarty
- * @subpackage Compiler
+ * Smarty Internal Plugin Compile Sectionclose Class.
  */
 class Smarty_Internal_Compile_Sectionclose extends Smarty_Internal_CompileBase
 {
     /**
-     * Compiles code for the {/section} tag
+     * Compiles code for the {/section} tag.
      *
-     * @param  array                                $args     array with attributes from parser
+     * @param array                                 $args     array with attributes from parser
      * @param \Smarty_Internal_TemplateCompilerBase $compiler compiler object
      *
      * @return string compiled code
@@ -435,8 +428,8 @@ class Smarty_Internal_Compile_Sectionclose extends Smarty_Internal_CompileBase
             $compiler->tag_nocache = true;
         }
 
-        list($openTag, $compiler->nocache, $local, $sectionVar) = $this->closeTag($compiler, array('section',
-                                                                                                   'sectionelse'));
+        list($openTag, $compiler->nocache, $local, $sectionVar) = $this->closeTag($compiler, ['section',
+                                                                                                   'sectionelse', ]);
 
         $output = "<?php\n";
         if ($openTag == 'sectionelse') {
@@ -447,7 +440,7 @@ class Smarty_Internal_Compile_Sectionclose extends Smarty_Internal_CompileBase
         $output .= "if ({$local}saved) {\n";
         $output .= "{$sectionVar} = {$local}saved;\n";
         $output .= "}\n";
-        $output .= "?>";
+        $output .= '?>';
 
         return $output;
     }

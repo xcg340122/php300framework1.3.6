@@ -1,17 +1,14 @@
 <?php
 
 /**
- * Runtime Methods createLocalArrayVariable
+ * Runtime Methods createLocalArrayVariable.
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
- *
  **/
 class Smarty_Internal_Runtime_Var
 {
     /**
-     * Template code runtime function to create a local Smarty variable for array assignments
+     * Template code runtime function to create a local Smarty variable for array assignments.
      *
      * @param \Smarty_Internal_Template $tpl     template object
      * @param string                    $varName template variable name
@@ -20,7 +17,7 @@ class Smarty_Internal_Runtime_Var
     public function createLocalArrayVariable(Smarty_Internal_Template $tpl, $varName, $nocache = false)
     {
         if (!isset($tpl->tpl_vars[$varName])) {
-            $tpl->tpl_vars[$varName] = new Smarty_Variable(array(), $nocache);
+            $tpl->tpl_vars[$varName] = new Smarty_Variable([], $nocache);
         } else {
             $tpl->tpl_vars[$varName] = clone $tpl->tpl_vars[$varName];
             if (!(is_array($tpl->tpl_vars[$varName]->value) ||

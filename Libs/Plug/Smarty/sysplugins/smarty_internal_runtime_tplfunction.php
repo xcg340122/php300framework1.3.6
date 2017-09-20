@@ -1,17 +1,14 @@
 <?php
 
 /**
- * Tplfunc Runtime Methods callTemplateFunction
+ * Tplfunc Runtime Methods callTemplateFunction.
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
- *
  **/
 class Smarty_Internal_Runtime_TplFunction
 {
     /**
-     * Call template function
+     * Call template function.
      *
      * @param \Smarty_Internal_Template $tpl     template object
      * @param string                    $name    template function name
@@ -33,21 +30,23 @@ class Smarty_Internal_Runtime_TplFunction
                 }
             }
             if (function_exists($function)) {
-                $function ($tpl, $params);
+                $function($tpl, $params);
+
                 return;
             }
             // try to load template function dynamically
             if ($this->addTplFuncToCache($tpl, $name, $function)) {
-                $function ($tpl, $params);
+                $function($tpl, $params);
+
                 return;
             }
         }
+
         throw new SmartyException("Unable to find template function '{$name}'");
     }
 
     /**
-     *
-     * Add template function to cache file for nocache calls
+     * Add template function to cache file for nocache calls.
      *
      * @param Smarty_Internal_Template $tpl
      * @param string                   $_name     template function name
@@ -83,15 +82,17 @@ class Smarty_Internal_Runtime_TplFunction
                             if (!preg_match("/'{$funcParam['uid']}'(.*?)'nocache_hash'/", $content, $match2)) {
                                 $content = preg_replace("/('file_dependency'(.*?)\()/", "\\1{$match1[0]}", $content);
                             }
-                            $tplPtr->smarty->ext->_updateCache->write($cache, $tplPtr, preg_replace('/\s*\?>\s*$/', "\n", $content) . "\n" .
-                                                 preg_replace(array('/^\s*<\?php\s+/', '/\s*\?>\s*$/'), "\n",
+                            $tplPtr->smarty->ext->_updateCache->write($cache, $tplPtr, preg_replace('/\s*\?>\s*$/', "\n", $content)."\n".
+                                                 preg_replace(['/^\s*<\?php\s+/', '/\s*\?>\s*$/'], "\n",
                                                               $match[0]));
                         }
                     }
+
                     return true;
                 }
             }
         }
+
         return false;
     }
 }
