@@ -1,24 +1,26 @@
 <?php
 
 /**
- * Smarty Method UnregisterFilter.
+ * Smarty Method UnregisterFilter
  *
  * Smarty::unregisterFilter() method
  *
+ * @package    Smarty
+ * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_UnregisterFilter extends Smarty_Internal_Method_RegisterFilter
 {
     /**
-     * Unregisters a filter function.
+     * Unregisters a filter function
      *
      * @api  Smarty::unregisterFilter()
      *
      * @link http://www.smarty.net/docs/en/api.unregister.filter.tpl
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
-     * @param string                                                          $type     filter type
-     * @param callback|string                                                 $callback
+     * @param  string                                                         $type filter type
+     * @param  callback|string                                                $callback
      *
      * @return \Smarty|\Smarty_Internal_Template
      */
@@ -35,7 +37,6 @@ class Smarty_Internal_Method_UnregisterFilter extends Smarty_Internal_Method_Reg
                 }
             }
         }
-
         return $obj;
     }
 }

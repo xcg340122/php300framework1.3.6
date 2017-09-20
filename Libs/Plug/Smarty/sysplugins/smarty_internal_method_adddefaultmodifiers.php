@@ -1,28 +1,30 @@
 <?php
 
 /**
- * Smarty Method AddDefaultModifiers.
+ * Smarty Method AddDefaultModifiers
  *
  * Smarty::addDefaultModifiers() method
  *
+ * @package    Smarty
+ * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_AddDefaultModifiers
 {
     /**
-     * Valid for Smarty and template object.
+     * Valid for Smarty and template object
      *
      * @var int
      */
     public $objMap = 3;
 
     /**
-     * Add default modifiers.
+     * Add default modifiers
      *
      * @api Smarty::addDefaultModifiers()
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
-     * @param array|string                                                    $modifiers modifier or list of modifiers
+     * @param  array|string                                                   $modifiers modifier or list of modifiers
      *                                                                                   to add
      *
      * @return \Smarty|\Smarty_Internal_Template
@@ -35,7 +37,6 @@ class Smarty_Internal_Method_AddDefaultModifiers
         } else {
             $smarty->default_modifiers[] = $modifiers;
         }
-
         return $obj;
     }
 }

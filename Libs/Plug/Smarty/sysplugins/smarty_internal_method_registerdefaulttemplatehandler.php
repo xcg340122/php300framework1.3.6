@@ -1,32 +1,33 @@
 <?php
 
 /**
- * Smarty Method RegisterDefaultTemplateHandler.
+ * Smarty Method RegisterDefaultTemplateHandler
  *
  * Smarty::registerDefaultTemplateHandler() method
  *
+ * @package    Smarty
+ * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_RegisterDefaultTemplateHandler
 {
     /**
-     * Valid for Smarty and template object.
+     * Valid for Smarty and template object
      *
      * @var int
      */
     public $objMap = 3;
 
     /**
-     * Register template default handler.
+     * Register template default handler
      *
      * @api  Smarty::registerDefaultTemplateHandler()
      *
      * @param \Smarty_Internal_TemplateBase|\Smarty_Internal_Template|\Smarty $obj
-     * @param callable                                                        $callback class/method name
-     *
-     * @throws SmartyException if $callback is not callable
+     * @param  callable                                                       $callback class/method name
      *
      * @return \Smarty|\Smarty_Internal_Template
+     * @throws SmartyException              if $callback is not callable
      */
     public function registerDefaultTemplateHandler(Smarty_Internal_TemplateBase $obj, $callback)
     {
@@ -34,14 +35,13 @@ class Smarty_Internal_Method_RegisterDefaultTemplateHandler
         if (is_callable($callback)) {
             $smarty->default_template_handler_func = $callback;
         } else {
-            throw new SmartyException('Default template handler not callable');
+            throw new SmartyException("Default template handler not callable");
         }
-
         return $obj;
     }
 
     /**
-     * get default content from template or config resource handler.
+     * get default content from template or config resource handler
      *
      * @param Smarty_Template_Source $source
      */
@@ -53,8 +53,8 @@ class Smarty_Internal_Method_RegisterDefaultTemplateHandler
             $default_handler = $source->smarty->default_template_handler_func;
         }
         $_content = $_timestamp = null;
-        $_return = call_user_func_array($default_handler, [$source->type, $source->name, &$_content, &$_timestamp,
-                                                                $source->smarty, ]);
+        $_return = call_user_func_array($default_handler, array($source->type, $source->name, &$_content, &$_timestamp,
+                                                                $source->smarty));
         if (is_string($_return)) {
             $source->exists = is_file($_return);
             if ($source->exists) {

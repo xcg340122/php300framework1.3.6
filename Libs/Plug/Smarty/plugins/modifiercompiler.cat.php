@@ -1,6 +1,9 @@
 <?php
 /**
- * Smarty plugin.
+ * Smarty plugin
+ *
+ * @package    Smarty
+ * @subpackage PluginsModifierCompiler
  */
 
 /**
@@ -10,11 +13,10 @@
  * Date:     Feb 24, 2003<br>
  * Purpose:  catenate a value to a variable<br>
  * Input:    string to catenate<br>
- * Example:  {$var|cat:"foo"}.
+ * Example:  {$var|cat:"foo"}
  *
  * @link     http://smarty.php.net/manual/en/language.modifier.cat.php cat
  *           (Smarty online manual)
- *
  * @author   Uwe Tews
  *
  * @param array $params parameters
@@ -23,5 +25,5 @@
  */
 function smarty_modifiercompiler_cat($params)
 {
-    return '('.implode(').(', $params).')';
+    return '(' . implode(').(', $params) . ')';
 }

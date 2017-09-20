@@ -1,37 +1,33 @@
 <?php
 
 /**
- * @copyright: PHP300Framework
- * @author: Chungui
- */
+* @copyright: PHP300Framework
+* @author: Chungui
+* 
+*/
 
 namespace Libs\Deal;
 
-class Image_class
-{
-    public $Image;
-
+class Image {
+	
+	public $Image;
+	
     private $CreateImage;
-
+    
     /**
-     *获取图片.
-     *
-     * @return 设置的图片
-     */
-    public function getImage()
-    {
+	*获取图片 
+	* @return 设置的图片
+	*/
+    function getImage() {
         return $this->Image;
     }
-
+    
     /**
-     * 设置图片.
-     *
-     * @param 图片路径 $image
-     *
-     * @return
-     */
-    public function setImage($image)
-    {
+	* 设置图片
+	* @param 图片路径 $image
+	* @return
+	*/
+    function setImage($image) {
         $this->Image = $image;
 
         /* 检查扩展后缀 */
@@ -52,20 +48,18 @@ class Image_class
                 break;
         }
     }
-
+    
     /**
-     * 上传图片.
-     *
-     * @param 接收的文件 $file
-     * @param 文件最大值 $maxSize
-     * @param 对象名称    $Target_name
-     * @param 对象路径    $target_path
-     * @param input名称     $uploadName
-     *
-     * @return string
-     */
-    public function upload($file, $target_path = '', $maxSize = 4325720, $Target_name = null, $uploadName = 'file')
-    {
+	* 上传图片
+	* @param 接收的文件 $file
+	* @param 文件最大值 $maxSize
+	* @param 对象名称 $Target_name
+	* @param 对象路径 $target_path
+	* @param input名称 $uploadName
+	* 
+	* @return String
+	*/
+    public function upload($file, $target_path = '' , $maxSize = 4325720, $Target_name = null, $uploadName = 'file') {
         /* Check if file is empty or not */
 
         if (!empty($file)) {
@@ -78,111 +72,103 @@ class Image_class
                 throw new Exception('File gotta be an array');
             }
 
-            $Mime = [
+            $Mime = array(
                 'image/jpeg',
                 'image/gif',
-                'image/png',
-            ];
-
+                'image/png'
+            );
+            
             if (!in_array($file[$uploadName]['type'], $Mime)) {
-                throw new Exception('File type isnt supported');
+                throw new Exception("File type isnt supported");
             }
             if ($file[$uploadName]['size'] > $maxSize) {
-                throw new Exception('File is too big');
+                throw new Exception("File is too big");
             }
-
+            
             if ($Target_name == null) {
                 $Target_name = $file[$uploadName]['name'];
             }
 
-            if (move_uploaded_file($file[$uploadName]['tmp_name'], $target_path.$Target_name)) {
-                return $target_path.$Target_name;
+            if (move_uploaded_file($file[$uploadName]['tmp_name'], $target_path . $Target_name)) {
+                return $target_path . $Target_name;
             } else {
                 return 'failed to upload';
             }
         }
     }
-
+    
     /**
-     * 返回图片的高.
-     *
-     * @return Height
-     */
-    public function Height()
-    {
-        $size = getimagesize($this->Image);
+	* 返回图片的高 
+	* @return Height
+	*/
+    public function Height() {
+    	
+    	 $size = getimagesize($this->Image);
         $Height = $size[1];
 
         return $Height;
     }
-
+    
     /**
-     * 返回图片的宽.
-     *
-     * @return Width
-     */
-    public function Width()
-    {
-        $size = getimagesize($this->Image);
-
+	* 返回图片的宽
+	* @return Width
+	*/
+    public function Width() {
+    	
+    	  $size = getimagesize($this->Image);
+    	  
         $Width = $size[0];
 
         return $Width;
     }
-
+    
     /**
-     *返回图片宽X高.
-     *
-     * @return Imagesize
-     */
-    public function Imagesize()
-    {
+	*返回图片宽X高 
+	* @return Imagesize
+	*/
+    public function Imagesize() {
+    	
         $dimension = getimagesize($this->Image);
 
-        $dimension = $dimension[0].' x '.$dimension[1];
-
+        $dimension = $dimension[0] . ' x ' . $dimension[1];
         return $dimension;
     }
-
+    
     /**
-     *返回图片后缀
-     *
-     * @return Extension
-     */
-    public function Extension()
-    {
+	*返回图片后缀 
+	* @return Extension
+	*/
+    public function Extension() {
+    	
         $FullPath = pathinfo($this->Image);
         $Extension = $FullPath['extension'];
 
         return $Extension;
     }
-
+    
     /**
-     * 返回图片mime.
-     *
-     * @return mime
-     */
-    public function mime()
-    {
-        $size = getimagesize($this->Image);
+	* 返回图片mime
+	* @return mime
+	*/
+    public function mime() {
+    	
+    	 $size = getimagesize($this->Image);
         $mime = $size['mime'];
 
         return $mime;
     }
-
+    
     /**
-     * 调整图片宽高.
-     *
-     * @param 宽 $NewWidth
-     * @param 高 $NewHeight
-     *
-     * @return bool
-     */
-    public function resize($NewWidth = null, $NewHeight = null)
-    {
+	* 调整图片宽高
+	* @param 宽 $NewWidth
+	* @param 高 $NewHeight
+	* @return Boolean
+	*/
+    public function resize($NewWidth = null, $NewHeight = null) {
+    	
         list($width, $height) = getimagesize($this->Image);
 
-        if ($NewHeight == null and $NewWidth == null) {
+        if ($NewHeight == null AND $NewWidth == null) {
             throw new Exception('Cannot resize without height or width');
         }
 
@@ -191,6 +177,7 @@ class Image_class
         }
 
         if (!is_numeric($NewWidth)) {
+
             $NewWidth = $width;
         }
 
@@ -201,16 +188,13 @@ class Image_class
 
         return true;
     }
-
+    
     /**
-     * 滤镜调整.
-     *
-     * @param 像素 $pixel
-     *
-     * @return bool
-     */
-    public function pixelate($pixel = 1)
-    {
+	* 滤镜调整
+	* @param 像素 $pixel
+	* @return Boolean
+	*/
+    public function pixelate($pixel = 1) {
         if (!is_numeric($pixel)) {
             throw new Exception('Has to be a number');
         }
@@ -218,30 +202,30 @@ class Image_class
         if ($pixel > 15) {
             throw new Exception('pixelate only support 1-15 levels');
         }
-
+        
         imagefilter($this->CreateImage, IMG_FILTER_PIXELATE, $pixel);
 
         return true;
     }
-
+    
     /**
-     * 翻转.
-     *
-     * @param 翻转类型【v and h】 $flip
-     *
-     * @return bool
-     */
-    public function flip($flip = null)
-    {
+	* 翻转
+	* @param 翻转类型【v and h】 $flip
+	* @return Boolean
+	*/
+    public function flip($flip = null) {
+
         if (!$flip) {
             throw new Exception('Require flip value');
         }
 
-        if ($flip == 'h' or $flip == 'v') {
+        if ($flip == 'h' OR $flip == 'v') {
             if ($flip == 'v') {
+            	
                 $flip = imageflip($this->CreateImage, IMG_FLIP_VERTICAL);
             }
             if ($flip == 'h') {
+            	
                 $flip = imageflip($this->CreateImage, IMG_FLIP_HORIZONTAL);
             }
         } else {
@@ -249,19 +233,16 @@ class Image_class
         }
 
         $this->Image = $flip;
-
         return true;
     }
-
+    
     /**
-     * 模糊.
-     *
-     * @param 模糊度 $blur
-     *
-     * @return bool
-     */
-    public function blur($blur = 1)
-    {
+	* 模糊
+	* @param 模糊度 $blur
+	* @return Boolean
+	*/
+    public function blur($blur = 1) {
+
         if (!is_numeric($blur)) {
             throw new Exception('blur value has to be a number');
         }
@@ -272,38 +253,31 @@ class Image_class
         for ($i = 1; $i < $blur; $i++) {
             imagefilter($this->CreateImage, IMG_FILTER_GAUSSIAN_BLUR);
         }
-
         return true;
     }
-
+    
     /**
-     * 亮度.
-     *
-     * @param 亮度值 $bright
-     *
-     * @return bool
-     */
-    public function brightness($bright = 0)
-    {
+	* 亮度
+	* @param 亮度值 $bright
+	* @return Boolean
+	*/
+    public function brightness($bright = 0) {
+
         if (!is_numeric($bright)) {
             throw new Exception('Bright value gotta be a number');
         } else {
             imagefilter($this->CreateImage, IMG_FILTER_BRIGHTNESS, $bright);
         }
-
         return true;
     }
-
+    
     /**
-     * 对比.
-     *
-     * @param 对比值 $contrastVal
-     *
-     * @return bool
-     */
-    public function contrast($contrastVal = 0)
-    {
-        if ($contrastVal > 100 or $contrastVal < -100) {
+	* 对比
+	* @param 对比值 $contrastVal
+	* @return Boolean
+	*/
+    public function contrast($contrastVal = 0) {
+        if ($contrastVal > 100 OR $contrastVal < -100) {
             throw new Exception('Contrast value is betwend -100 and 100');
         }
 
@@ -312,50 +286,43 @@ class Image_class
         } else {
             imagefilter($this->CreateImage, IMG_FILTER_CONTRAST, $contrastVal);
         }
-
         return true;
     }
-
+    
     /**
-     * 灰色.
-     *
-     * @return bool
-     */
-    public function grayscale()
-    {
-        imagefilter($this->CreateImage, IMG_FILTER_GRAYSCALE);
+	* 灰色
+	* @return Boolean
+	*/
+    public function grayscale() {
 
+        imagefilter($this->CreateImage, IMG_FILTER_GRAYSCALE);
         return true;
     }
 
-    public function gamma($gammaRatio = 1)
-    {
+    public function gamma($gammaRatio = 1) {
+
         if (!is_numeric($gammaRatio)) {
             throw new Exception('gamma gotta be a number');
         }
 
-        if ($gammaRatio > 100 or $gammaRatio < -100) {
+        if ($gammaRatio > 100 OR $gammaRatio < -100) {
             throw new Exception('Gamma only goes between -100 and 100');
         }
 
         imagegammacorrect($this->CreateImage, 1.0, $gammaRatio);
-
         return true;
     }
-
+    
     /**
-     * 添加文字.
-     *
-     * @param 文字       $text
-     * @param 字体       $font
-     * @param 字体大小 $fontsize
-     * @param 设置       $option
-     * @param 颜色值    $rgb
-     *
-     * @return bool
-     */
-    public function AddText($text = null, $font = null, $fontsize = 13, $option = 'bottom-left', $rgb = '255,255,255')
-    {
+	* 添加文字
+	* @param 文字 $text
+	* @param 字体 $font
+	* @param 字体大小 $fontsize
+	* @param 设置 $option
+	* @param 颜色值 $rgb
+	* @return Boolean
+	*/
+    public function AddText($text = null, $font = null, $fontsize = 13, $option = 'bottom-left', $rgb = '255,255,255') {
         $opacity = 0;
         $rotates = 0;
         $option = explode('-', $option);
@@ -384,9 +351,11 @@ class Image_class
 
         if (empty($option[1])) {
             throw new Exception('Gotta fill second parameter for text position');
-        } elseif ($option[1] != 'center' and $option[1] != 'right' and $option[1] != 'left') {
+        } elseif ($option[1] != 'center' AND $option[1] != 'right' AND $option[1] != 'left') {
+
             throw new Exception('Wrong parameter for position Y');
         } else {
+
             if ($option[1] == 'left') {
                 $y = ($text_width) + 20;
             } elseif ($option[1] == 'right') {
@@ -396,9 +365,10 @@ class Image_class
             }
         }
 
-        if ($option[0] != 'middle' and $option[0] != 'bottom' and $option[0] != 'top') {
+        if ($option[0] != 'middle' AND $option[0] != 'bottom' AND $option[0] != 'top') {
             throw new Exception('Wrong parameter for position X');
         } else {
+
             if ($option[0] == 'middle') {
                 $x = ($height / 2) - ($text_height / 2);
             } elseif ($option[0] == 'bottom') {
@@ -408,30 +378,27 @@ class Image_class
             }
         }
 
-        if (!is_numeric($Colors[0]) or !is_numeric($Colors[1]) or !is_numeric($Colors[2])) {
+        if (!is_numeric($Colors[0]) OR ! is_numeric($Colors[1]) OR ! is_numeric($Colors[2])) {
             throw new Exception('has to be a rgb number');
         }
 
         $white = imagecolorallocatealpha($this->CreateImage, $Colors[0], $Colors[1], $Colors[2], $opacity);
 
         imagettftext($this->CreateImage, $fontsize, $rotates, $y, $x, $white, $font, $text);
-
         return true;
     }
-
+    
     /**
-     * 修剪.
-     *
-     * @param X坐标 $x
-     * @param Y坐标 $y
-     * @param 宽     $Target_Width
-     * @param 高     $Target_Height
-     *
-     * @return bool
-     */
-    public function crop($x = 334, $y = 178, $Target_Width = 79, $Target_Height = 75)
-    {
-        if (!is_numeric($x) or !is_numeric($y) or !is_numeric($Target_Width) or !is_numeric($Target_Height)) {
+	* 修剪
+	* @param X坐标 $x
+	* @param Y坐标 $y
+	* @param 宽 $Target_Width
+	* @param 高 $Target_Height
+	* @return Boolean
+	*/
+    public function crop($x = 334, $y = 178, $Target_Width = 79, $Target_Height = 75) {
+
+        if (!is_numeric($x) OR ! is_numeric($y) OR ! is_numeric($Target_Width) OR ! is_numeric($Target_Height)) {
             throw new Exception('Cordinates has to be numbers');
         }
 
@@ -442,17 +409,14 @@ class Image_class
 
         return true;
     }
-
+    
     /**
-     * 保存.
-     *
-     * @param 名称       $name
-     * @param 图片质量 $quality
-     *
-     * @return bool
-     */
-    public function save($name, $quality = 100)
-    {
+	* 保存
+	* @param 名称 $name
+	* @param 图片质量 $quality
+	* @return Boolean
+	*/
+    public function save($name, $quality = 100) {
         if (empty($name)) {
             throw new Exception('Need a name for image');
         } else {
@@ -487,7 +451,7 @@ class Image_class
                             imagegif($this->CreateImage, $name, $quality);
                             break;
                         case 'png':
-                            if ($quality > 9 or $quality < 0) {
+                            if ($quality > 9 OR $quality < 0) {
                                 throw new Exception('Png decode compress level is betwend 0 and 9');
                             }
                             imagepng($this->CreateImage, $name, $quality);
@@ -499,19 +463,16 @@ class Image_class
                 }
             }
         }
-
         return true;
     }
-
+    
     /**
-     * 销毁
-     *
-     * @return bool
-     */
-    public function destroy()
-    {
+	* 销毁 
+	* @return Boolean
+	*/
+    public function destroy() {
         imagedestroy($this->CreateImage);
-
         return true;
     }
 }
+?>

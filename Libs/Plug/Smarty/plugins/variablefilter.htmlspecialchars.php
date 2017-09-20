@@ -1,10 +1,13 @@
 <?php
 /**
- * Smarty plugin.
+ * Smarty plugin
+ *
+ * @package    Smarty
+ * @subpackage PluginsFilter
  */
 
 /**
- * Smarty htmlspecialchars variablefilter plugin.
+ * Smarty htmlspecialchars variablefilter plugin
  *
  * @param string $source input string
  *

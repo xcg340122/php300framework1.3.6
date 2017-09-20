@@ -1,16 +1,18 @@
 <?php
 
 /**
- * Smarty Method UnloadFilter.
+ * Smarty Method UnloadFilter
  *
  * Smarty_Internal_Template::mustCompile() method
  *
+ * @package    Smarty
+ * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_MustCompile
 {
     /**
-     * Valid for template object.
+     * Valid for template object
      *
      * @var int
      */
@@ -19,13 +21,12 @@ class Smarty_Internal_Method_MustCompile
     /**
      * Returns if the current template must be compiled by the Smarty compiler
      * It does compare the timestamps of template source and the compiled templates and checks the force compile
-     * configuration.
+     * configuration
      *
      * @param \Smarty_Internal_Template $_template
      *
-     * @throws \SmartyException
-     *
      * @return bool
+     * @throws \SmartyException
      */
     public function mustCompile(Smarty_Internal_Template $_template)
     {
@@ -35,7 +36,6 @@ class Smarty_Internal_Method_MustCompile
             } else {
                 $parent_resource = '';
             }
-
             throw new SmartyException("Unable to load template {$_template->source->type} '{$_template->source->name}'{$parent_resource}");
         }
         if ($_template->mustCompile === null) {

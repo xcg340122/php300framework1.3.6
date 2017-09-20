@@ -1,18 +1,20 @@
 <?php
 /**
  * Smarty plugin
- * This plugin is only for Smarty2 BC.
+ * This plugin is only for Smarty2 BC
+ *
+ * @package    Smarty
+ * @subpackage PluginsFunction
  */
 
 /**
  * Smarty {math} function plugin
  * Type:     function<br>
  * Name:     math<br>
- * Purpose:  handle math computations in template.
+ * Purpose:  handle math computations in template
  *
  * @link     http://www.smarty.net/manual/en/language.function.math.php {math}
  *           (Smarty online manual)
- *
  * @author   Monte Ohrt <monte at ohrt dot com>
  *
  * @param array                    $params   parameters
@@ -22,14 +24,14 @@
  */
 function smarty_function_math($params, $template)
 {
-    static $_allowed_funcs = [
+    static $_allowed_funcs = array(
         'int'  => true, 'abs' => true, 'ceil' => true, 'cos' => true, 'exp' => true, 'floor' => true,
         'log'  => true, 'log10' => true, 'max' => true, 'min' => true, 'pi' => true, 'pow' => true,
-        'rand' => true, 'round' => true, 'sin' => true, 'sqrt' => true, 'srand' => true, 'tan' => true,
-    ];
+        'rand' => true, 'round' => true, 'sin' => true, 'sqrt' => true, 'srand' => true, 'tan' => true
+    );
     // be sure equation parameter is present
     if (empty($params['equation'])) {
-        trigger_error('math: missing equation parameter', E_USER_WARNING);
+        trigger_error("math: missing equation parameter", E_USER_WARNING);
 
         return;
     }
@@ -37,14 +39,14 @@ function smarty_function_math($params, $template)
     $equation = $params['equation'];
 
     // make sure parenthesis are balanced
-    if (substr_count($equation, '(') != substr_count($equation, ')')) {
-        trigger_error('math: unbalanced parenthesis', E_USER_WARNING);
+    if (substr_count($equation, "(") != substr_count($equation, ")")) {
+        trigger_error("math: unbalanced parenthesis", E_USER_WARNING);
 
         return;
     }
 
     // match all vars in equation, make sure all are passed
-    preg_match_all('!(?:0x[a-fA-F0-9]+)|([a-zA-Z][a-zA-Z0-9_]*)!', $equation, $match);
+    preg_match_all("!(?:0x[a-fA-F0-9]+)|([a-zA-Z][a-zA-Z0-9_]*)!", $equation, $match);
 
     foreach ($match[1] as $curr_var) {
         if ($curr_var && !isset($params[$curr_var]) && !isset($_allowed_funcs[$curr_var])) {
@@ -55,7 +57,7 @@ function smarty_function_math($params, $template)
     }
 
     foreach ($params as $key => $val) {
-        if ($key != 'equation' && $key != 'format' && $key != 'assign') {
+        if ($key != "equation" && $key != "format" && $key != "assign") {
             // make sure value is not empty
             if (strlen($val) == 0) {
                 trigger_error("math: parameter $key is empty", E_USER_WARNING);
@@ -71,7 +73,7 @@ function smarty_function_math($params, $template)
         }
     }
     $smarty_math_result = null;
-    eval('$smarty_math_result = '.$equation.';');
+    eval("\$smarty_math_result = " . $equation . ";");
 
     if (empty($params['format'])) {
         if (empty($params['assign'])) {

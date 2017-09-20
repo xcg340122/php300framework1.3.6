@@ -2,13 +2,18 @@
 
 /**
  * Smarty Internal Plugin Compile extend
- * Compiles the {extends} tag.
+ * Compiles the {extends} tag
  *
+ * @package    Smarty
+ * @subpackage Compiler
  * @author     Uwe Tews
  */
 
 /**
- * Smarty Internal Plugin Compile extend Class.
+ * Smarty Internal Plugin Compile extend Class
+ *
+ * @package    Smarty
+ * @subpackage Compiler
  */
 class Smarty_Internal_Compile_Extends extends Smarty_Internal_Compile_Shared_Inheritance
 {
@@ -16,38 +21,35 @@ class Smarty_Internal_Compile_Extends extends Smarty_Internal_Compile_Shared_Inh
      * Attribute definition: Overwrites base class.
      *
      * @var array
-     *
      * @see Smarty_Internal_CompileBase
      */
-    public $required_attributes = ['file'];
+    public $required_attributes = array('file');
 
     /**
      * Array of names of optional attribute required by tag
-     * use array('_any') if there is no restriction of attributes names.
+     * use array('_any') if there is no restriction of attributes names
      *
      * @var array
      */
-    public $optional_attributes = ['extends_resource'];
+    public $optional_attributes = array('extends_resource');
 
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
-     *
      * @see Smarty_Internal_CompileBase
      */
-    public $shorttag_order = ['file'];
+    public $shorttag_order = array('file');
 
     /**
-     * Compiles code for the {extends} tag extends: resource.
+     * Compiles code for the {extends} tag extends: resource
      *
      * @param array                                 $args     array with attributes from parser
      * @param \Smarty_Internal_TemplateCompilerBase $compiler compiler object
      *
+     * @return string compiled code
      * @throws \SmartyCompilerException
      * @throws \SmartyException
-     *
-     * @return string compiled code
      */
     public function compile($args, Smarty_Internal_TemplateCompilerBase $compiler)
     {
@@ -72,7 +74,7 @@ class Smarty_Internal_Compile_Extends extends Smarty_Internal_Compile_Shared_Inh
                 } else {
                     $file = "'{$file}'";
                 }
-                $i++;
+                $i ++;
                 if ($i == count($files) && isset($_attr['extends_resource'])) {
                     $this->compileEndChild($compiler);
                 }
@@ -86,12 +88,11 @@ class Smarty_Internal_Compile_Extends extends Smarty_Internal_Compile_Shared_Inh
             $this->compileInclude($compiler, $_attr['file']);
         }
         $compiler->has_code = false;
-
         return '';
     }
 
     /**
-     * Add code for inheritance endChild() method to end of template.
+     * Add code for inheritance endChild() method to end of template
      *
      * @param \Smarty_Internal_TemplateCompilerBase $compiler
      */
@@ -102,21 +103,21 @@ class Smarty_Internal_Compile_Extends extends Smarty_Internal_Compile_Shared_Inh
     }
 
     /**
-     * Add code for including subtemplate to end of template.
+     * Add code for including subtemplate to end of template
      *
      * @param \Smarty_Internal_TemplateCompilerBase $compiler
-     * @param string                                $file     subtemplate name
+     * @param  string                               $file subtemplate name
      */
     private function compileInclude(Smarty_Internal_TemplateCompilerBase $compiler, $file)
     {
         $compiler->parser->template_postfix[] = new Smarty_Internal_ParseTree_Tag($compiler->parser,
                                                                                   $compiler->compileTag('include',
-                                                                                                        [$file,
-                                                                                                              ['scope' => 'parent'], ]));
+                                                                                                        array($file,
+                                                                                                              array('scope' => 'parent'))));
     }
 
     /**
-     * Create source code for {extends} from source components array.
+     * Create source code for {extends} from source components array
      *
      * @param []\Smarty_Internal_Template_Source $components
      *
@@ -124,11 +125,10 @@ class Smarty_Internal_Compile_Extends extends Smarty_Internal_Compile_Shared_Inh
      */
     public static function extendsSourceArrayCode($components)
     {
-        $resources = [];
+        $resources = array();
         foreach ($components as $source) {
             $resources[] = $source->resource;
         }
-
-        return '{extends file=\'extends:'.implode('|', $resources).'\' extends_resource=true}';
+        return '{extends file=\'extends:' . join('|', $resources) . '\' extends_resource=true}';
     }
 }

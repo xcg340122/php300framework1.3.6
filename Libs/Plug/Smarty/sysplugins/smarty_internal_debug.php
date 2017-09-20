@@ -1,46 +1,51 @@
 <?php
 /**
  * Smarty Internal Plugin Debug
- * Class to collect data for the Smarty Debugging Console.
+ * Class to collect data for the Smarty Debugging Console
  *
+ * @package    Smarty
+ * @subpackage Debug
  * @author     Uwe Tews
  */
 
 /**
- * Smarty Internal Plugin Debug Class.
+ * Smarty Internal Plugin Debug Class
+ *
+ * @package    Smarty
+ * @subpackage Debug
  */
 class Smarty_Internal_Debug extends Smarty_Internal_Data
 {
     /**
-     * template data.
+     * template data
      *
      * @var array
      */
-    public $template_data = [];
+    public $template_data = array();
 
     /**
-     * List of uid's which shall be ignored.
+     * List of uid's which shall be ignored
      *
      * @var array
      */
-    public $ignore_uid = [];
+    public $ignore_uid = array();
 
     /**
-     * Index of display() and fetch() calls.
+     * Index of display() and fetch() calls
      *
      * @var int
      */
     public $index = 0;
 
     /**
-     * Counter for window offset.
+     * Counter for window offset
      *
      * @var int
      */
     public $offset = 0;
 
     /**
-     * Start logging template.
+     * Start logging template
      *
      * @param \Smarty_Internal_Template $template template
      * @param null                      $mode     true: display   false: fetch  null: subtemplate
@@ -48,8 +53,8 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     public function start_template(Smarty_Internal_Template $template, $mode = null)
     {
         if (isset($mode)) {
-            $this->index++;
-            $this->offset++;
+            $this->index ++;
+            $this->offset ++;
             $this->template_data[$this->index] = null;
         }
         $key = $this->get_key($template);
@@ -57,7 +62,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * End logging of cache time.
+     * End logging of cache time
      *
      * @param \Smarty_Internal_Template $template cached template
      */
@@ -70,19 +75,19 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * Start logging of compile time.
+     * Start logging of compile time
      *
      * @param \Smarty_Internal_Template $template
      */
     public function start_compile(Smarty_Internal_Template $template)
     {
-        static $_is_stringy = ['string' => true, 'eval' => true];
+        static $_is_stringy = array('string' => true, 'eval' => true);
         if (!empty($template->compiler->trace_uid)) {
             $key = $template->compiler->trace_uid;
             if (!isset($this->template_data[$this->index][$key])) {
                 if (isset($_is_stringy[$template->source->type])) {
                     $this->template_data[$this->index][$key]['name'] =
-                        '\''.substr($template->source->name, 0, 25).'...\'';
+                        '\'' . substr($template->source->name, 0, 25) . '...\'';
                 } else {
                     $this->template_data[$this->index][$key]['name'] = $template->source->filepath;
                 }
@@ -100,7 +105,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * End logging of compile time.
+     * End logging of compile time
      *
      * @param \Smarty_Internal_Template $template
      */
@@ -120,7 +125,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * Start logging of render time.
+     * Start logging of render time
      *
      * @param \Smarty_Internal_Template $template
      */
@@ -131,7 +136,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * End logging of compile time.
+     * End logging of compile time
      *
      * @param \Smarty_Internal_Template $template
      */
@@ -143,7 +148,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * Start logging of cache time.
+     * Start logging of cache time
      *
      * @param \Smarty_Internal_Template $template cached template
      */
@@ -154,7 +159,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * End logging of cache time.
+     * End logging of cache time
      *
      * @param \Smarty_Internal_Template $template cached template
      */
@@ -166,7 +171,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * Register template object.
+     * Register template object
      *
      * @param \Smarty_Internal_Template $template cached template
      */
@@ -175,7 +180,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * Register data object.
+     * Register data object
      *
      * @param \Smarty_Data $data data object
      */
@@ -184,15 +189,15 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * Opens a window for the Smarty Debugging Console and display the data.
+     * Opens a window for the Smarty Debugging Console and display the data
      *
-     * @param Smarty_Internal_Template|Smarty $obj  object to debug
+     * @param Smarty_Internal_Template|Smarty $obj object to debug
      * @param bool                            $full
      */
     public function display_debug($obj, $full = false)
     {
         if (!$full) {
-            $this->offset++;
+            $this->offset ++;
             $savedIndex = $this->index;
             $this->index = 9999;
         }
@@ -207,7 +212,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
         // copy the working dirs from application
         $debObj->setCompileDir($smarty->getCompileDir());
         // init properties by hand as user may have edited the original Smarty class
-        $debObj->setPluginsDir(is_dir(__DIR__.'/../plugins') ? __DIR__.'/../plugins' : $smarty->getPluginsDir());
+        $debObj->setPluginsDir(is_dir(__DIR__ . '/../plugins') ? __DIR__ . '/../plugins' : $smarty->getPluginsDir());
         $debObj->force_compile = false;
         $debObj->compile_check = true;
         $debObj->left_delimiter = '{';
@@ -216,12 +221,12 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
         $debObj->debugging = false;
         $debObj->debugging_ctrl = 'NONE';
         $debObj->error_reporting = E_ALL & ~E_NOTICE;
-        $debObj->debug_tpl = isset($smarty->debug_tpl) ? $smarty->debug_tpl : 'file:'.__DIR__.'/../debug.tpl';
-        $debObj->registered_plugins = [];
-        $debObj->registered_resources = [];
-        $debObj->registered_filters = [];
-        $debObj->autoload_filters = [];
-        $debObj->default_modifiers = [];
+        $debObj->debug_tpl = isset($smarty->debug_tpl) ? $smarty->debug_tpl : 'file:' . __DIR__ . '/../debug.tpl';
+        $debObj->registered_plugins = array();
+        $debObj->registered_resources = array();
+        $debObj->registered_filters = array();
+        $debObj->autoload_filters = array();
+        $debObj->default_modifiers = array();
         $debObj->escape_html = true;
         $debObj->caching = false;
         $debObj->compile_id = null;
@@ -236,7 +241,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
 
         $_template = new Smarty_Internal_Template($debObj->debug_tpl, $debObj);
         if ($obj->_objType == 2) {
-            $_template->assign('template_name', $obj->source->type.':'.$obj->source->name);
+            $_template->assign('template_name', $obj->source->type . ':' . $obj->source->name);
         }
         if ($obj->_objType == 1 || $full) {
             $_template->assign('template_data', $this->template_data[$this->index]);
@@ -250,7 +255,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
         $_template->assign('offset', $this->offset * 50);
         echo $_template->fetch();
         if (isset($full)) {
-            $this->index--;
+            $this->index --;
         }
         if (!$full) {
             $this->index = $savedIndex;
@@ -258,26 +263,26 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * Recursively gets variables from all template/data scopes.
+     * Recursively gets variables from all template/data scopes
      *
-     * @param Smarty_Internal_Template|Smarty_Data $obj object to debug
+     * @param  Smarty_Internal_Template|Smarty_Data $obj object to debug
      *
      * @return StdClass
      */
     public function get_debug_vars($obj)
     {
-        $config_vars = [];
+        $config_vars = array();
         foreach ($obj->config_vars as $key => $var) {
             $config_vars[$key]['value'] = $var;
             if ($obj->_objType == 2) {
-                $config_vars[$key]['scope'] = $obj->source->type.':'.$obj->source->name;
+                $config_vars[$key]['scope'] = $obj->source->type . ':' . $obj->source->name;
             } elseif ($obj->_objType == 4) {
                 $tpl_vars[$key]['scope'] = $obj->dataObjectName;
             } else {
                 $config_vars[$key]['scope'] = 'Smarty object';
             }
         }
-        $tpl_vars = [];
+        $tpl_vars = array();
         foreach ($obj->tpl_vars as $key => $var) {
             foreach ($var as $varkey => $varvalue) {
                 if ($varkey == 'value') {
@@ -295,7 +300,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
                 }
             }
             if ($obj->_objType == 2) {
-                $tpl_vars[$key]['scope'] = $obj->source->type.':'.$obj->source->name;
+                $tpl_vars[$key]['scope'] = $obj->source->type . ':' . $obj->source->name;
             } elseif ($obj->_objType == 4) {
                 $tpl_vars[$key]['scope'] = $obj->dataObjectName;
             } else {
@@ -341,11 +346,11 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
             }
         }
 
-        return (object) ['tpl_vars' => $tpl_vars, 'config_vars' => $config_vars];
+        return (object) array('tpl_vars' => $tpl_vars, 'config_vars' => $config_vars);
     }
 
     /**
-     * Return key into $template_data for template.
+     * Return key into $template_data for template
      *
      * @param \Smarty_Internal_Template $template template object
      *
@@ -353,7 +358,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
      */
     private function get_key(Smarty_Internal_Template $template)
     {
-        static $_is_stringy = ['string' => true, 'eval' => true];
+        static $_is_stringy = array('string' => true, 'eval' => true);
         // calculate Uid if not already done
         if ($template->source->uid == '') {
             $template->source->filepath;
@@ -364,7 +369,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
         } else {
             if (isset($_is_stringy[$template->source->type])) {
                 $this->template_data[$this->index][$key]['name'] =
-                    '\''.substr($template->source->name, 0, 25).'...\'';
+                    '\'' . substr($template->source->name, 0, 25) . '...\'';
             } else {
                 $this->template_data[$this->index][$key]['name'] = $template->source->filepath;
             }
@@ -378,7 +383,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * Ignore template.
+     * Ignore template
      *
      * @param \Smarty_Internal_Template $template
      */
@@ -392,7 +397,7 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
     }
 
     /**
-     * handle 'URL' debugging mode.
+     * handle 'URL' debugging mode
      *
      * @param Smarty $smarty
      */
@@ -404,11 +409,11 @@ class Smarty_Internal_Debug extends Smarty_Internal_Data
             $_query_string = '';
         }
         if (false !== strpos($_query_string, $smarty->smarty_debug_id)) {
-            if (false !== strpos($_query_string, $smarty->smarty_debug_id.'=on')) {
+            if (false !== strpos($_query_string, $smarty->smarty_debug_id . '=on')) {
                 // enable debugging for this browser session
                 setcookie('SMARTY_DEBUG', true);
                 $smarty->debugging = true;
-            } elseif (false !== strpos($_query_string, $smarty->smarty_debug_id.'=off')) {
+            } elseif (false !== strpos($_query_string, $smarty->smarty_debug_id . '=off')) {
                 // disable debugging for this browser session
                 setcookie('SMARTY_DEBUG', false);
                 $smarty->debugging = false;
