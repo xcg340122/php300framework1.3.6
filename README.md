@@ -1,7 +1,5 @@
 # php300framework
 
-[![Jenkins coverage](https://img.shields.io/jenkins/c/https/jenkins.qa.ubuntu.com/view/Utopic/view/All/job/address-book-service-utopic-i386-ci.svg?style=plastic)](http://baidu.com)
-
 在线手册：http://api.php300.cn
 
 官方网站：http://framework.php300.cn
