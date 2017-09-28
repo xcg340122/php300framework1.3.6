@@ -1,18 +1,13 @@
 <?php
 /**
  * Smarty Internal Plugin Compile Config Load
- * Compiles the {config load} tag
+ * Compiles the {config load} tag.
  *
- * @package    Smarty
- * @subpackage Compiler
  * @author     Uwe Tews
  */
 
 /**
- * Smarty Internal Plugin Compile Config Load Class
- *
- * @package    Smarty
- * @subpackage Compiler
+ * Smarty Internal Plugin Compile Config Load Class.
  */
 class Smarty_Internal_Compile_Config_Load extends Smarty_Internal_CompileBase
 {
@@ -20,42 +15,46 @@ class Smarty_Internal_Compile_Config_Load extends Smarty_Internal_CompileBase
      * Attribute definition: Overwrites base class.
      *
      * @var array
+     *
      * @see Smarty_Internal_CompileBase
      */
-    public $required_attributes = array('file');
+    public $required_attributes = ['file'];
 
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
+     *
      * @see Smarty_Internal_CompileBase
      */
-    public $shorttag_order = array('file', 'section');
+    public $shorttag_order = ['file', 'section'];
 
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
+     *
      * @see Smarty_Internal_CompileBase
      */
-    public $optional_attributes = array('section', 'scope', 'bubble_up');
+    public $optional_attributes = ['section', 'scope', 'bubble_up'];
 
     /**
-     * Valid scope names
-     * 
+     * Valid scope names.
+     *
      * @var array
      */
-    public $valid_scopes = array('local'  => true, 'parent' => true, 'root' => true, 'global' => true,
-                                 'smarty' => true, 'tpl_root' => true);
+    public $valid_scopes = ['local'       => true, 'parent' => true, 'root' => true, 'global' => true,
+                                 'smarty' => true, 'tpl_root' => true, ];
 
     /**
-     * Compiles code for the {config_load} tag
+     * Compiles code for the {config_load} tag.
      *
-     * @param  array                                $args     array with attributes from parser
+     * @param array                                 $args     array with attributes from parser
      * @param \Smarty_Internal_TemplateCompilerBase $compiler compiler object
      *
-     * @return string compiled code
      * @throws \SmartyCompilerException
+     *
+     * @return string compiled code
      */
     public function compile($args, Smarty_Internal_TemplateCompilerBase $compiler)
     {

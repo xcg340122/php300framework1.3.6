@@ -1,18 +1,13 @@
 <?php
 /**
  * Smarty Internal Plugin Compile Function_Call
- * Compiles the calls of user defined tags defined by {function}
+ * Compiles the calls of user defined tags defined by {function}.
  *
- * @package    Smarty
- * @subpackage Compiler
  * @author     Uwe Tews
  */
 
 /**
- * Smarty Internal Plugin Compile Function_Call Class
- *
- * @package    Smarty
- * @subpackage Compiler
+ * Smarty Internal Plugin Compile Function_Call Class.
  */
 class Smarty_Internal_Compile_Call extends Smarty_Internal_CompileBase
 {
@@ -20,31 +15,34 @@ class Smarty_Internal_Compile_Call extends Smarty_Internal_CompileBase
      * Attribute definition: Overwrites base class.
      *
      * @var array
+     *
      * @see Smarty_Internal_CompileBase
      */
-    public $required_attributes = array('name');
+    public $required_attributes = ['name'];
 
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
+     *
      * @see Smarty_Internal_CompileBase
      */
-    public $shorttag_order = array('name');
+    public $shorttag_order = ['name'];
 
     /**
      * Attribute definition: Overwrites base class.
      *
      * @var array
+     *
      * @see Smarty_Internal_CompileBase
      */
-    public $optional_attributes = array('_any');
+    public $optional_attributes = ['_any'];
 
     /**
-     * Compiles the calls of user defined tags defined by {function}
+     * Compiles the calls of user defined tags defined by {function}.
      *
-     * @param  array  $args     array with attributes from parser
-     * @param  object $compiler compiler object
+     * @param array  $args     array with attributes from parser
+     * @param object $compiler compiler object
      *
      * @return string compiled code
      */
@@ -66,7 +64,7 @@ class Smarty_Internal_Compile_Call extends Smarty_Internal_CompileBase
         } else {
             $_nocache = 'false';
         }
-        $_paramsArray = array();
+        $_paramsArray = [];
         foreach ($_attr as $_key => $_value) {
             if (is_int($_key)) {
                 $_paramsArray[] = "$_key=>$_value";
@@ -74,7 +72,7 @@ class Smarty_Internal_Compile_Call extends Smarty_Internal_CompileBase
                 $_paramsArray[] = "'$_key'=>$_value";
             }
         }
-        $_params = 'array(' . implode(",", $_paramsArray) . ')';
+        $_params = 'array('.implode(',', $_paramsArray).')';
         //$compiler->suppressNocacheProcessing = true;
         // was there an assign attribute
         if (isset($_assign)) {
@@ -84,6 +82,7 @@ class Smarty_Internal_Compile_Call extends Smarty_Internal_CompileBase
             $_output =
                 "<?php \$_smarty_tpl->smarty->ext->_tplFunction->callTemplateFunction(\$_smarty_tpl, {$_name}, {$_params}, {$_nocache});?>\n";
         }
+
         return $_output;
     }
 }

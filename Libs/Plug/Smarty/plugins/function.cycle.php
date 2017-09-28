@@ -1,9 +1,6 @@
 <?php
 /**
- * Smarty plugin
- *
- * @package    Smarty
- * @subpackage PluginsFunction
+ * Smarty plugin.
  */
 
 /**
@@ -28,14 +25,16 @@
  * {cycle values="#eeeeee,#d0d0d0d"}
  * {cycle name=row values="one,two,three" reset=true}
  * {cycle name=row}
- * </pre>
+ * </pre>.
  *
  * @link     http://www.smarty.net/manual/en/language.function.cycle.php {cycle}
  *           (Smarty online manual)
+ *
  * @author   Monte Ohrt <monte at ohrt dot com>
  * @author   credit to Mark Priatel <mpriatel@rogers.com>
  * @author   credit to Gerard <gerard@interfold.com>
  * @author   credit to Jason Sweat <jsweat_php@yahoo.com>
+ *
  * @version  1.3
  *
  * @param array                    $params   parameters
@@ -43,7 +42,6 @@
  *
  * @return string|null
  */
-
 function smarty_function_cycle($params, $template)
 {
     static $cycle_vars;
@@ -99,7 +97,7 @@ function smarty_function_cycle($params, $template)
         if ($cycle_vars[$name]['index'] >= count($cycle_array) - 1) {
             $cycle_vars[$name]['index'] = 0;
         } else {
-            $cycle_vars[$name]['index'] ++;
+            $cycle_vars[$name]['index']++;
         }
     }
 

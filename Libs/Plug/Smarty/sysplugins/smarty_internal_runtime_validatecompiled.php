@@ -1,24 +1,21 @@
 <?php
 
 /**
- * Runtime Methods decodeProperties
+ * Runtime Methods decodeProperties.
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
- *
  **/
 class Smarty_Internal_Runtime_ValidateCompiled
 {
     /**
      * This function is executed automatically when a compiled or cached template file is included
      * - Decode saved properties from compiled template and cache files
-     * - Check if compiled or cache file is valid
+     * - Check if compiled or cache file is valid.
      *
-     * @param  array $properties special template properties
-     * @param  bool  $cache      flag if called from cache file
+     * @param array $properties special template properties
+     * @param bool  $cache      flag if called from cache file
      *
-     * @return bool  flag if compiled or cache file is valid
+     * @return bool flag if compiled or cache file is valid
      */
     public function decodeProperties(Smarty_Internal_Template $tpl, $properties, $cache = false)
     {
@@ -45,7 +42,7 @@ class Smarty_Internal_Runtime_ValidateCompiled
                 } else {
                     $handler = Smarty_Resource::load($tpl->smarty, $_file_to_check[2]);
                     if ($handler->checkTimestamps()) {
-                        $source = Smarty_Template_Source::load($tpl, $tpl->smarty, $_file_to_check[ 0 ]);
+                        $source = Smarty_Template_Source::load($tpl, $tpl->smarty, $_file_to_check[0]);
                         $mtime = $source->getTimeStamp();
                     } else {
                         continue;
@@ -70,7 +67,7 @@ class Smarty_Internal_Runtime_ValidateCompiled
         } else {
             $tpl->mustCompile = !$is_valid;
             $resource = $tpl->compiled;
-            $resource->includes = isset($properties['includes']) ? $properties['includes'] : array();
+            $resource->includes = isset($properties['includes']) ? $properties['includes'] : [];
         }
         if ($is_valid) {
             $resource->unifunc = $properties['unifunc'];
@@ -81,6 +78,7 @@ class Smarty_Internal_Runtime_ValidateCompiled
                 $tpl->tpl_function = $properties['tpl_function'];
             }
         }
+
         return $is_valid && !function_exists($properties['unifunc']);
     }
 }

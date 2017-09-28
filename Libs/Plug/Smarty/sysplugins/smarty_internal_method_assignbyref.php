@@ -1,24 +1,21 @@
 <?php
 
 /**
- * Smarty Method AssignByRef
+ * Smarty Method AssignByRef.
  *
  * Smarty::assignByRef() method
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_AssignByRef
 {
-
     /**
-     * assigns values to template variables by reference
+     * assigns values to template variables by reference.
      *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
      * @param string                                                  $tpl_var the template variable name
      * @param                                                         $value
-     * @param  boolean                                                $nocache if true any output of this variable will be not cached
+     * @param bool                                                    $nocache if true any output of this variable will be not cached
      *
      * @return \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty
      */
@@ -31,6 +28,7 @@ class Smarty_Internal_Method_AssignByRef
                 $data->ext->_updateScope->updateScope($data, $tpl_var);
             }
         }
+
         return $data;
     }
 }

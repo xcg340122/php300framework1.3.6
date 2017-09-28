@@ -1,18 +1,13 @@
 <?php
 /**
  * Smarty Internal TestInstall
- * Test Smarty installation
+ * Test Smarty installation.
  *
- * @package    Smarty
- * @subpackage Utilities
  * @author     Uwe Tews
  */
 
 /**
- * TestInstall class
- *
- * @package    Smarty
- * @subpackage Utilities
+ * TestInstall class.
  */
 class Smarty_Internal_TestInstall
 {
@@ -20,9 +15,9 @@ class Smarty_Internal_TestInstall
      * diagnose Smarty setup
      * If $errors is secified, the diagnostic report will be appended to the array, rather than being output.
      *
-     * @param  array $errors array to push results into rather than outputting them
+     * @param array $errors array to push results into rather than outputting them
      *
-     * @return bool   status, true if everything is fine, false else
+     * @return bool status, true if everything is fine, false else
      */
     public static function testInstall(Smarty $smarty, &$errors = null)
     {
@@ -61,9 +56,9 @@ class Smarty_Internal_TestInstall
                         $message =
                             "FAILED: $_template_dir does not exist (and couldn't be found in include_path either)";
                         if ($errors === null) {
-                            echo $message . ".\n";
+                            echo $message.".\n";
                         } else {
-                            $errors[ 'template_dir' ] = $message;
+                            $errors['template_dir'] = $message;
                         }
 
                         continue;
@@ -72,9 +67,9 @@ class Smarty_Internal_TestInstall
                     $status = false;
                     $message = "FAILED: $_template_dir does not exist";
                     if ($errors === null) {
-                        echo $message . ".\n";
+                        echo $message.".\n";
                     } else {
-                        $errors[ 'template_dir' ] = $message;
+                        $errors['template_dir'] = $message;
                     }
 
                     continue;
@@ -85,17 +80,17 @@ class Smarty_Internal_TestInstall
                 $status = false;
                 $message = "FAILED: $template_dir is not a directory";
                 if ($errors === null) {
-                    echo $message . ".\n";
+                    echo $message.".\n";
                 } else {
-                    $errors[ 'template_dir' ] = $message;
+                    $errors['template_dir'] = $message;
                 }
             } elseif (!is_readable($template_dir)) {
                 $status = false;
                 $message = "FAILED: $template_dir is not readable";
                 if ($errors === null) {
-                    echo $message . ".\n";
+                    echo $message.".\n";
                 } else {
-                    $errors[ 'template_dir' ] = $message;
+                    $errors['template_dir'] = $message;
                 }
             } else {
                 if ($errors === null) {
@@ -115,33 +110,33 @@ class Smarty_Internal_TestInstall
             $status = false;
             $message = "FAILED: {$__compile_dir} does not exist";
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'compile_dir' ] = $message;
+                $errors['compile_dir'] = $message;
             }
         } elseif (!is_dir($_compile_dir)) {
             $status = false;
             $message = "FAILED: {$_compile_dir} is not a directory";
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'compile_dir' ] = $message;
+                $errors['compile_dir'] = $message;
             }
         } elseif (!is_readable($_compile_dir)) {
             $status = false;
             $message = "FAILED: {$_compile_dir} is not readable";
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'compile_dir' ] = $message;
+                $errors['compile_dir'] = $message;
             }
         } elseif (!is_writable($_compile_dir)) {
             $status = false;
             $message = "FAILED: {$_compile_dir} is not writable";
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'compile_dir' ] = $message;
+                $errors['compile_dir'] = $message;
             }
         } else {
             if ($errors === null) {
@@ -155,7 +150,7 @@ class Smarty_Internal_TestInstall
 
         // test if all registered plugins_dir are accessible
         // and if core plugins directory is still registered
-        $_core_plugins_dir = realpath(dirname(__FILE__) . '/../plugins');
+        $_core_plugins_dir = realpath(dirname(__FILE__).'/../plugins');
         $_core_plugins_available = false;
         foreach ($smarty->getPluginsDir() as $plugin_dir) {
             $_plugin_dir = $plugin_dir;
@@ -180,9 +175,9 @@ class Smarty_Internal_TestInstall
                         $status = false;
                         $message = "FAILED: $_plugin_dir does not exist (and couldn't be found in include_path either)";
                         if ($errors === null) {
-                            echo $message . ".\n";
+                            echo $message.".\n";
                         } else {
-                            $errors[ 'plugins_dir' ] = $message;
+                            $errors['plugins_dir'] = $message;
                         }
 
                         continue;
@@ -191,9 +186,9 @@ class Smarty_Internal_TestInstall
                     $status = false;
                     $message = "FAILED: $_plugin_dir does not exist";
                     if ($errors === null) {
-                        echo $message . ".\n";
+                        echo $message.".\n";
                     } else {
-                        $errors[ 'plugins_dir' ] = $message;
+                        $errors['plugins_dir'] = $message;
                     }
 
                     continue;
@@ -204,17 +199,17 @@ class Smarty_Internal_TestInstall
                 $status = false;
                 $message = "FAILED: $plugin_dir is not a directory";
                 if ($errors === null) {
-                    echo $message . ".\n";
+                    echo $message.".\n";
                 } else {
-                    $errors[ 'plugins_dir' ] = $message;
+                    $errors['plugins_dir'] = $message;
                 }
             } elseif (!is_readable($plugin_dir)) {
                 $status = false;
                 $message = "FAILED: $plugin_dir is not readable";
                 if ($errors === null) {
-                    echo $message . ".\n";
+                    echo $message.".\n";
                 } else {
-                    $errors[ 'plugins_dir' ] = $message;
+                    $errors['plugins_dir'] = $message;
                 }
             } elseif ($_core_plugins_dir && $_core_plugins_dir == realpath($plugin_dir)) {
                 $_core_plugins_available = true;
@@ -231,9 +226,9 @@ class Smarty_Internal_TestInstall
             $status = false;
             $message = "WARNING: Smarty's own libs/plugins is not available";
             if ($errors === null) {
-                echo $message . ".\n";
-            } elseif (!isset($errors[ 'plugins_dir' ])) {
-                $errors[ 'plugins_dir' ] = $message;
+                echo $message.".\n";
+            } elseif (!isset($errors['plugins_dir'])) {
+                $errors['plugins_dir'] = $message;
             }
         }
 
@@ -248,33 +243,33 @@ class Smarty_Internal_TestInstall
             $status = false;
             $message = "FAILED: {$__cache_dir} does not exist";
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'cache_dir' ] = $message;
+                $errors['cache_dir'] = $message;
             }
         } elseif (!is_dir($_cache_dir)) {
             $status = false;
             $message = "FAILED: {$_cache_dir} is not a directory";
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'cache_dir' ] = $message;
+                $errors['cache_dir'] = $message;
             }
         } elseif (!is_readable($_cache_dir)) {
             $status = false;
             $message = "FAILED: {$_cache_dir} is not readable";
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'cache_dir' ] = $message;
+                $errors['cache_dir'] = $message;
             }
         } elseif (!is_writable($_cache_dir)) {
             $status = false;
             $message = "FAILED: {$_cache_dir} is not writable";
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'cache_dir' ] = $message;
+                $errors['cache_dir'] = $message;
             }
         } else {
             if ($errors === null) {
@@ -309,9 +304,9 @@ class Smarty_Internal_TestInstall
                         $status = false;
                         $message = "FAILED: $_config_dir does not exist (and couldn't be found in include_path either)";
                         if ($errors === null) {
-                            echo $message . ".\n";
+                            echo $message.".\n";
                         } else {
-                            $errors[ 'config_dir' ] = $message;
+                            $errors['config_dir'] = $message;
                         }
 
                         continue;
@@ -320,9 +315,9 @@ class Smarty_Internal_TestInstall
                     $status = false;
                     $message = "FAILED: $_config_dir does not exist";
                     if ($errors === null) {
-                        echo $message . ".\n";
+                        echo $message.".\n";
                     } else {
-                        $errors[ 'config_dir' ] = $message;
+                        $errors['config_dir'] = $message;
                     }
 
                     continue;
@@ -333,17 +328,17 @@ class Smarty_Internal_TestInstall
                 $status = false;
                 $message = "FAILED: $config_dir is not a directory";
                 if ($errors === null) {
-                    echo $message . ".\n";
+                    echo $message.".\n";
                 } else {
-                    $errors[ 'config_dir' ] = $message;
+                    $errors['config_dir'] = $message;
                 }
             } elseif (!is_readable($config_dir)) {
                 $status = false;
                 $message = "FAILED: $config_dir is not readable";
                 if ($errors === null) {
-                    echo $message . ".\n";
+                    echo $message.".\n";
                 } else {
-                    $errors[ 'config_dir' ] = $message;
+                    $errors['config_dir'] = $message;
                 }
             } else {
                 if ($errors === null) {
@@ -358,7 +353,7 @@ class Smarty_Internal_TestInstall
         // test if sysplugins are available
         $source = SMARTY_SYSPLUGINS_DIR;
         if (is_dir($source)) {
-            $expectedSysplugins = array('smartycompilerexception.php'                               => true,
+            $expectedSysplugins = ['smartycompilerexception.php'                                    => true,
                                         'smartyexception.php'                                       => true,
                                         'smarty_cacheresource.php'                                  => true,
                                         'smarty_cacheresource_custom.php'                           => true,
@@ -502,34 +497,34 @@ class Smarty_Internal_TestInstall
                                         'smarty_template_resource_base.php'                         => true,
                                         'smarty_template_source.php'                                => true,
                                         'smarty_undefined_variable.php'                             => true,
-                                        'smarty_variable.php'                                       => true,);
+                                        'smarty_variable.php'                                       => true, ];
             $iterator = new DirectoryIterator($source);
             foreach ($iterator as $file) {
                 if (!$file->isDot()) {
                     $filename = $file->getFilename();
-                    if (isset($expectedSysplugins[ $filename ])) {
-                        unset($expectedSysplugins[ $filename ]);
+                    if (isset($expectedSysplugins[$filename])) {
+                        unset($expectedSysplugins[$filename]);
                     }
                 }
             }
             if ($expectedSysplugins) {
                 $status = false;
-                $message = "FAILED: files missing from libs/sysplugins: " . join(', ', array_keys($expectedSysplugins));
+                $message = 'FAILED: files missing from libs/sysplugins: '.implode(', ', array_keys($expectedSysplugins));
                 if ($errors === null) {
-                    echo $message . ".\n";
+                    echo $message.".\n";
                 } else {
-                    $errors[ 'sysplugins' ] = $message;
+                    $errors['sysplugins'] = $message;
                 }
             } elseif ($errors === null) {
                 echo "... OK\n";
             }
         } else {
             $status = false;
-            $message = "FAILED: " . SMARTY_SYSPLUGINS_DIR . ' is not a directory';
+            $message = 'FAILED: '.SMARTY_SYSPLUGINS_DIR.' is not a directory';
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'sysplugins_dir_constant' ] = $message;
+                $errors['sysplugins_dir_constant'] = $message;
             }
         }
 
@@ -540,7 +535,7 @@ class Smarty_Internal_TestInstall
         $source = SMARTY_PLUGINS_DIR;
         if (is_dir($source)) {
             $expectedPlugins =
-                array('block.textformat.php'                  => true, 'function.counter.php' => true,
+                ['block.textformat.php'                       => true, 'function.counter.php' => true,
                       'function.cycle.php'                    => true, 'function.fetch.php' => true,
                       'function.html_checkboxes.php'          => true, 'function.html_image.php' => true,
                       'function.html_options.php'             => true, 'function.html_radios.php' => true,
@@ -563,34 +558,34 @@ class Smarty_Internal_TestInstall
                       'shared.escape_special_chars.php'       => true, 'shared.literal_compiler_param.php' => true,
                       'shared.make_timestamp.php'             => true, 'shared.mb_str_replace.php' => true,
                       'shared.mb_unicode.php'                 => true, 'shared.mb_wordwrap.php' => true,
-                      'variablefilter.htmlspecialchars.php'   => true,);
+                      'variablefilter.htmlspecialchars.php'   => true, ];
             $iterator = new DirectoryIterator($source);
             foreach ($iterator as $file) {
                 if (!$file->isDot()) {
                     $filename = $file->getFilename();
-                    if (isset($expectedPlugins[ $filename ])) {
-                        unset($expectedPlugins[ $filename ]);
+                    if (isset($expectedPlugins[$filename])) {
+                        unset($expectedPlugins[$filename]);
                     }
                 }
             }
             if ($expectedPlugins) {
                 $status = false;
-                $message = "FAILED: files missing from libs/plugins: " . join(', ', array_keys($expectedPlugins));
+                $message = 'FAILED: files missing from libs/plugins: '.implode(', ', array_keys($expectedPlugins));
                 if ($errors === null) {
-                    echo $message . ".\n";
+                    echo $message.".\n";
                 } else {
-                    $errors[ 'plugins' ] = $message;
+                    $errors['plugins'] = $message;
                 }
             } elseif ($errors === null) {
                 echo "... OK\n";
             }
         } else {
             $status = false;
-            $message = "FAILED: " . SMARTY_PLUGINS_DIR . ' is not a directory';
+            $message = 'FAILED: '.SMARTY_PLUGINS_DIR.' is not a directory';
             if ($errors === null) {
-                echo $message . ".\n";
+                echo $message.".\n";
             } else {
-                $errors[ 'plugins_dir_constant' ] = $message;
+                $errors['plugins_dir_constant'] = $message;
             }
         }
 

@@ -1,34 +1,33 @@
 <?php
 
 /**
- * Smarty Method Append
+ * Smarty Method Append.
  *
  * Smarty::append() method
  *
- * @package    Smarty
- * @subpackage PluginsInternal
  * @author     Uwe Tews
  */
 class Smarty_Internal_Method_Append
 {
     /**
-     * Valid for all objects
+     * Valid for all objects.
      *
      * @var int
      */
     public $objMap = 7;
 
     /**
-     * appends values to template variables
+     * appends values to template variables.
      *
      * @api  Smarty::append()
+     *
      * @link http://www.smarty.net/docs/en/api.append.tpl
      *
      * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $data
-     * @param  array|string                                           $tpl_var the template variable name(s)
-     * @param  mixed                                                  $value   the value to append
-     * @param  bool                                                   $merge   flag if array elements shall be merged
-     * @param  bool                                                   $nocache if true any output of this variable will
+     * @param array|string                                            $tpl_var the template variable name(s)
+     * @param mixed                                                   $value   the value to append
+     * @param bool                                                    $merge   flag if array elements shall be merged
+     * @param bool                                                    $nocache if true any output of this variable will
      *                                                                         be not cached
      *
      * @return \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty
@@ -69,6 +68,7 @@ class Smarty_Internal_Method_Append
                 $data->ext->_updateScope->updateScope($data, $tpl_var);
             }
         }
+
         return $data;
     }
 }
