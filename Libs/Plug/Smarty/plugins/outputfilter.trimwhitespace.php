@@ -1,6 +1,9 @@
 <?php
 /**
- * Smarty plugin.
+ * Smarty plugin
+ *
+ * @package    Smarty
+ * @subpackage PluginsFilter
  */
 
 /**
@@ -12,12 +15,11 @@
  * @param string $source input string
  *
  * @return string filtered output
- *
  * @todo     substr_replace() is not overloaded by mbstring.func_overload - so this function might fail!
  */
 function smarty_outputfilter_trimwhitespace($source)
 {
-    $store = [];
+    $store = array();
     $_store = 0;
     $_offset = 0;
 
@@ -29,11 +31,11 @@ function smarty_outputfilter_trimwhitespace($source)
         foreach ($matches as $match) {
             $store[] = $match[0][0];
             $_length = strlen($match[0][0]);
-            $replace = '@!@SMARTY:'.$_store.':SMARTY@!@';
+            $replace = '@!@SMARTY:' . $_store . ':SMARTY@!@';
             $source = substr_replace($source, $replace, $match[0][1] - $_offset, $_length);
 
             $_offset += $_length - strlen($replace);
-            $_store++;
+            $_store ++;
         }
     }
 
@@ -47,15 +49,15 @@ function smarty_outputfilter_trimwhitespace($source)
         foreach ($matches as $match) {
             $store[] = $match[0][0];
             $_length = strlen($match[0][0]);
-            $replace = '@!@SMARTY:'.$_store.':SMARTY@!@';
+            $replace = '@!@SMARTY:' . $_store . ':SMARTY@!@';
             $source = substr_replace($source, $replace, $match[0][1] - $_offset, $_length);
 
             $_offset += $_length - strlen($replace);
-            $_store++;
+            $_store ++;
         }
     }
 
-    $expressions = [
+    $expressions = array(
         // replace multiple spaces between tags by a single space
         // can't remove them entirely, becaue that might break poorly implemented CSS display:inline-block elements
         '#(:SMARTY@!@|>)\s+(?=@!@SMARTY:|<)#s'                            => '\1 \2',
@@ -65,7 +67,7 @@ function smarty_outputfilter_trimwhitespace($source)
         // maybe a \0 byte or something is interfering?
         '#^\s+<#Ss'                                                       => '<',
         '#>\s+$#Ss'                                                       => '>',
-    ];
+    );
 
     $source = preg_replace(array_keys($expressions), array_values($expressions), $source);
     // note: for some very weird reason trim() seems to remove spaces inside attributes.
@@ -80,7 +82,7 @@ function smarty_outputfilter_trimwhitespace($source)
             $source = substr_replace($source, $replace, $match[0][1] + $_offset, $_length);
 
             $_offset += strlen($replace) - $_length;
-            $_store++;
+            $_store ++;
         }
     }
 

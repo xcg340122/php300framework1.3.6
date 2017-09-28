@@ -1,6 +1,9 @@
 <?php
 /**
- * Smarty plugin.
+ * Smarty plugin
+ *
+ * @package    Smarty
+ * @subpackage PluginsFunction
  */
 
 /**
@@ -31,14 +34,12 @@
  * {table loop=$data}
  * {table loop=$data cols=4 tr_attr='"bgcolor=red"'}
  * {table loop=$data cols="first,second,third" tr_attr=$colors}
- * </pre>.
+ * </pre>
  *
  * @author   Monte Ohrt <monte at ohrt dot com>
  * @author   credit to Messju Mohr <messju at lammfellpuschen dot de>
  * @author   credit to boots <boots dot smarty at yahoo dot com>
- *
  * @version  1.1
- *
  * @link     http://www.smarty.net/manual/en/language.function.html.table.php {html_table}
  *           (Smarty online manual)
  *
@@ -122,15 +123,15 @@ function smarty_function_html_table($params)
     $output = "<table $table_attr>\n";
 
     if (!empty($caption)) {
-        $output .= '<caption>'.$caption."</caption>\n";
+        $output .= '<caption>' . $caption . "</caption>\n";
     }
 
     if (is_array($cols)) {
         $cols = ($hdir == 'right') ? $cols : array_reverse($cols);
         $output .= "<thead><tr>\n";
 
-        for ($r = 0; $r < $cols_count; $r++) {
-            $output .= '<th'.smarty_function_html_table_cycle('th', $th_attr, $r).'>';
+        for ($r = 0; $r < $cols_count; $r ++) {
+            $output .= '<th' . smarty_function_html_table_cycle('th', $th_attr, $r) . '>';
             $output .= $cols[$r];
             $output .= "</th>\n";
         }
@@ -138,11 +139,11 @@ function smarty_function_html_table($params)
     }
 
     $output .= "<tbody>\n";
-    for ($r = 0; $r < $rows; $r++) {
-        $output .= '<tr'.smarty_function_html_table_cycle('tr', $tr_attr, $r).">\n";
+    for ($r = 0; $r < $rows; $r ++) {
+        $output .= "<tr" . smarty_function_html_table_cycle('tr', $tr_attr, $r) . ">\n";
         $rx = ($vdir == 'down') ? $r * $cols_count : ($rows - 1 - $r) * $cols_count;
 
-        for ($c = 0; $c < $cols_count; $c++) {
+        for ($c = 0; $c < $cols_count; $c ++) {
             $x = ($hdir == 'right') ? $rx + $c : $rx + $cols_count - 1 - $c;
             if ($inner != 'cols') {
                 /* shuffle x to loop over rows*/
@@ -150,9 +151,9 @@ function smarty_function_html_table($params)
             }
 
             if ($x < $loop_count) {
-                $output .= '<td'.smarty_function_html_table_cycle('td', $td_attr, $c).'>'.$loop[$x]."</td>\n";
+                $output .= "<td" . smarty_function_html_table_cycle('td', $td_attr, $c) . ">" . $loop[$x] . "</td>\n";
             } else {
-                $output .= '<td'.smarty_function_html_table_cycle('td', $td_attr, $c).">$trailpad</td>\n";
+                $output .= "<td" . smarty_function_html_table_cycle('td', $td_attr, $c) . ">$trailpad</td>\n";
             }
         }
         $output .= "</tr>\n";
@@ -171,5 +172,5 @@ function smarty_function_html_table_cycle($name, $var, $no)
         $ret = $var[$no % count($var)];
     }
 
-    return ($ret) ? ' '.$ret : '';
+    return ($ret) ? ' ' . $ret : '';
 }

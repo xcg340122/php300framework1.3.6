@@ -4,72 +4,77 @@
  * This is the config file compiler class. It calls the lexer and parser to
  * perform the compiling.
  *
+ * @package    Smarty
+ * @subpackage Config
  * @author     Uwe Tews
  */
 
 /**
- * Main config file compiler class.
+ * Main config file compiler class
+ *
+ * @package    Smarty
+ * @subpackage Config
  */
 class Smarty_Internal_Config_File_Compiler
 {
     /**
-     * Lexer class name.
+     * Lexer class name
      *
      * @var string
      */
     public $lexer_class;
 
     /**
-     * Parser class name.
+     * Parser class name
      *
      * @var string
      */
     public $parser_class;
 
     /**
-     * Lexer object.
+     * Lexer object
      *
      * @var object
      */
     public $lex;
 
     /**
-     * Parser object.
+     * Parser object
      *
      * @var object
      */
     public $parser;
 
     /**
-     * Smarty object.
+     * Smarty object
      *
      * @var Smarty object
      */
     public $smarty;
 
     /**
-     * Smarty object.
+     * Smarty object
      *
      * @var Smarty_Internal_Template object
      */
     public $template;
 
     /**
-     * Compiled config data sections and variables.
+     * Compiled config data sections and variables
      *
      * @var array
      */
-    public $config_data = [];
+    public $config_data = array();
 
     /**
-     * compiled config data must always be written.
+     * compiled config data must always be written
      *
      * @var bool
      */
     public $write_compiled_code = true;
 
     /**
-     * Initialize compiler.
+     * Initialize compiler
      *
      * @param string $lexer_class  class name
      * @param string $parser_class class name
@@ -82,8 +87,8 @@ class Smarty_Internal_Config_File_Compiler
         $this->lexer_class = $lexer_class;
         $this->parser_class = $parser_class;
         $this->smarty = $smarty;
-        $this->config_data['sections'] = [];
-        $this->config_data['vars'] = [];
+        $this->config_data['sections'] = array();
+        $this->config_data['vars'] = array();
     }
 
     /**
@@ -96,15 +101,15 @@ class Smarty_Internal_Config_File_Compiler
     public function compileTemplate(Smarty_Internal_Template $template)
     {
         $this->template = $template;
-        $this->template->compiled->file_dependency[$this->template->source->uid] = [$this->template->source->filepath,
+        $this->template->compiled->file_dependency[$this->template->source->uid] = array($this->template->source->filepath,
                                                                                              $this->template->source->getTimeStamp(),
-                                                                                             $this->template->source->type, ];
+                                                                                             $this->template->source->type);
         if ($this->smarty->debugging) {
             $this->smarty->_debug->start_compile($this->template);
         }
         // init the lexer/parser to compile the config file
         /* @var Smarty_Internal_ConfigFileLexer $lex */
-        $lex = new $this->lexer_class(str_replace(["\r\n", "\r"], "\n", $template->source->getContent()).
+        $lex = new $this->lexer_class(str_replace(array("\r\n", "\r"), "\n", $template->source->getContent()) .
                                       "\n", $this);
         /* @var Smarty_Internal_ConfigFileParser $parser */
         $parser = new $this->parser_class($lex, $this);
@@ -136,21 +141,20 @@ class Smarty_Internal_Config_File_Compiler
             $this->smarty->_debug->end_compile($this->template);
         }
         // template header code
-        $template_header = '<?php /* Smarty version '.Smarty::SMARTY_VERSION.', created on '.
-            strftime('%Y-%m-%d %H:%M:%S')."\n";
-        $template_header .= '         compiled from "'.$this->template->source->filepath."\" */ ?>\n";
+        $template_header = "<?php /* Smarty version " . Smarty::SMARTY_VERSION . ", created on " .
+            strftime("%Y-%m-%d %H:%M:%S") . "\n";
+        $template_header .= "         compiled from \"" . $this->template->source->filepath . "\" */ ?>\n";
 
-        $code = '<?php $_smarty_tpl->smarty->ext->configLoad->_loadConfigVars($_smarty_tpl, '.
-            var_export($this->config_data, true).'); ?>';
-
-        return $template_header.$this->template->smarty->ext->_codeFrame->create($this->template, $code);
+        $code = '<?php $_smarty_tpl->smarty->ext->configLoad->_loadConfigVars($_smarty_tpl, ' .
+            var_export($this->config_data, true) . '); ?>';
+        return $template_header . $this->template->smarty->ext->_codeFrame->create($this->template, $code);
     }
 
     /**
      * display compiler error messages without dying
      * If parameter $args is empty it is a parser detected syntax error.
      * In this case the parser is called to obtain information about expected tokens.
-     * If parameter $args contains a string this is used as error message.
+     * If parameter $args contains a string this is used as error message
      *
      * @param string $args individual error message or null
      *
@@ -176,16 +180,15 @@ class Smarty_Internal_Config_File_Compiler
                 $exp_token = $this->parser->yyTokenName[$token];
                 if (isset($this->lex->smarty_token_names[$exp_token])) {
                     // token type from lexer
-                    $expect[] = '"'.$this->lex->smarty_token_names[$exp_token].'"';
+                    $expect[] = '"' . $this->lex->smarty_token_names[$exp_token] . '"';
                 } else {
                     // otherwise internal token name
                     $expect[] = $this->parser->yyTokenName[$token];
                 }
             }
             // output parser error message
-            $error_text .= ' - Unexpected "'.$this->lex->value.'", expected one of: '.implode(' , ', $expect);
+            $error_text .= ' - Unexpected "' . $this->lex->value . '", expected one of: ' . implode(' , ', $expect);
         }
-
         throw new SmartyCompilerException($error_text);
     }
 }

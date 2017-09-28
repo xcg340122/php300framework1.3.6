@@ -2,14 +2,17 @@
 
 /**
  * class for undefined variable object
- * This class defines an object for undefined variable handling.
+ * This class defines an object for undefined variable handling
+ *
+ * @package    Smarty
+ * @subpackage Template
  */
 class Smarty_Undefined_Variable
 {
     /**
      * Returns FALSE for 'nocache' and NULL otherwise.
      *
-     * @param string $name
+     * @param  string $name
      *
      * @return bool
      */
@@ -18,7 +21,7 @@ class Smarty_Undefined_Variable
         if ($name == 'nocache') {
             return false;
         } else {
-            return;
+            return null;
         }
     }
 
@@ -29,6 +32,6 @@ class Smarty_Undefined_Variable
      */
     public function __toString()
     {
-        return '';
+        return "";
     }
 }

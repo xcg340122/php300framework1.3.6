@@ -1,41 +1,45 @@
 <?php
 /**
  * Smarty Internal Plugin Compile Assign
- * Compiles the {assign} tag.
+ * Compiles the {assign} tag
  *
+ * @package    Smarty
+ * @subpackage Compiler
  * @author     Uwe Tews
  */
 
 /**
- * Smarty Internal Plugin Compile Assign Class.
+ * Smarty Internal Plugin Compile Assign Class
+ *
+ * @package    Smarty
+ * @subpackage Compiler
  */
 class Smarty_Internal_Compile_Assign extends Smarty_Internal_CompileBase
 {
     /**
-     * Valid scope names.
+     * Valid scope names
      *
      * @var array
      */
-    public $valid_scopes = ['local'       => true, 'parent' => true, 'root' => true, 'global' => true,
-                                 'smarty' => true, 'tpl_root' => true, ];
+    public $valid_scopes = array('local'  => true, 'parent' => true, 'root' => true, 'global' => true,
+                                 'smarty' => true, 'tpl_root' => true);
 
     /**
-     * Compiles code for the {assign} tag.
+     * Compiles code for the {assign} tag
      *
-     * @param array                                 $args      array with attributes from parser
+     * @param  array                                $args      array with attributes from parser
      * @param \Smarty_Internal_TemplateCompilerBase $compiler  compiler object
-     * @param array                                 $parameter array with compilation parameter
-     *
-     * @throws \SmartyCompilerException
+     * @param  array                                $parameter array with compilation parameter
      *
      * @return string compiled code
+     * @throws \SmartyCompilerException
      */
     public function compile($args, Smarty_Internal_TemplateCompilerBase $compiler, $parameter)
     {
         // the following must be assigned at runtime because it will be overwritten in Smarty_Internal_Compile_Append
-        $this->required_attributes = ['var', 'value'];
-        $this->shorttag_order = ['var', 'value'];
-        $this->optional_attributes = ['scope', 'bubble_up'];
+        $this->required_attributes = array('var', 'value');
+        $this->shorttag_order = array('var', 'value');
+        $this->optional_attributes = array('scope', 'bubble_up');
         $_nocache = 'null';
         // check and get attributes
         $_attr = $this->getAttributes($compiler, $args);

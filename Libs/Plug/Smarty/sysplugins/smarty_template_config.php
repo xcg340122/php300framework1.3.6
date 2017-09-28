@@ -1,41 +1,46 @@
 <?php
 /**
- * Smarty Config Source Plugin.
+ * Smarty Config Source Plugin
  *
+ * @package    Smarty
+ * @subpackage TemplateResources
  * @author     Uwe Tews
  */
 
 /**
  * Smarty Connfig Resource Data Object
- * Meta Data Container for Template Files.
+ * Meta Data Container for Template Files
  *
+ * @package    Smarty
+ * @subpackage TemplateResources
  * @author     Uwe Tews
+ *
  */
 class Smarty_Template_Config extends Smarty_Template_Source
 {
     /**
-     * array of section names, single section or null.
+     * array of section names, single section or null
      *
      * @var null|string|array
      */
     public $config_sections = null;
 
     /**
-     * scope into which the config variables shall be loaded.
+     * scope into which the config variables shall be loaded
      *
      * @var string
      */
     public $scope = 'local';
 
     /**
-     * Flag that source is a config file.
+     * Flag that source is a config file
      *
      * @var bool
      */
     public $isConfig = true;
 
     /**
-     * create Source Object container.
+     * create Source Object container
      *
      * @param Smarty_Resource $handler  Resource Handler this source object communicates with
      * @param Smarty          $smarty   Smarty instance this source object belongs to
@@ -58,19 +63,18 @@ class Smarty_Template_Config extends Smarty_Template_Source
 
     /**
      * initialize Source Object for given resource
-     * Either [$_template] or [$smarty, $template_resource] must be specified.
+     * Either [$_template] or [$smarty, $template_resource] must be specified
      *
-     * @param Smarty_Internal_Template $_template         template object
-     * @param Smarty                   $smarty            smarty object
-     * @param string                   $template_resource resource identifier
-     *
-     * @throws SmartyException
+     * @param  Smarty_Internal_Template $_template         template object
+     * @param  Smarty                   $smarty            smarty object
+     * @param  string                   $template_resource resource identifier
      *
      * @return Smarty_Template_Config Source Object
+     * @throws SmartyException
      */
     public static function load(Smarty_Internal_Template $_template = null, Smarty $smarty = null, $template_resource = null)
     {
-        static $_incompatible_resources = ['extends' => true, 'php' => true];
+        static $_incompatible_resources = array('extends' => true, 'php' => true);
         $template_resource = $_template->template_resource;
         if (empty($template_resource)) {
             throw new SmartyException('Missing config name');
@@ -79,16 +83,15 @@ class Smarty_Template_Config extends Smarty_Template_Source
         list($name, $type) = Smarty_Resource::parseResourceName($template_resource, $_template->smarty->default_config_type);
         // make sure configs are not loaded via anything smarty can't handle
         if (isset($_incompatible_resources[$type])) {
-            throw new SmartyException("Unable to use resource '{$type}' for config");
+            throw new SmartyException ("Unable to use resource '{$type}' for config");
         }
         $resource = Smarty_Resource::load($_template->smarty, $type);
-        $source = new self($resource, $_template->smarty, $template_resource, $type, $name);
+        $source = new Smarty_Template_Config($resource, $_template->smarty, $template_resource, $type, $name);
         $resource->populate($source, $_template);
         if (!$source->exists && isset($_template->smarty->default_config_handler_func)) {
             Smarty_Internal_Method_RegisterDefaultTemplateHandler::_getDefaultTemplate($source);
         }
         $source->unique_resource = $resource->buildUniqueResourceName($_template->smarty, $name, true);
-
         return $source;
     }
 }
