@@ -576,4 +576,4 @@ class Php300
 /**
  * 实例化驱动对象
  */
-$Php300 = new Php300Deal(); Glovar('Runcount', '0', 'OS');
+$Php300 = new Php300(); Glovar('Runcount', '0', 'OS');
