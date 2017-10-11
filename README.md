@@ -1,7 +1,7 @@
 PHP300Framework1.3.6
 ====
 [![](https://img.shields.io/badge/download%20-417k-brightgreen.svg)](https://framework.php300.cn/)
-![](https://img.shields.io/badge/version-1.3.6-blue.svg)
+[![](https://img.shields.io/badge/version-1.3.6-blue.svg)](http://api.php300.cn/313845)
 [![](https://img.shields.io/badge/group-480-brightgreen.svg)](https://jq.qq.com/?_wv=1027&k=5exsSYT)
 [![](https://img.shields.io/badge/document-online-brightgreen.svg)](http://api.php300.cn/)
 ### 介绍
