@@ -1,10 +1,7 @@
-# php300framework
-在线手册：http://api.php300.cn
+# php300framework1.3.6
 
-官方网站：http://framework.php300.cn
+###介绍<br/>
+  为了更好更快的开发WEB程序,PHP300FrameWork基于PHP300云类库的功能上进行开发,遵守开源免费的原则让开发者更好的扩展或使用本程序,随着PHP框架的日益增多,我们也融入了当前主流框架的一些性质并且优化的更简单更方便,框架代码简介,让您更容易了解本框架的原理用于自身学习.
+1.3.6版本支持中文编码，如果需要更高的性能条件请移步[PHP300Framework2.0](https://github.com/xcg340122/PHP300Framework2.0)  
+###环境支持
 
-在线云类库函数调用：http://yun.php300.cn
-
-在线Javascript即时推送：http://push.php300.cn
-
-QQ交流群：231201376
