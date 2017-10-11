@@ -1,10 +1,9 @@
-PHP300Framework1.3.6<br />
+PHP300Framework1.3.6
+====
 [![](https://img.shields.io/badge/download%20-417k-brightgreen.svg)](https://framework.php300.cn/)
 ![](https://img.shields.io/badge/version-1.3.6-blue.svg)
 [![](https://img.shields.io/badge/group-480-brightgreen.svg)](https://jq.qq.com/?_wv=1027&k=5exsSYT)
 [![](https://img.shields.io/badge/document-online-brightgreen.svg)](http://api.php300.cn/)
-
-====
 ### 介绍
 &emsp;&emsp;为了更好更快的开发WEB程序,PHP300FrameWork基于PHP300云类库的功能上进行开发,遵守开源免费的原则让开发者更好的扩展或使用本程序,随着PHP框架的日益增多,我们也融入了当前主流框架的一些性质并且优化的更简单更方便,框架代码简介,让您更容易了解本框架的原理用于自身学习.
 1.3.6版本支持中文编码，如果需要更高的性能条件请移步[PHP300Framework2.0](https://github.com/xcg340122/PHP300Framework2.0)<br />
