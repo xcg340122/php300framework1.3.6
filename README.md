@@ -1,4 +1,4 @@
-PHP300Framework1.3.6(此版本已停用,请移步至[PHP300Framework2.0](https://github.com/xcg340122/PHP300Framework2.0))
+此版本已停用,请移步至[PHP300Framework2.0](https://github.com/xcg340122/PHP300Framework2.0)
 ====
 [![](https://img.shields.io/badge/download%20-417k-brightgreen.svg)](https://framework.php300.cn/)
 [![](https://img.shields.io/badge/version-1.3.6-blue.svg)](http://api.php300.cn/313845)
